@@ -34,7 +34,7 @@ public interface MovimientoDao {
     List<Movimiento> obtenerPorTipo(String tipo);
 
     // OBTENER la suma total de ingresos o gastos
-    @Query("SELECT SUM(cantidad) FROM movimientos WHERE tipo = :tipo")
+    @Query("SELECT IFNULL(SUM(cantidad), 0) FROM movimientos WHERE tipo = :tipo")
     double obtenerSumaPorTipo(String tipo);
 }
 

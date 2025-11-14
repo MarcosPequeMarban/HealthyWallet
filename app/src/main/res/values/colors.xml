@@ -1,10 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="purple_200">#FFBB86FC</color>
-    <color name="purple_500">#FF6200EE</color>
-    <color name="purple_700">#FF3700B3</color>
-    <color name="teal_200">#FF03DAC5</color>
-    <color name="teal_700">#FF018786</color>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+
+    <!-- 🎨 Colores principales -->
+    <color name="colorVerde">#2ECC71</color>          <!-- Verde principal -->
+    <color name="colorVerdeOscuro">#27AE60</color>    <!-- Verde oscuro -->
+    <color name="colorVerdeSuave">#DFF6E7</color>     <!-- Verde muy claro -->
+
+    <!--  Blanco -->
+    <color name="colorBlanco">#FFFFFFFF</color>
+
+    <!--  Negro / Texto -->
+    <color name="colorNegro">#FF000000</color>
+    <color name="colorTextoGris">#FF6E6E6E</color>     <!-- Gris texto -->
+    <color name="colorGrisClaro">#FFEFEFEF</color>     <!-- Fondo suave -->
+
+    <!--  Azul / tono para enlaces o educación (opcional) -->
+    <color name="colorAzul">#3498DB</color>
+
+    <!--  Rojo de advertencia (para gastos altos, alertas) -->
+    <color name="colorRojo">#E74C3C</color>
+    <color name="colorTextoNegro">#FF000000</color>        <!-- Negro estándar -->
+    <color name="colorNavFondo">#FFFFFFFF</color>         <!-- Blanco para la barra de navegación -->
+
 </resources>
