@@ -1,7 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:padding="16dp">
 
-</LinearLayout>
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <!-- Saldo total -->
+        <TextView
+            android:id="@+id/txtSaldoTotal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Saldo total: 0€"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:padding="12dp" />
+
+        <!-- Gasto del mes -->
+        <TextView
+            android:id="@+id/txtGastoMes"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Gasto del mes: 0€"
+            android:textSize="18sp"
+            android:padding="12dp" />
+
+        <!-- Presupuesto -->
+        <TextView
+            android:id="@+id/txtPresupuestoRestante"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Presupuesto restante: 0€"
+            android:textSize="18sp"
+            android:padding="12dp" />
+
+        <!-- Botón agregar movimiento -->
+        <Button
+            android:id="@+id/btnAgregarMovimiento"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Agregar movimiento"
+            android:padding="16dp"
+            android:layout_marginTop="20dp"/>
+
+    </LinearLayout>
+</ScrollView>

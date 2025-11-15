@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/fragmentoInicio">
+
+    <fragment
+        android:id="@+id/fragmentoInicio"
+        android:name="com.example.healthywallet.ui.inicio.PantallaInicio"
+        android:label="Inicio" />
+
+    <fragment
+        android:id="@+id/fragmentoMovimientos"
+        android:name="com.example.healthywallet.ui.movimientos.PantallaMovimientos"
+        android:label="Movimientos" />
+
+    <fragment
+        android:id="@+id/fragmentoPresupuestos"
+        android:name="com.example.healthywallet.ui.presupuestos.PantallaPresupuestos"
+        android:label="Presupuestos" />
+
+    <fragment
+        android:id="@+id/fragmentoMetas"
+        android:name="com.example.healthywallet.ui.metas.PantallaMetas"
+        android:label="Metas" />
+
+    <fragment
+        android:id="@+id/fragmentoEducacion"
+        android:name="com.example.healthywallet.ui.educacion.PantallaEducacion"
+        android:label="Educación" />
+
+    <fragment
+        android:id="@+id/fragmentoAjustes"
+        android:name="com.example.healthywallet.ui.ajustes.PantallaAjustes"
+        android:label="Ajustes" />
+
+    <fragment
+        android:id="@+id/fragmentoAgregarMovimiento"
+        android:name="com.example.healthywallet.ui.movimientos.PantallaAgregarMovimiento"
+        android:label="Agregar movimiento" />
+
+
+</navigation>
