@@ -1,18 +1,28 @@
 package com.example.healthywallet.database.entities;
 
+import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
 @Entity(tableName = "formacion")
 public class Formacion {
+
     @PrimaryKey(autoGenerate = true)
     private int id;
-    private String titulo;
-    private String contenido;
 
-    public Formacion(String titulo, String contenido) {
+    @ColumnInfo(name = "titulo")
+    private String titulo;
+
+    @ColumnInfo(name = "descripcion")
+    private String descripcion;
+
+    @ColumnInfo(name = "nivel")
+    private String nivel;
+
+    public Formacion(String titulo, String descripcion, String nivel) {
         this.titulo = titulo;
-        this.contenido = contenido;
+        this.descripcion = descripcion;
+        this.nivel = nivel;
     }
 
     public int getId() { return id; }
@@ -21,6 +31,9 @@ public class Formacion {
     public String getTitulo() { return titulo; }
     public void setTitulo(String titulo) { this.titulo = titulo; }
 
-    public String getContenido() { return contenido; }
-    public void setContenido(String contenido) { this.contenido = contenido; }
+    public String getDescripcion() { return descripcion; }
+    public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
+
+    public String getNivel() { return nivel; }
+    public void setNivel(String nivel) { this.nivel = nivel; }
 }

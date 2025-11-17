@@ -1,50 +1,224 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp">
+    android:background="#F3F3F3">
 
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:padding="20dp">
 
-        <!-- Saldo total -->
-        <TextView
-            android:id="@+id/txtSaldoTotal"
+        <!-- HEADER -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Saldo total: 0€"
-            android:textSize="22sp"
-            android:textStyle="bold"
-            android:padding="12dp" />
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
-        <!-- Gasto del mes -->
-        <TextView
-            android:id="@+id/txtGastoMes"
+            <ImageView
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:src="@drawable/ic_home"
+                app:tint="#4CAF50"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Inicio"
+                android:textSize="26sp"
+                android:textColor="#333333"
+                android:textStyle="bold"
+                android:layout_marginStart="12dp"/>
+        </LinearLayout>
+
+
+        <!-- TARJETA BALANCE GENERAL -->
+        <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Gasto del mes: 0€"
-            android:textSize="18sp"
-            android:padding="12dp" />
+            android:layout_marginTop="18dp"
+            android:foreground="?attr/selectableItemBackground"
+            app:cardElevation="4dp"
+            app:cardCornerRadius="14dp"
+            android:backgroundTint="#FFFFFF">
 
-        <!-- Presupuesto -->
-        <TextView
-            android:id="@+id/txtPresupuestoRestante"
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="18dp">
+
+                <TextView
+                    android:id="@+id/txtBalanceTituloInicio"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Balance total"
+                    android:textColor="#888888"
+                    android:textSize="16sp"/>
+
+                <TextView
+                    android:id="@+id/txtBalanceCantidadInicio"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0,00 €"
+                    android:textColor="#4CAF50"
+                    android:textSize="24sp"
+                    android:textStyle="bold"
+                    android:layout_marginTop="6dp"/>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+
+
+        <!-- TARJETA: PRESUPUESTOS -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardPresupuestos"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Presupuesto restante: 0€"
-            android:textSize="18sp"
-            android:padding="12dp" />
+            android:layout_marginTop="20dp"
+            android:foreground="?attr/selectableItemBackground"
+            app:cardCornerRadius="14dp"
+            app:cardElevation="3dp"
+            android:backgroundTint="#FFFFFF">
 
-        <!-- Botón agregar movimiento -->
-        <Button
-            android:id="@+id/btnAgregarMovimiento"
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Presupuestos"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="#333333"/>
+
+                <TextView
+                    android:id="@+id/txtResumenPresupuestosInicio"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0 € gastados / 0 €"
+                    android:textColor="#777777"
+                    android:layout_marginTop="6dp"/>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+
+
+        <!-- TARJETA: MOVIMIENTOS -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardMovimientos"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Agregar movimiento"
-            android:padding="16dp"
-            android:layout_marginTop="20dp"/>
+            android:layout_marginTop="20dp"
+            android:foreground="?attr/selectableItemBackground"
+            app:cardCornerRadius="14dp"
+            app:cardElevation="3dp"
+            android:backgroundTint="#FFFFFF">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Movimientos"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="#333333"/>
+
+                <TextView
+                    android:id="@+id/txtResumenMovimientosInicio"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="+0 ingresos | -0 gastos"
+                    android:textColor="#777777"
+                    android:layout_marginTop="6dp"/>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+
+
+        <!-- TARJETA: METAS -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardMetas"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:foreground="?attr/selectableItemBackground"
+            app:cardCornerRadius="14dp"
+            app:cardElevation="3dp"
+            android:backgroundTint="#FFFFFF">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Metas"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="#333333"/>
+
+                <TextView
+                    android:id="@+id/txtResumenMetasInicio"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0 activas | 0 completadas"
+                    android:textColor="#777777"
+                    android:layout_marginTop="6dp"/>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+
+
+        <!-- TARJETA: EDUCACIÓN FINANCIERA -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardEducacion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:foreground="?attr/selectableItemBackground"
+            app:cardCornerRadius="14dp"
+            app:cardElevation="3dp"
+            android:backgroundTint="#FFFFFF">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Educación financiera"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="#333333"/>
+
+                <TextView
+                    android:id="@+id/txtResumenEducacionInicio"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0 módulos completados"
+                    android:textColor="#777777"
+                    android:layout_marginTop="6dp"/>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
 
     </LinearLayout>
 </ScrollView>

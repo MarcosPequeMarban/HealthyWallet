@@ -1,25 +1,34 @@
 package com.example.healthywallet.ui.metas;
 
 import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.healthywallet.R;
+import com.example.healthywallet.adapters.AdaptadorMetas;
+import com.example.healthywallet.controller.MetaControlador;
+import com.example.healthywallet.database.entities.Meta;
 
-public class PantallaMetas extends Fragment {
+import java.util.List;
 
-    public PantallaMetas() { }
+public class PantallaMetas extends AppCompatActivity {
 
-    @Nullable
+    private RecyclerView recyclerView;
+    private AdaptadorMetas adaptador;
+    private MetaControlador controlador;
+
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.pantalla_metas, container, false);
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.pantalla_metas);
+
+        controlador = new MetaControlador(this);
+
+        recyclerView = findViewById(R.id.recyclerMetas);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
     }
+
+
 }

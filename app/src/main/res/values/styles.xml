@@ -1,2 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<resources>
+    <style name="PresupuestoProgressBar" parent="Widget.AppCompat.ProgressBar.Horizontal">
+        <item name="android:progressDrawable">@drawable/barra_presupuesto</item>
+        <item name="android:maxHeight">12dp</item>
+        <item name="android:minHeight">12dp</item>
+    </style>
+
+</resources>

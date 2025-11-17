@@ -1,13 +1,19 @@
 package com.example.healthywallet.database.entities;
 
+import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
 @Entity(tableName = "categorias")
 public class Categoria {
+
     @PrimaryKey(autoGenerate = true)
     private int id;
+
+    @ColumnInfo(name = "nombre")
     private String nombre;
+
+    @ColumnInfo(name = "descripcion")
     private String descripcion;
 
     public Categoria(String nombre, String descripcion) {

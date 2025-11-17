@@ -1,5 +1,6 @@
 package com.example.healthywallet.database.entities;
 
+import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
@@ -9,37 +10,44 @@ public class Movimiento {
     @PrimaryKey(autoGenerate = true)
     private int id;
 
-    private String descripcion;
-    private double cantidad;
-    private String tipo; // "INGRESO" o "GASTO"
-    private String fecha;
+    @ColumnInfo(name = "tipo")
+    private String tipo;
+
+    @ColumnInfo(name = "categoria")
     private String categoria;
 
-    // Constructor
-    public Movimiento(String descripcion, double cantidad, String tipo, String fecha, String categoria) {
-        this.descripcion = descripcion;
-        this.cantidad = cantidad;
+    @ColumnInfo(name = "cantidad")
+    private double cantidad;
+
+    @ColumnInfo(name = "fecha")
+    private String fecha;
+
+    @ColumnInfo(name = "descripcion")
+    private String descripcion;
+
+    public Movimiento(String tipo, String categoria, double cantidad, String fecha, String descripcion) {
         this.tipo = tipo;
-        this.fecha = fecha;
         this.categoria = categoria;
+        this.cantidad = cantidad;
+        this.fecha = fecha;
+        this.descripcion = descripcion;
     }
 
-    // Getters y Setters
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
-
-    public String getDescripcion() { return descripcion; }
-    public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
-
-    public double getCantidad() { return cantidad; }
-    public void setCantidad(double cantidad) { this.cantidad = cantidad; }
 
     public String getTipo() { return tipo; }
     public void setTipo(String tipo) { this.tipo = tipo; }
 
+    public String getCategoria() { return categoria; }
+    public void setCategoria(String categoria) { this.categoria = categoria; }
+
+    public double getCantidad() { return cantidad; }
+    public void setCantidad(double cantidad) { this.cantidad = cantidad; }
+
     public String getFecha() { return fecha; }
     public void setFecha(String fecha) { this.fecha = fecha; }
 
-    public String getCategoria() { return categoria; }
-    public void setCategoria(String categoria) { this.categoria = categoria; }
+    public String getDescripcion() { return descripcion; }
+    public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
 }
