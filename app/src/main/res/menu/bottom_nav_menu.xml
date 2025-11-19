@@ -1,4 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <item
+        android:id="@+id/nav_inicio"
+        android:icon="@drawable/ic_home"
+        android:title="Inicio" />
+
+    <item
+        android:id="@+id/nav_movimientos"
+        android:icon="@drawable/ic_movimientos"
+        android:title="Movimientos" />
+
+    <item
+        android:id="@+id/nav_presupuestos"
+        android:icon="@drawable/ic_presupuesto"
+        android:title="Presupuestos" />
+
+    <item
+        android:id="@+id/nav_metas"
+        android:icon="@drawable/ic_metas"
+        android:title="Metas" />
+
+    <item
+        android:id="@+id/nav_educacion"
+        android:icon="@drawable/ic_educacion"
+        android:title="Educación" />
+
 </menu>

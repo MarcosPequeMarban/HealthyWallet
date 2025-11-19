@@ -1,43 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/nav_graph"
-    app:startDestination="@id/fragmentoInicio">
+    xmlns:tools="http://schemas.android.com/tools"
+    app:startDestination="@id/nav_inicio">
 
     <fragment
-        android:id="@+id/fragmentoInicio"
+        android:id="@+id/nav_inicio"
         android:name="com.example.healthywallet.ui.inicio.PantallaInicio"
-        android:label="Inicio" />
+        android:label="Inicio"
+        tools:layout="@layout/pantalla_inicio" />
 
     <fragment
-        android:id="@+id/fragmentoMovimientos"
+        android:id="@+id/nav_movimientos"
         android:name="com.example.healthywallet.ui.movimientos.PantallaMovimientos"
-        android:label="Movimientos" />
+        android:label="Movimientos"
+        tools:layout="@layout/pantalla_movimientos" />
 
     <fragment
-        android:id="@+id/fragmentoPresupuestos"
+        android:id="@+id/nav_presupuestos"
         android:name="com.example.healthywallet.ui.presupuestos.PantallaPresupuestos"
-        android:label="Presupuestos" />
+        android:label="Presupuestos"
+        tools:layout="@layout/pantalla_presupuestos" />
 
     <fragment
-        android:id="@+id/fragmentoMetas"
+        android:id="@+id/nav_metas"
         android:name="com.example.healthywallet.ui.metas.PantallaMetas"
-        android:label="Metas" />
+        android:label="Metas"
+        tools:layout="@layout/pantalla_metas" />
 
     <fragment
-        android:id="@+id/fragmentoEducacion"
+        android:id="@+id/nav_educacion"
         android:name="com.example.healthywallet.ui.educacion.PantallaEducacion"
-        android:label="Educación" />
-
-    <fragment
-        android:id="@+id/fragmentoAjustes"
-        android:name="com.example.healthywallet.ui.ajustes.PantallaAjustes"
-        android:label="Ajustes" />
+        android:label="Educación"
+        tools:layout="@layout/pantalla_educacion" />
 
     <fragment
         android:id="@+id/fragmentoAgregarMovimiento"
         android:name="com.example.healthywallet.ui.movimientos.PantallaAgregarMovimiento"
-        android:label="Agregar movimiento" />
-
+        android:label="Agregar movimiento"
+        tools:layout="@layout/pantalla_agregar_movimiento" />
 
 </navigation>
