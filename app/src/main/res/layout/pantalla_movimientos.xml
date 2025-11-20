@@ -13,7 +13,7 @@
         android:layout_height="match_parent"
         android:padding="20dp">
 
-        <!-- HEADER estilo Revolut -->
+        <!-- HEADER -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -25,7 +25,6 @@
                 android:layout_height="35dp"
                 android:src="@drawable/ic_movimientos"
                 app:tint="#4CAF50" />
-
 
             <TextView
                 android:id="@+id/tituloMovimientos"
@@ -70,7 +69,6 @@
                     android:textStyle="bold"
                     android:textSize="24sp"
                     android:layout_marginTop="6dp"/>
-
             </LinearLayout>
 
         </androidx.cardview.widget.CardView>
@@ -80,21 +78,22 @@
             android:id="@+id/recyclerMovimientos"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_marginTop="20dp"
-            android:layout_weight="1"/>
-
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fabAgregarMovimiento"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="20dp"
-            android:src="@drawable/ic_add"
-            app:backgroundTint="#4CAF50"
-            app:elevation="6dp"
-            app:tint="#FFFFFF" />
+            android:layout_weight="1"
+            android:layout_marginTop="20dp"/>
 
     </LinearLayout>
 
-    <!-- FAB para añadir movimiento -->
+    <!-- FAB flotante -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabAgregarMovimiento"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        android:contentDescription="Agregar movimiento"
+        android:src="@drawable/ic_add"
+        app:tint="#FFFFFF"
+        android:backgroundTint="#4CAF50"
+        app:layout_anchorGravity="bottom|end"
+        android:layout_gravity="bottom|end"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

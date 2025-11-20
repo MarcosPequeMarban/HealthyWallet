@@ -14,20 +14,20 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.healthywallet.R;
 import com.example.healthywallet.adapters.AdaptadorMovimientos;
-import com.example.healthywallet.database.GestorBaseDatos;
 import com.example.healthywallet.controller.MovimientosControlador;
 import com.example.healthywallet.database.entities.Movimiento;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.util.Collections;
 import java.util.List;
 
 public class PantallaMovimientos extends Fragment {
 
-    private RecyclerView recycler;
-    private FloatingActionButton fabAgregar;
-    private MovimientosControlador controlador;
+    private RecyclerView recyclerView;
+    private FloatingActionButton fabAgregarMovimiento;
 
-    public PantallaMovimientos() { }
+    private MovimientosControlador movimientosControlador;
+    private AdaptadorMovimientos adaptador;
 
     @Nullable
     @Override
@@ -37,42 +37,33 @@ public class PantallaMovimientos extends Fragment {
 
         View vista = inflater.inflate(R.layout.pantalla_movimientos, container, false);
 
-        controlador = new MovimientosControlador(requireContext());
+        movimientosControlador = new MovimientosControlador(requireContext());
 
-        recycler = vista.findViewById(R.id.recyclerMovimientos);
-        recycler.setLayoutManager(new LinearLayoutManager(requireContext()));
+        recyclerView = vista.findViewById(R.id.recyclerMovimientos);
+        fabAgregarMovimiento = vista.findViewById(R.id.fabAgregarMovimiento);
 
-        fabAgregar = vista.findViewById(R.id.fabAgregarMovimiento);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        fabAgregar.setOnClickListener(view ->
-                Navigation.findNavController(view)
-                        .navigate(R.id.fragmentoAgregarMovimiento)
+        fabAgregarMovimiento.setOnClickListener(v ->
+                Navigation.findNavController(v).navigate(R.id.fragmentoAgregarMovimiento)
         );
 
-        cargarMovimientos();
+        cargarLista();
 
         return vista;
     }
 
-    private void cargarMovimientos() {
-        if (!isAdded()) {
-            return;
-        }
+    private void cargarLista() {
 
-        GestorBaseDatos.getExecutor().execute(() -> {
-            List<Movimiento> lista = controlador.obtenerTodos();
-
-            if (!isAdded()) {
-                return;
-            }
+        movimientosControlador.obtenerTodos(movimientos -> {
 
             requireActivity().runOnUiThread(() -> {
-                if (!isAdded()) {
-                    return;
-                }
 
-                AdaptadorMovimientos adaptador = new AdaptadorMovimientos(requireContext(), lista);
-                recycler.setAdapter(adaptador);
+                List<Movimiento> listaSegura =
+                        (movimientos != null) ? movimientos : Collections.emptyList();
+
+                adaptador = new AdaptadorMovimientos(requireContext(), listaSegura);
+                recyclerView.setAdapter(adaptador);
             });
         });
     }

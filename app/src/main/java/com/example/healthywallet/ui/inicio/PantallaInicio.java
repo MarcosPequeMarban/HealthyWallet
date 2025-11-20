@@ -17,15 +17,16 @@ import com.example.healthywallet.controller.FormacionControlador;
 import com.example.healthywallet.controller.MetaControlador;
 import com.example.healthywallet.controller.MovimientosControlador;
 import com.example.healthywallet.controller.PresupuestoControlador;
-import com.example.healthywallet.database.GestorBaseDatos;
 import com.example.healthywallet.database.entities.Formacion;
 import com.example.healthywallet.database.entities.Meta;
+import com.example.healthywallet.database.entities.Movimiento;
 import com.example.healthywallet.database.entities.Presupuesto;
 
 import java.util.List;
 
 public class PantallaInicio extends Fragment {
 
+    // UI
     private TextView txtBalanceCantidadInicio;
     private TextView txtResumenMovimientosInicio;
     private TextView txtResumenPresupuestosInicio;
@@ -33,6 +34,12 @@ public class PantallaInicio extends Fragment {
     private TextView txtResumenEducacionInicio;
 
     private CardView cardMovimientos, cardPresupuestos, cardMetas, cardEducacion;
+
+    // Controllers
+    private MovimientosControlador movimientosControlador;
+    private PresupuestoControlador presupuestoControlador;
+    private MetaControlador metaControlador;
+    private FormacionControlador formacionControlador;
 
     @Nullable
     @Override
@@ -42,7 +49,13 @@ public class PantallaInicio extends Fragment {
 
         View vista = inflater.inflate(R.layout.pantalla_inicio, container, false);
 
-        // IDs reales
+        // Controladores
+        movimientosControlador = new MovimientosControlador(getContext());
+        presupuestoControlador = new PresupuestoControlador(getContext());
+        metaControlador = new MetaControlador(getContext());
+        formacionControlador = new FormacionControlador(getContext());
+
+        // UI
         txtBalanceCantidadInicio = vista.findViewById(R.id.txtBalanceCantidadInicio);
         txtResumenMovimientosInicio = vista.findViewById(R.id.txtResumenMovimientosInicio);
         txtResumenPresupuestosInicio = vista.findViewById(R.id.txtResumenPresupuestosInicio);
@@ -54,97 +67,96 @@ public class PantallaInicio extends Fragment {
         cardMetas = vista.findViewById(R.id.cardMetas);
         cardEducacion = vista.findViewById(R.id.cardEducacion);
 
-        // Navegación real
-        cardMovimientos.setOnClickListener(v -> Navigation.findNavController(v).navigate(R.id.nav_movimientos));
-        cardPresupuestos.setOnClickListener(v -> Navigation.findNavController(v).navigate(R.id.nav_presupuestos));
-        cardMetas.setOnClickListener(v -> Navigation.findNavController(v).navigate(R.id.nav_metas));
-        cardEducacion.setOnClickListener(v -> Navigation.findNavController(v).navigate(R.id.nav_educacion));
+        // Navegación
+        cardMovimientos.setOnClickListener(v ->
+                Navigation.findNavController(v).navigate(R.id.nav_movimientos));
 
+        cardPresupuestos.setOnClickListener(v ->
+                Navigation.findNavController(v).navigate(R.id.nav_presupuestos));
+
+        cardMetas.setOnClickListener(v ->
+                Navigation.findNavController(v).navigate(R.id.nav_metas));
+
+        cardEducacion.setOnClickListener(v ->
+                Navigation.findNavController(v).navigate(R.id.nav_educacion));
+
+        // Cargar datos
         cargarDatos();
 
         return vista;
     }
 
+
     private void cargarDatos() {
-        if (!isAdded()) {
-            return;
-        }
 
-        GestorBaseDatos.getExecutor().execute(() -> {
-            if (!isAdded()) {
-                return;
-            }
+        // ------ MOVIMIENTOS ------
+        movimientosControlador.obtenerSumaPorTipo("Ingreso", ingresos ->
+                movimientosControlador.obtenerSumaPorTipo("Gasto", gastos -> {
 
-            MovimientosControlador movimientosControlador = new MovimientosControlador(requireContext());
-            PresupuestoControlador presupuestoControlador = new PresupuestoControlador(requireContext());
-            MetaControlador metaControlador = new MetaControlador(requireContext());
-            FormacionControlador formacionControlador = new FormacionControlador(requireContext());
+                    double balance = ingresos - gastos;
 
-            double ingresos = movimientosControlador.obtenerSumaPorTipo("Ingreso");
-            double gastos = movimientosControlador.obtenerSumaPorTipo("Gasto");
-            double balance = ingresos - gastos;
+                    requireActivity().runOnUiThread(() -> {
+                        txtBalanceCantidadInicio.setText(String.format("%.2f €", balance));
+                        txtResumenMovimientosInicio.setText(
+                                String.format("+%.2f ingresos | -%.2f gastos", ingresos, gastos)
+                        );
+                    });
+                })
+        );
 
-            List<Presupuesto> presupuestos = presupuestoControlador.obtenerTodos();
-            double totalGasto = 0;
-            double totalLimite = 0;
+        // ------ PRESUPUESTOS ------
+        presupuestoControlador.obtenerTodos(presupuestos -> {
+
+            double totalLimite = 0, totalGasto = 0;
 
             if (presupuestos != null) {
                 for (Presupuesto p : presupuestos) {
-                    totalGasto += p.getGastoActual();
                     totalLimite += p.getLimite();
+                    totalGasto += p.getGastoActual();
                 }
             }
 
-            List<Meta> metas = metaControlador.obtenerTodas();
+            double finalTotalLimite = totalLimite;
+            double finalTotalGasto = totalGasto;
+
+            requireActivity().runOnUiThread(() ->
+                    txtResumenPresupuestosInicio.setText(
+                            String.format("%.2f € gastados / %.2f €", finalTotalGasto, finalTotalLimite)
+                    ));
+        });
+
+        // ------ METAS ------
+        metaControlador.obtenerTodas(metas -> {
+
             int activas = 0;
             int completadas = 0;
 
             if (metas != null) {
                 for (Meta m : metas) {
-                    if (m.getCantidadActual() >= m.getCantidadObjetivo()) {
+                    if (m.getCantidadActual() >= m.getCantidadObjetivo())
                         completadas++;
-                    } else {
+                    else
                         activas++;
-                    }
                 }
             }
 
-            List<Formacion> modulos = formacionControlador.obtenerTodas();
-            int completados = 0;
+            int finalActivas = activas;
+            int finalCompletadas = completadas;
 
-            if (modulos != null) {
-                for (Formacion f : modulos) {
-                    if (f.getCompletado() == 1) completados++;
-                }
-            }
-
-            if (!isAdded()) {
-                return;
-            }
-
-            requireActivity().runOnUiThread(() -> {
-                if (!isAdded()) {
-                    return;
-                }
-
-                txtBalanceCantidadInicio.setText(String.format("%.2f €", balance));
-                txtResumenMovimientosInicio.setText(
-                        "+ " + String.format("%.2f", ingresos) + " €  |  - " + String.format("%.2f", gastos) + " €"
-                );
-
-                txtResumenPresupuestosInicio.setText(
-                        String.format("%.2f€ gastados / %.2f€", totalGasto, totalLimite)
-                );
-
-                txtResumenMetasInicio.setText(
-                        activas + " activas  |  " + completadas + " completadas"
-                );
-
-                txtResumenEducacionInicio.setText(
-                        completados + " módulos completados"
-                );
-            });
+            requireActivity().runOnUiThread(() ->
+                    txtResumenMetasInicio.setText(
+                            String.format("%d activas | %d completadas", finalActivas, finalCompletadas)
+                    ));
         });
 
+        // ------ EDUCACIÓN ------
+        formacionControlador.obtenerTodas(modulos -> {
+            int total = (modulos != null ? modulos.size() : 0);
+
+            requireActivity().runOnUiThread(() ->
+                    txtResumenEducacionInicio.setText(
+                            String.format("%d módulos registrados", total)
+                    ));
+        });
     }
 }

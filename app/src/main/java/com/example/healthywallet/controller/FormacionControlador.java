@@ -1,47 +1,42 @@
 package com.example.healthywallet.controller;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.example.healthywallet.database.GestorBaseDatos;
 import com.example.healthywallet.database.DAO.FormacionDao;
 import com.example.healthywallet.database.entities.Formacion;
 
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 
 public class FormacionControlador {
 
-    private final FormacionDao formacionDao;
+    public interface CallbackListaFormacion {
+        void onResult(List<Formacion> lista);
+    }
+
+    public interface CallbackInt {
+        void onResult(int valor);
+    }
+
+    private final FormacionDao dao;
+    private final ExecutorService executor;
 
     public FormacionControlador(Context context) {
         GestorBaseDatos db = GestorBaseDatos.obtenerInstancia(context);
-        this.formacionDao = db.formacionDao();
+        dao = db.formacionDao();
+        executor = GestorBaseDatos.databaseExecutor;
     }
 
-    public long insertarFormacion(Formacion formacion) {
-        try {
-            return formacionDao.insertar(formacion);
-        } catch (Exception e) {
-            Log.e("FormacionControlador", "Error insertando formación", e);
-            return -1;
-        }
+    public void insertar(Formacion formacion, CallbackInt callback) {
+        executor.execute(() -> callback.onResult((int) dao.insertar(formacion)));
     }
 
-    public List<Formacion> obtenerTodas() {
-        try {
-            return formacionDao.obtenerTodas();
-        } catch (Exception e) {
-            Log.e("FormacionControlador", "Error obteniendo formaciones", e);
-            return null;
-        }
+    public void obtenerTodas(CallbackListaFormacion callback) {
+        executor.execute(() -> callback.onResult(dao.obtenerTodas()));
     }
 
-    public int eliminarFormacion(int id) {
-        try {
-            return formacionDao.eliminarPorId(id);
-        } catch (Exception e) {
-            Log.e("FormacionControlador", "Error eliminando formación", e);
-            return 0;
-        }
+    public void eliminarPorId(int id, CallbackInt callback) {
+        executor.execute(() -> callback.onResult(dao.eliminarPorId(id)));
     }
 }

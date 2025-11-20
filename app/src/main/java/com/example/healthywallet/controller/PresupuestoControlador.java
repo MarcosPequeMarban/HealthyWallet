@@ -1,76 +1,62 @@
 package com.example.healthywallet.controller;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.example.healthywallet.database.GestorBaseDatos;
 import com.example.healthywallet.database.DAO.PresupuestoDao;
 import com.example.healthywallet.database.entities.Presupuesto;
 
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 
 public class PresupuestoControlador {
 
-    private final PresupuestoDao presupuestoDao;
+    public interface CallbackListaPresupuesto {
+        void onResult(List<Presupuesto> lista);
+    }
+
+    public interface CallbackPresupuesto {
+        void onResult(Presupuesto p);
+    }
+
+    public interface CallbackInt {
+        void onResult(int valor);
+    }
+
+    public interface CallbackLong {
+        void onResult(long valor);
+    }
+
+    private final PresupuestoDao dao;
+    private final ExecutorService executor;
 
     public PresupuestoControlador(Context context) {
         GestorBaseDatos db = GestorBaseDatos.obtenerInstancia(context);
-        this.presupuestoDao = db.presupuestoDao();
+        dao = db.presupuestoDao();
+        executor = GestorBaseDatos.databaseExecutor;
     }
 
-    public long insertarPresupuesto(Presupuesto presupuesto) {
-        try {
-            return presupuestoDao.insertar(presupuesto);
-        } catch (Exception e) {
-            Log.e("PresupuestoControlador", "Error insertando presupuesto", e);
-            return -1;
-        }
+    public void insertar(Presupuesto p, CallbackLong callback) {
+        executor.execute(() -> callback.onResult(dao.insertar(p)));
     }
 
-    public int actualizarPresupuesto(Presupuesto presupuesto) {
-        try {
-            return presupuestoDao.actualizar(presupuesto);
-        } catch (Exception e) {
-            Log.e("PresupuestoControlador", "Error actualizando presupuesto", e);
-            return 0;
-        }
+    public void actualizar(Presupuesto p, CallbackInt callback) {
+        executor.execute(() -> callback.onResult(dao.actualizar(p)));
     }
 
-    public Presupuesto obtenerPresupuesto(int id) {
-        try {
-            Presupuesto p = presupuestoDao.obtenerPorId(id);
-            if (p == null) Log.e("PresupuestoControlador", "Presupuesto no encontrado (id=" + id + ")");
-            return p;
-        } catch (Exception e) {
-            Log.e("PresupuestoControlador", "Error obteniendo presupuesto", e);
-            return null;
-        }
+    public void obtenerPorId(int id, CallbackPresupuesto callback) {
+        executor.execute(() -> callback.onResult(dao.obtenerPorId(id)));
     }
 
-    public List<Presupuesto> obtenerTodos() {
-        try {
-            return presupuestoDao.obtenerTodos();
-        } catch (Exception e) {
-            Log.e("PresupuestoControlador", "Error obteniendo presupuestos", e);
-            return null;
-        }
+    public void obtenerTodos(CallbackListaPresupuesto callback) {
+        executor.execute(() -> callback.onResult(dao.obtenerTodos()));
     }
 
-    public int actualizarGasto(int id, double nuevoGasto) {
-        try {
-            return presupuestoDao.actualizarGasto(id, nuevoGasto);
-        } catch (Exception e) {
-            Log.e("PresupuestoControlador", "Error actualizando gasto", e);
-            return 0;
-        }
+    public void actualizarGasto(int id, double gasto, CallbackInt callback) {
+        executor.execute(() -> callback.onResult(dao.actualizarGasto(id, gasto)));
     }
 
-    public int eliminarPresupuesto(Presupuesto presupuesto) {
-        try {
-            return presupuestoDao.eliminar(presupuesto);
-        } catch (Exception e) {
-            Log.e("PresupuestoControlador", "Error eliminando presupuesto", e);
-            return 0;
-        }
+    public void eliminar(Presupuesto p, CallbackInt callback) {
+        executor.execute(() -> callback.onResult(dao.eliminar(p)));
     }
 }

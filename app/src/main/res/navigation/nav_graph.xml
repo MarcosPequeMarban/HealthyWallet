@@ -40,4 +40,5 @@
         android:label="Agregar movimiento"
         tools:layout="@layout/pantalla_agregar_movimiento" />
 
+
 </navigation>

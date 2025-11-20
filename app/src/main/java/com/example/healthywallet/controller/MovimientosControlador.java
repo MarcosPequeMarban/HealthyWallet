@@ -8,79 +8,75 @@ import com.example.healthywallet.database.DAO.MovimientoDao;
 import com.example.healthywallet.database.entities.Movimiento;
 
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 
 public class MovimientosControlador {
 
-    private final MovimientoDao movimientoDao;
+    public interface CallbackMovimiento {
+        void onResult(Movimiento mov);
+    }
+
+    public interface CallbackListaMovimiento {
+        void onResult(List<Movimiento> lista);
+    }
+
+    public interface CallbackDouble {
+        void onResult(double valor);
+    }
+
+    public interface CallbackInt {
+        void onResult(int valor);
+    }
+
+    private final MovimientoDao dao;
+    private final ExecutorService executor;
 
     public MovimientosControlador(Context context) {
         GestorBaseDatos db = GestorBaseDatos.obtenerInstancia(context);
-        this.movimientoDao = db.movimientoDao();
+        dao = db.movimientoDao();
+        executor = GestorBaseDatos.databaseExecutor;
     }
 
-    public long insertarMovimiento(Movimiento mov) {
-        try {
-            return movimientoDao.insertar(mov);
-        } catch (Exception e) {
-            Log.e("MovimientosControlador", "Error insertando movimiento", e);
-            return -1;
-        }
+    // Insertar
+    public void insertar(Movimiento mov, CallbackInt callback) {
+        executor.execute(() -> {
+            int result = (int) dao.insertar(mov);
+            callback.onResult(result);
+        });
     }
 
-    public int actualizarMovimiento(Movimiento mov) {
-        try {
-            return movimientoDao.actualizar(mov);
-        } catch (Exception e) {
-            Log.e("MovimientosControlador", "Error actualizando movimiento", e);
-            return 0;
-        }
+    // Actualizar
+    public void actualizar(Movimiento mov, CallbackInt callback) {
+        executor.execute(() -> {
+            int result = dao.actualizar(mov);
+            callback.onResult(result);
+        });
     }
 
-    public Movimiento obtenerMovimiento(int id) {
-        try {
-            Movimiento mov = movimientoDao.obtenerPorId(id);
-            if (mov == null) Log.e("MovimientosControlador", "Movimiento no encontrado (id=" + id + ")");
-            return mov;
-        } catch (Exception e) {
-            Log.e("MovimientosControlador", "Error obteniendo movimiento", e);
-            return null;
-        }
+    // Obtener por ID
+    public void obtenerPorId(int id, CallbackMovimiento callback) {
+        executor.execute(() -> {
+            Movimiento mov = dao.obtenerPorId(id);
+            callback.onResult(mov);
+        });
     }
 
-    public List<Movimiento> obtenerTodos() {
-        try {
-            return movimientoDao.obtenerTodos();
-        } catch (Exception e) {
-            Log.e("MovimientosControlador", "Error obteniendo movimientos", e);
-            return null;
-        }
+    // Obtener todos
+    public void obtenerTodos(CallbackListaMovimiento callback) {
+        executor.execute(() -> callback.onResult(dao.obtenerTodos()));
     }
 
-    public List<Movimiento> obtenerPorTipo(String tipo) {
-        try {
-            return movimientoDao.obtenerPorTipo(tipo);
-        } catch (Exception e) {
-            Log.e("MovimientosControlador", "Error filtrando movimientos por tipo", e);
-            return null;
-        }
+    // Obtener por tipo
+    public void obtenerPorTipo(String tipo, CallbackListaMovimiento callback) {
+        executor.execute(() -> callback.onResult(dao.obtenerPorTipo(tipo)));
     }
 
-    public Double obtenerSumaPorTipo(String tipo) {
-        try {
-            Double suma = movimientoDao.obtenerSumaPorTipo(tipo);
-            return suma == null ? 0.0 : suma;
-        } catch (Exception e) {
-            Log.e("MovimientosControlador", "Error obteniendo suma", e);
-            return 0.0;
-        }
+    // Obtener suma por tipo
+    public void obtenerSumaPorTipo(String tipo, CallbackDouble callback) {
+        executor.execute(() -> {
+            Double valor = dao.obtenerSumaPorTipo(tipo);
+            callback.onResult(valor != null ? valor : 0.0);
+        });
     }
 
-    public int eliminarMovimiento(Movimiento mov) {
-        try {
-            return movimientoDao.eliminar(mov);
-        } catch (Exception e) {
-            Log.e("MovimientosControlador", "Error eliminando movimiento", e);
-            return 0;
-        }
-    }
 }

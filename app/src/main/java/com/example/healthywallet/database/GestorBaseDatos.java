@@ -2,12 +2,24 @@ package com.example.healthywallet.database;
 
 import android.content.Context;
 
+import androidx.annotation.NonNull;
 import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
+import androidx.room.migration.Migration;
+import androidx.sqlite.db.SupportSQLiteDatabase;
 
-import com.example.healthywallet.database.DAO.*;
-import com.example.healthywallet.database.entities.*;
+import com.example.healthywallet.database.DAO.CategoriaDao;
+import com.example.healthywallet.database.DAO.FormacionDao;
+import com.example.healthywallet.database.DAO.MetaDao;
+import com.example.healthywallet.database.DAO.MovimientoDao;
+import com.example.healthywallet.database.DAO.PresupuestoDao;
+
+import com.example.healthywallet.database.entities.Categoria;
+import com.example.healthywallet.database.entities.Formacion;
+import com.example.healthywallet.database.entities.Meta;
+import com.example.healthywallet.database.entities.Movimiento;
+import com.example.healthywallet.database.entities.Presupuesto;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -20,44 +32,57 @@ import java.util.concurrent.Executors;
                 Meta.class,
                 Formacion.class
         },
-        version = 1,
-        exportSchema = false
+        version = 2,
+        exportSchema = true
 )
 public abstract class GestorBaseDatos extends RoomDatabase {
 
-    // --- DAOs ---
+    // --- DAO ---
     public abstract MovimientoDao movimientoDao();
     public abstract CategoriaDao categoriaDao();
     public abstract PresupuestoDao presupuestoDao();
     public abstract MetaDao metaDao();
     public abstract FormacionDao formacionDao();
 
-    // --- Instancia Singleton ---
-    private static volatile GestorBaseDatos instancia;
+    // -------------------------------
+    //   SINGLETON + THREAD POOL
+    // -------------------------------
+    private static volatile GestorBaseDatos INSTANCIA;
 
-    // Executor para ejecutar consultas en segundo plano
-    private static final ExecutorService databaseExecutor =
-            Executors.newFixedThreadPool(4);
+    private static final int NUM_HILOS = 4;
+    public static final ExecutorService databaseExecutor =
+            Executors.newFixedThreadPool(NUM_HILOS);
 
-    public static ExecutorService getExecutor() {
-        return databaseExecutor;
-    }
 
-    // --- Obtener instancia ---
-    public static GestorBaseDatos obtenerInstancia(final Context context) {
-        if (instancia == null) {
+    // -------------------------------
+    //        MIGRACIONES
+    // -------------------------------
+    // ⭐ Migración vacía 1→2 (necesaria para evitar borrado de datos)
+    static final Migration MIGRACION_1_2 = new Migration(1, 2) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            // No hay cambios aún, pero es obligatorio definir la migración
+        }
+    };
+
+
+    // -------------------------------
+    //         OBTENER INSTANCIA
+    // -------------------------------
+    public static GestorBaseDatos obtenerInstancia(Context context) {
+        if (INSTANCIA == null) {
             synchronized (GestorBaseDatos.class) {
-                if (instancia == null) {
-                    instancia = Room.databaseBuilder(
+                if (INSTANCIA == null) {
+                    INSTANCIA = Room.databaseBuilder(
                                     context.getApplicationContext(),
                                     GestorBaseDatos.class,
-                                    "healthy_wallet_db"
+                                    "HealthyWalletDB"
                             )
-                            .fallbackToDestructiveMigration()
+                            .addMigrations(MIGRACION_1_2)
                             .build();
                 }
             }
         }
-        return instancia;
+        return INSTANCIA;
     }
 }
