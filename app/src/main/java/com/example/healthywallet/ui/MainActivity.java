@@ -22,6 +22,10 @@ public class MainActivity extends AppCompatActivity {
                 (NavHostFragment) getSupportFragmentManager()
                         .findFragmentById(R.id.contenedorFragments);
 
+        if (navHostFragment == null) {
+            throw new IllegalStateException("El contenedor de navegación no está disponible en el layout");
+        }
+
         NavController navController = navHostFragment.getNavController();
 
         // 2. Conecta el BottomNavigationView

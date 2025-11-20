@@ -17,6 +17,7 @@ import com.example.healthywallet.controller.FormacionControlador;
 import com.example.healthywallet.controller.MetaControlador;
 import com.example.healthywallet.controller.MovimientosControlador;
 import com.example.healthywallet.controller.PresupuestoControlador;
+import com.example.healthywallet.database.GestorBaseDatos;
 import com.example.healthywallet.database.entities.Formacion;
 import com.example.healthywallet.database.entities.Meta;
 import com.example.healthywallet.database.entities.Presupuesto;
@@ -65,82 +66,85 @@ public class PantallaInicio extends Fragment {
     }
 
     private void cargarDatos() {
-
-        // CONTROLADORES
-        MovimientosControlador movimientosControlador = new MovimientosControlador(getContext());
-        PresupuestoControlador presupuestoControlador = new PresupuestoControlador(getContext());
-        MetaControlador metaControlador = new MetaControlador(getContext());
-        FormacionControlador formacionControlador = new FormacionControlador(getContext());
-
-        // ======================
-        //       MOVIMIENTOS
-        // ======================
-        double ingresos = movimientosControlador.obtenerSumaPorTipo("Ingreso");
-        double gastos = movimientosControlador.obtenerSumaPorTipo("Gasto");
-        double balance = ingresos - gastos;
-
-        txtBalanceCantidadInicio.setText(String.format("%.2f €", balance));
-        txtResumenMovimientosInicio.setText(
-                "+ " + String.format("%.2f", ingresos) + " €  |  - " + String.format("%.2f", gastos) + " €"
-        );
-
-        // ======================
-        //      PRESUPUESTOS
-        // ======================
-        List<Presupuesto> presupuestos = presupuestoControlador.obtenerTodos();
-        double totalGasto = 0;
-        double totalLimite = 0;
-
-        if (presupuestos != null) {
-            for (Presupuesto p : presupuestos) {
-                totalGasto += p.getGastoActual();
-                totalLimite += p.getLimite();
-            }
+        if (!isAdded()) {
+            return;
         }
 
-        txtResumenPresupuestosInicio.setText(
-                String.format("%.2f€ gastados / %.2f€", totalGasto, totalLimite)
-        );
+        GestorBaseDatos.getExecutor().execute(() -> {
+            if (!isAdded()) {
+                return;
+            }
 
-        // ======================
-        //         METAS
-        // ======================
-// ======================
-//          METAS
-// ======================
-        List<Meta> metas = metaControlador.obtenerTodas();
-        int activas = 0;
-        int completadas = 0;
+            MovimientosControlador movimientosControlador = new MovimientosControlador(requireContext());
+            PresupuestoControlador presupuestoControlador = new PresupuestoControlador(requireContext());
+            MetaControlador metaControlador = new MetaControlador(requireContext());
+            FormacionControlador formacionControlador = new FormacionControlador(requireContext());
 
-        if (metas != null) {
-            for (Meta m : metas) {
-                if (m.getCantidadActual() >= m.getCantidadObjetivo()) {
-                    completadas++;
-                } else {
-                    activas++;
+            double ingresos = movimientosControlador.obtenerSumaPorTipo("Ingreso");
+            double gastos = movimientosControlador.obtenerSumaPorTipo("Gasto");
+            double balance = ingresos - gastos;
+
+            List<Presupuesto> presupuestos = presupuestoControlador.obtenerTodos();
+            double totalGasto = 0;
+            double totalLimite = 0;
+
+            if (presupuestos != null) {
+                for (Presupuesto p : presupuestos) {
+                    totalGasto += p.getGastoActual();
+                    totalLimite += p.getLimite();
                 }
             }
-        }
 
-        txtResumenMetasInicio.setText(
-                activas + " activas  |  " + completadas + " completadas"
-        );
+            List<Meta> metas = metaControlador.obtenerTodas();
+            int activas = 0;
+            int completadas = 0;
 
-
-        // ======================
-        //         EDUCACION
-        // ======================
-        List<Formacion> modulos = formacionControlador.obtenerTodas();
-        int completados = 0;
-
-        if (modulos != null) {
-            for (Formacion f : modulos) {
-                if (f.getCompletado() == 1) completados++;
+            if (metas != null) {
+                for (Meta m : metas) {
+                    if (m.getCantidadActual() >= m.getCantidadObjetivo()) {
+                        completadas++;
+                    } else {
+                        activas++;
+                    }
+                }
             }
-        }
 
-        txtResumenEducacionInicio.setText(
-                completados + " módulos completados"
-        );
+            List<Formacion> modulos = formacionControlador.obtenerTodas();
+            int completados = 0;
+
+            if (modulos != null) {
+                for (Formacion f : modulos) {
+                    if (f.getCompletado() == 1) completados++;
+                }
+            }
+
+            if (!isAdded()) {
+                return;
+            }
+
+            requireActivity().runOnUiThread(() -> {
+                if (!isAdded()) {
+                    return;
+                }
+
+                txtBalanceCantidadInicio.setText(String.format("%.2f €", balance));
+                txtResumenMovimientosInicio.setText(
+                        "+ " + String.format("%.2f", ingresos) + " €  |  - " + String.format("%.2f", gastos) + " €"
+                );
+
+                txtResumenPresupuestosInicio.setText(
+                        String.format("%.2f€ gastados / %.2f€", totalGasto, totalLimite)
+                );
+
+                txtResumenMetasInicio.setText(
+                        activas + " activas  |  " + completadas + " completadas"
+                );
+
+                txtResumenEducacionInicio.setText(
+                        completados + " módulos completados"
+                );
+            });
+        });
+
     }
 }

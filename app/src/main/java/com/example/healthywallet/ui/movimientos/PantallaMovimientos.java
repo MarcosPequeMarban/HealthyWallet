@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.healthywallet.R;
 import com.example.healthywallet.adapters.AdaptadorMovimientos;
+import com.example.healthywallet.database.GestorBaseDatos;
 import com.example.healthywallet.controller.MovimientosControlador;
 import com.example.healthywallet.database.entities.Movimiento;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -54,9 +55,25 @@ public class PantallaMovimientos extends Fragment {
     }
 
     private void cargarMovimientos() {
-        List<Movimiento> lista = controlador.obtenerTodos();
+        if (!isAdded()) {
+            return;
+        }
 
-        AdaptadorMovimientos adaptador = new AdaptadorMovimientos(requireContext(), lista);
-        recycler.setAdapter(adaptador);
+        GestorBaseDatos.getExecutor().execute(() -> {
+            List<Movimiento> lista = controlador.obtenerTodos();
+
+            if (!isAdded()) {
+                return;
+            }
+
+            requireActivity().runOnUiThread(() -> {
+                if (!isAdded()) {
+                    return;
+                }
+
+                AdaptadorMovimientos adaptador = new AdaptadorMovimientos(requireContext(), lista);
+                recycler.setAdapter(adaptador);
+            });
+        });
     }
 }
