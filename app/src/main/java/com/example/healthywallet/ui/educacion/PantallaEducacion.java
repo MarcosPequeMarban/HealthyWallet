@@ -34,10 +34,10 @@ public class PantallaEducacion extends Fragment {
 
         // =========== EVENTOS ===========
 
-        abrir(cardVideo1, "https://youtu.be/WN6C4V9Ezg8");
-        abrir(cardVideo2, "https://youtu.be/G1nK2JQyb-8");
+        abrir(cardVideo1, "https://youtu.be/ujY0DkyL--w?si=bOuKABNajrNIy-iT");
+        abrir(cardVideo2, "https://youtu.be/bkYK-akFam4?si=zZ1Oug3rfNqxzNex");
 
-        abrir(cardLibro1, "https://amzn.to/3EMYabc");
+        abrir(cardLibro1, "https://www.amazon.es/s?k=padre+rico+padre+pobre&__mk_es_ES=%C3%85M%C3%85%C5%BD%C3%95%C3%91&crid=3CQQ3JP79SI2&sprefix=padre+rico+padre+pobre+%2Caps%2C73&ref=nb_sb_noss_2");
 
         abrir(cardTool1, "https://es.investing.com/");
         abrir(cardTool2, "https://www.tradingview.com/");

@@ -62,7 +62,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="https://youtu.be/WN6C4V9Ezg8"
+                    android:text="https://youtu.be/ujY0DkyL--w?si=bOuKABNajrNIy-iT"
                     android:textColor="#4CAF50"
                     android:layout_marginTop="6dp"/>
             </LinearLayout>
@@ -95,7 +95,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="https://youtu.be/G1nK2JQyb-8"
+                    android:text="https://youtu.be/bkYK-akFam4?si=zZ1Oug3rfNqxzNex"
                     android:textColor="#4CAF50"
                     android:layout_marginTop="6dp"/>
             </LinearLayout>
