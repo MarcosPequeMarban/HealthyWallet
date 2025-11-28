@@ -4,41 +4,106 @@
     xmlns:tools="http://schemas.android.com/tools"
     app:startDestination="@id/nav_inicio">
 
+    <!-- INICIO -->
     <fragment
         android:id="@+id/nav_inicio"
         android:name="com.example.healthywallet.ui.inicio.PantallaInicio"
         android:label="Inicio"
         tools:layout="@layout/pantalla_inicio" />
 
+    <!-- MOVIMIENTOS -->
     <fragment
         android:id="@+id/nav_movimientos"
         android:name="com.example.healthywallet.ui.movimientos.PantallaMovimientos"
         android:label="Movimientos"
-        tools:layout="@layout/pantalla_movimientos" />
+        tools:layout="@layout/pantalla_movimientos" >
 
-    <fragment
-        android:id="@+id/nav_presupuestos"
-        android:name="com.example.healthywallet.ui.presupuestos.PantallaPresupuestos"
-        android:label="Presupuestos"
-        tools:layout="@layout/pantalla_presupuestos" />
+        <action
+            android:id="@+id/action_movimientos_to_agregarMovimiento"
+            app:destination="@id/fragmentoAgregarMovimiento" />
+    </fragment>
 
-    <fragment
-        android:id="@+id/nav_metas"
-        android:name="com.example.healthywallet.ui.metas.PantallaMetas"
-        android:label="Metas"
-        tools:layout="@layout/pantalla_metas" />
-
-    <fragment
-        android:id="@+id/nav_educacion"
-        android:name="com.example.healthywallet.ui.educacion.PantallaEducacion"
-        android:label="Educación"
-        tools:layout="@layout/pantalla_educacion" />
-
+    <!-- AGREGAR MOVIMIENTO -->
     <fragment
         android:id="@+id/fragmentoAgregarMovimiento"
         android:name="com.example.healthywallet.ui.movimientos.PantallaAgregarMovimiento"
         android:label="Agregar movimiento"
         tools:layout="@layout/pantalla_agregar_movimiento" />
 
+    <!-- PRESUPUESTOS -->
+    <fragment
+        android:id="@+id/nav_presupuestos"
+        android:name="com.example.healthywallet.ui.presupuestos.PantallaPresupuestos"
+        android:label="Presupuestos"
+        tools:layout="@layout/pantalla_presupuestos">
+
+        <action
+            android:id="@+id/action_presupuestos_to_agregarPresupuesto"
+            app:destination="@id/pantallaAgregarPresupuesto" />
+    </fragment>
+
+    <!-- AGREGAR PRESUPUESTO -->
+    <fragment
+        android:id="@+id/pantallaAgregarPresupuesto"
+        android:name="com.example.healthywallet.ui.presupuestos.PantallaAgregarPresupuesto"
+        android:label="Agregar Presupuesto"
+        tools:layout="@layout/pantalla_agregar_presupuesto" />
+
+    <!-- METAS -->
+    <fragment
+        android:id="@+id/nav_metas"
+        android:name="com.example.healthywallet.ui.metas.PantallaMetas"
+        android:label="Metas"
+        tools:layout="@layout/pantalla_metas">
+
+        <!-- Acción → Detalle -->
+        <action
+            android:id="@+id/action_metas_to_detalleMeta"
+            app:destination="@id/pantallaDetalleMeta" />
+
+        <!-- Acción → Agregar Meta -->
+        <action
+            android:id="@+id/action_metas_to_agregarMeta"
+            app:destination="@id/pantallaAgregarMeta" />
+    </fragment>
+
+    <!-- DETALLE META -->
+    <fragment
+        android:id="@+id/pantallaDetalleMeta"
+        android:name="com.example.healthywallet.ui.metas.PantallaDetalleMeta"
+        android:label="Detalle Meta"
+        tools:layout="@layout/pantalla_detalle_meta">
+
+        <!-- Desde detalle → agregar ahorro -->
+        <action
+            android:id="@+id/action_detalle_to_agregarAhorro"
+            app:destination="@id/pantallaAgregarAhorro" />
+    </fragment>
+
+    <!-- AGREGAR META -->
+    <fragment
+        android:id="@+id/pantallaAgregarMeta"
+        android:name="com.example.healthywallet.ui.metas.PantallaAgregarMeta"
+        android:label="Agregar Meta"
+        tools:layout="@layout/pantalla_agregar_meta" />
+
+    <!-- AGREGAR AHORRO A META -->
+    <fragment
+        android:id="@+id/pantallaAgregarAhorro"
+        android:name="com.example.healthywallet.ui.metas.PantallaAgregarAhorro"
+        android:label="Agregar Ahorro"
+        tools:layout="@layout/pantalla_agregar_ahorro" />
+
+    <!-- EDUCACIÓN -->
+    <fragment
+        android:id="@+id/nav_educacion"
+        android:name="com.example.healthywallet.ui.educacion.PantallaEducacion"
+        android:label="Educación"
+        tools:layout="@layout/pantalla_educacion" />
+    <fragment
+        android:id="@+id/pantallaBalanceGeneral"
+        android:name="com.example.healthywallet.ui.inicio.PantallaBalanceGeneral"
+        android:label="Balance General"
+        tools:layout="@layout/pantalla_balance_general" />
 
 </navigation>

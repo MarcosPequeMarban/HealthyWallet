@@ -19,7 +19,6 @@ import com.example.healthywallet.controller.MovimientosControlador;
 import com.example.healthywallet.controller.PresupuestoControlador;
 import com.example.healthywallet.database.entities.Formacion;
 import com.example.healthywallet.database.entities.Meta;
-import com.example.healthywallet.database.entities.Movimiento;
 import com.example.healthywallet.database.entities.Presupuesto;
 
 import java.util.List;
@@ -33,6 +32,7 @@ public class PantallaInicio extends Fragment {
     private TextView txtResumenMetasInicio;
     private TextView txtResumenEducacionInicio;
 
+    private CardView cardBalanceGeneral;  // NUEVA TARJETA
     private CardView cardMovimientos, cardPresupuestos, cardMetas, cardEducacion;
 
     // Controllers
@@ -43,9 +43,11 @@ public class PantallaInicio extends Fragment {
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState) {
+    public View onCreateView(
+            @NonNull LayoutInflater inflater,
+            @Nullable ViewGroup container,
+            @Nullable Bundle savedInstanceState
+    ) {
 
         View vista = inflater.inflate(R.layout.pantalla_inicio, container, false);
 
@@ -62,12 +64,17 @@ public class PantallaInicio extends Fragment {
         txtResumenMetasInicio = vista.findViewById(R.id.txtResumenMetasInicio);
         txtResumenEducacionInicio = vista.findViewById(R.id.txtResumenEducacionInicio);
 
+        cardBalanceGeneral = vista.findViewById(R.id.cardBalanceGeneral); 
         cardMovimientos = vista.findViewById(R.id.cardMovimientos);
         cardPresupuestos = vista.findViewById(R.id.cardPresupuestos);
         cardMetas = vista.findViewById(R.id.cardMetas);
         cardEducacion = vista.findViewById(R.id.cardEducacion);
 
         // Navegación
+        cardBalanceGeneral.setOnClickListener(v ->
+                Navigation.findNavController(v).navigate(R.id.pantallaBalanceGeneral)
+        );
+
         cardMovimientos.setOnClickListener(v ->
                 Navigation.findNavController(v).navigate(R.id.nav_movimientos));
 
@@ -80,7 +87,6 @@ public class PantallaInicio extends Fragment {
         cardEducacion.setOnClickListener(v ->
                 Navigation.findNavController(v).navigate(R.id.nav_educacion));
 
-        // Cargar datos
         cargarDatos();
 
         return vista;
@@ -89,7 +95,7 @@ public class PantallaInicio extends Fragment {
 
     private void cargarDatos() {
 
-        // ------ MOVIMIENTOS ------
+        // -------- MOVIMIENTOS --------
         movimientosControlador.obtenerSumaPorTipo("Ingreso", ingresos ->
                 movimientosControlador.obtenerSumaPorTipo("Gasto", gastos -> {
 
@@ -101,10 +107,11 @@ public class PantallaInicio extends Fragment {
                                 String.format("+%.2f ingresos | -%.2f gastos", ingresos, gastos)
                         );
                     });
+
                 })
         );
 
-        // ------ PRESUPUESTOS ------
+        // -------- PRESUPUESTOS --------
         presupuestoControlador.obtenerTodos(presupuestos -> {
 
             double totalLimite = 0, totalGasto = 0;
@@ -122,10 +129,11 @@ public class PantallaInicio extends Fragment {
             requireActivity().runOnUiThread(() ->
                     txtResumenPresupuestosInicio.setText(
                             String.format("%.2f € gastados / %.2f €", finalTotalGasto, finalTotalLimite)
-                    ));
+                    )
+            );
         });
 
-        // ------ METAS ------
+        // -------- METAS --------
         metaControlador.obtenerTodas(metas -> {
 
             int activas = 0;
@@ -149,14 +157,16 @@ public class PantallaInicio extends Fragment {
                     ));
         });
 
-        // ------ EDUCACIÓN ------
+        // -------- EDUCACIÓN --------
         formacionControlador.obtenerTodas(modulos -> {
+
             int total = (modulos != null ? modulos.size() : 0);
 
             requireActivity().runOnUiThread(() ->
                     txtResumenEducacionInicio.setText(
                             String.format("%d módulos registrados", total)
-                    ));
+                    )
+            );
         });
     }
 }

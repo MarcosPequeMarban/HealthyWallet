@@ -16,7 +16,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.healthywallet.R;
 import com.example.healthywallet.adapters.AdaptadorPresupuestos;
+import com.example.healthywallet.controller.MovimientosControlador;
 import com.example.healthywallet.controller.PresupuestoControlador;
+import com.example.healthywallet.database.entities.Movimiento;
 import com.example.healthywallet.database.entities.Presupuesto;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -45,24 +47,20 @@ public class PantallaPresupuestos extends Fragment {
 
         View vista = inflater.inflate(R.layout.pantalla_presupuestos, container, false);
 
-        // Controlador
         controlador = new PresupuestoControlador(requireContext());
 
-        // UI
         recycler = vista.findViewById(R.id.recyclerPresupuestos);
         fabAgregar = vista.findViewById(R.id.fabAgregarPresupuesto);
         txtResumen = vista.findViewById(R.id.txtResumenPresupuesto);
         barraProgreso = vista.findViewById(R.id.progresoGeneralPresupuesto);
 
-        // Recycler
         recycler.setLayoutManager(new LinearLayoutManager(getContext()));
         adaptador = new AdaptadorPresupuestos(getContext(), lista);
         recycler.setAdapter(adaptador);
 
-        // FAB → Agregar presupuesto
         fabAgregar.setOnClickListener(v ->
                 Navigation.findNavController(v)
-                        .navigate(R.id.nav_presupuestos)
+                        .navigate(R.id.action_presupuestos_to_agregarPresupuesto)
         );
 
         cargarPresupuestos();
@@ -76,16 +74,45 @@ public class PantallaPresupuestos extends Fragment {
     }
 
     private void cargarPresupuestos() {
-
         controlador.obtenerTodos(presupuestos -> {
-
             requireActivity().runOnUiThread(() -> {
 
                 lista.clear();
                 if (presupuestos != null) lista.addAll(presupuestos);
 
-                adaptador.notifyDataSetChanged();
+                // Recalcular gastoActual según movimientos reales
+                recalcularGastosPresupuestos();
+            });
+        });
+    }
 
+    private void recalcularGastosPresupuestos() {
+
+        MovimientosControlador movControlador = new MovimientosControlador(requireContext());
+
+        movControlador.obtenerTodos(movimientos -> {
+
+            requireActivity().runOnUiThread(() -> {
+
+                for (Presupuesto p : lista) {
+
+                    double suma = 0;
+
+                    for (Movimiento m : movimientos) {
+                        if (m.getCategoria().equalsIgnoreCase(p.getCategoria())
+                                && m.getTipo().equalsIgnoreCase("Gasto")) {
+
+                            suma += m.getCantidad();
+                        }
+                    }
+
+                    // Actualiza el gasto actual REAL basado en movimientos
+                    p.setGastoActual(suma);
+
+                    controlador.actualizar(p, filas -> {});
+                }
+
+                adaptador.notifyDataSetChanged();
                 actualizarResumen();
             });
         });
@@ -103,7 +130,6 @@ public class PantallaPresupuestos extends Fragment {
 
         txtResumen.setText(String.format("%.2f € gastados de %.2f €", totalGasto, totalLimite));
 
-        // Configurar barra
         barraProgreso.setMax((int) totalLimite);
         barraProgreso.setProgress((int) totalGasto);
     }

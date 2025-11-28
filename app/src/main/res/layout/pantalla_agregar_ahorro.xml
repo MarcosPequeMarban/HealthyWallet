@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F5F5F5">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="22dp">
+
+        <!-- HEADER -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@drawable/ic_metas"
+                app:tint="#4CAF50" />
+
+            <TextView
+                android:id="@+id/txtTituloAhorro"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Añadir ahorro"
+                android:textSize="26sp"
+                android:textStyle="bold"
+                android:textColor="#333333"
+                android:layout_marginStart="12dp"/>
+        </LinearLayout>
+
+        <!-- TARJETA META -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="#FFFFFF"
+            android:layout_marginTop="24dp"
+            app:cardElevation="5dp"
+            app:cardCornerRadius="18dp">
+
+            <LinearLayout
+                android:padding="20dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/txtNombreMetaAhorro"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Nombre meta"
+                    android:textColor="#333333"
+                    android:textSize="20sp"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:id="@+id/txtResumenAhorro"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="400 € / 1000 €"
+                    android:textColor="#777777"
+                    android:textSize="16sp"
+                    android:layout_marginTop="6dp"/>
+
+                <ProgressBar
+                    android:id="@+id/barraMetaAhorro"
+                    style="@android:style/Widget.ProgressBar.Horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="10dp"
+                    android:progress="40"
+                    android:max="100"
+                    android:progressDrawable="@drawable/progress_meta_estilo"
+                    android:layout_marginTop="12dp"/>
+
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+
+        <!-- TARJETA FORMULARIO -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="#FFFFFF"
+            android:layout_marginTop="20dp"
+            app:cardElevation="5dp"
+            app:cardCornerRadius="18dp">
+
+            <LinearLayout
+                android:padding="20dp"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:text="Cantidad a añadir (€)"
+                    android:textSize="14sp"
+                    android:textColor="#666666"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <EditText
+                    android:id="@+id/inputCantidadAhorro"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Ej: 50"
+                    android:inputType="numberDecimal"
+                    android:padding="14dp"
+                    android:textSize="18sp" />
+            </LinearLayout>
+
+        </androidx.cardview.widget.CardView>
+
+
+        <!-- BOTÓN GUARDAR -->
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/btnGuardarAhorro"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_marginTop="28dp"
+            android:src="@drawable/ic_check"
+            android:contentDescription="Guardar"
+            app:tint="#FFFFFF"
+            android:backgroundTint="#4CAF50"/>
+
+    </LinearLayout>
+
+</ScrollView>

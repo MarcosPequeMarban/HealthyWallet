@@ -22,4 +22,8 @@
     <color name="colorTextoNegro">#FF000000</color>        <!-- Negro estándar -->
     <color name="colorNavFondo">#FFFFFFFF</color>         <!-- Blanco para la barra de navegación -->
 
+    <color name="meta_verde">#4CAF50</color>
+    <color name="meta_amarillo">#FFC107</color>
+    <color name="meta_rojo">#F44336</color>
+
 </resources>

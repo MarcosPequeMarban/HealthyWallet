@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -25,6 +26,7 @@ public class PantallaMovimientos extends Fragment {
 
     private RecyclerView recyclerView;
     private FloatingActionButton fabAgregarMovimiento;
+    private TextView txtBalanceMensual;
 
     private MovimientosControlador movimientosControlador;
     private AdaptadorMovimientos adaptador;
@@ -42,6 +44,9 @@ public class PantallaMovimientos extends Fragment {
         recyclerView = vista.findViewById(R.id.recyclerMovimientos);
         fabAgregarMovimiento = vista.findViewById(R.id.fabAgregarMovimiento);
 
+        // ✔ ESTE ES EL QUE EXISTE EN TU XML
+        txtBalanceMensual = vista.findViewById(R.id.txtBalanceCantidad);
+
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         fabAgregarMovimiento.setOnClickListener(v ->
@@ -51,6 +56,12 @@ public class PantallaMovimientos extends Fragment {
         cargarLista();
 
         return vista;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        cargarLista(); // refrescar al volver
     }
 
     private void cargarLista() {
@@ -64,7 +75,24 @@ public class PantallaMovimientos extends Fragment {
 
                 adaptador = new AdaptadorMovimientos(requireContext(), listaSegura);
                 recyclerView.setAdapter(adaptador);
+
+                actualizarBalance(listaSegura);
             });
         });
+    }
+
+    private void actualizarBalance(List<Movimiento> lista) {
+
+        double total = 0;
+
+        for (Movimiento mov : lista) {
+            if (mov.getTipo().equals("Ingreso")) {
+                total += mov.getCantidad();
+            } else {
+                total -= mov.getCantidad();
+            }
+        }
+
+        txtBalanceMensual.setText(String.format("%.2f €", total));
     }
 }

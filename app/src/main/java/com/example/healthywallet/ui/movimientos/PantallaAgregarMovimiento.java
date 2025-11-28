@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -31,6 +32,15 @@ public class PantallaAgregarMovimiento extends Fragment {
 
     private MovimientosControlador controlador;
 
+    // 🔥 NUEVAS CATEGORÍAS
+    private final String[] categoriasGasto = {
+            "Comida", "Transporte", "Educación", "Ocio", "Hogar", "Salud", "Otros"
+    };
+
+    private final String[] categoriasIngreso = {
+            "Trabajo", "Beca", "Regalo", "Venta", "Premio", "Extra", "Otros ingresos"
+    };
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -50,26 +60,70 @@ public class PantallaAgregarMovimiento extends Fragment {
         btnGuardar = vista.findViewById(R.id.btnGuardarMovimiento);
 
         configurarSpinners();
+        configurarCambioCategorias();
         configurarSelectorFecha();
         configurarBotonGuardar();
 
         return vista;
     }
 
+    // ✔ SPINNER TIPO (Ingreso / Gasto)
     private void configurarSpinners() {
 
-        // Spinner tipo: Ingreso / Gasto
         String[] tipos = {"Ingreso", "Gasto"};
-        spinnerTipo.setAdapter(new ArrayAdapter<>(requireContext(),
-                android.R.layout.simple_spinner_dropdown_item, tipos));
 
-        // Spinner categorías
-        String[] categorias = {"Comida", "Transporte", "Educación", "Ocio", "Otros"};
+        ArrayAdapter<String> adapterTipo = new ArrayAdapter<>(
+                requireContext(),
+                android.R.layout.simple_spinner_dropdown_item,
+                tipos
+        );
 
-        spinnerCategoria.setAdapter(new ArrayAdapter<>(requireContext(),
-                android.R.layout.simple_spinner_dropdown_item, categorias));
+        spinnerTipo.setAdapter(adapterTipo);
+
+        // Por defecto → categorías de gasto
+        ArrayAdapter<String> adapterCat = new ArrayAdapter<>(
+                requireContext(),
+                android.R.layout.simple_spinner_dropdown_item,
+                categoriasGasto
+        );
+        spinnerCategoria.setAdapter(adapterCat);
     }
 
+
+    // ✔ CAMBIO DINÁMICO DE CATEGORÍAS SEGÚN EL TIPO
+    private void configurarCambioCategorias() {
+
+        spinnerTipo.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                String tipo = spinnerTipo.getSelectedItem().toString();
+
+                ArrayAdapter<String> adapter;
+
+                if (tipo.equals("Ingreso")) {
+                    adapter = new ArrayAdapter<>(
+                            requireContext(),
+                            android.R.layout.simple_spinner_dropdown_item,
+                            categoriasIngreso
+                    );
+                } else {
+                    adapter = new ArrayAdapter<>(
+                            requireContext(),
+                            android.R.layout.simple_spinner_dropdown_item,
+                            categoriasGasto
+                    );
+                }
+
+                spinnerCategoria.setAdapter(adapter);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {}
+        });
+    }
+
+    // ✔ SELECTOR DE FECHA
     private void configurarSelectorFecha() {
         inputFecha.setOnClickListener(v -> {
 
@@ -81,7 +135,8 @@ public class PantallaAgregarMovimiento extends Fragment {
             DatePickerDialog dialog = new DatePickerDialog(
                     requireContext(),
                     (DatePicker view, int year, int month, int dayOfMonth) -> {
-                        String fecha = dayOfMonth + "/" + (month + 1) + "/" + year;
+                        String fecha = String.format("%02d/%02d/%04d",
+                                dayOfMonth, month + 1, year);
                         inputFecha.setText(fecha);
                     },
                     año, mes, dia
@@ -91,6 +146,7 @@ public class PantallaAgregarMovimiento extends Fragment {
         });
     }
 
+    // ✔ GUARDAR MOVIMIENTO EN BD
     private void configurarBotonGuardar() {
 
         btnGuardar.setOnClickListener(v -> {
@@ -101,7 +157,7 @@ public class PantallaAgregarMovimiento extends Fragment {
 
             if (cantidadStr.isEmpty() || fecha.isEmpty()) {
                 Toast.makeText(requireContext(),
-                        "Rellena al menos cantidad y fecha",
+                        "Rellena cantidad y fecha",
                         Toast.LENGTH_SHORT).show();
                 return;
             }
@@ -136,6 +192,7 @@ public class PantallaAgregarMovimiento extends Fragment {
                                 "Movimiento guardado",
                                 Toast.LENGTH_SHORT).show();
 
+                        // Volver a Movimientos
                         Navigation.findNavController(v)
                                 .navigate(R.id.nav_movimientos);
 

@@ -1,6 +1,7 @@
 package com.example.healthywallet.adapters;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,6 +39,23 @@ public class AdaptadorPresupuestos extends RecyclerView.Adapter<AdaptadorPresupu
         holder.txtCategoria.setText(p.getCategoria());
         holder.txtLimite.setText("Límite: " + p.getLimite() + " €");
         holder.txtGastoActual.setText("Gastado: " + p.getGastoActual() + " €");
+
+        double limite = p.getLimite();
+        double gasto = p.getGastoActual();
+
+        // 🔥 COLOR DINÁMICO DEL ITEM SEGÚN EL NIVEL DE GASTO
+        if (gasto > limite) {
+            // PASADO → ROJO
+            holder.itemView.setBackgroundColor(Color.parseColor("#FF8A80"));
+        }
+        else if (gasto >= limite * 0.80) {
+            // CERCA DEL LÍMITE → AMARILLO
+            holder.itemView.setBackgroundColor(Color.parseColor("#FFF176"));
+        }
+        else {
+            // NORMAL → BLANCO
+            holder.itemView.setBackgroundColor(Color.parseColor("#FFFFFF"));
+        }
     }
 
     @Override

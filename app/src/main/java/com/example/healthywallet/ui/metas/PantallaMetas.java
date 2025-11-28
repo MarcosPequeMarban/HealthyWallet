@@ -1,5 +1,6 @@
 package com.example.healthywallet.ui.metas;
 
+import android.app.AlertDialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,7 +29,6 @@ public class PantallaMetas extends Fragment {
     private AdaptadorMetas adaptador;
     private FloatingActionButton fabAgregar;
 
-    private TextView txtResumenTitulo;
     private TextView txtResumenCantidad;
 
     private MetaControlador controlador;
@@ -44,26 +44,30 @@ public class PantallaMetas extends Fragment {
 
         View vista = inflater.inflate(R.layout.pantalla_metas, container, false);
 
-        // Controlador
         controlador = new MetaControlador(requireContext());
 
-        // UI
         recycler = vista.findViewById(R.id.recyclerMetas);
         fabAgregar = vista.findViewById(R.id.fabAgregarMeta);
-
-        txtResumenTitulo = vista.findViewById(R.id.txtResumenTitulo);
         txtResumenCantidad = vista.findViewById(R.id.txtResumenCantidad);
 
-        // Recycler configurado
         recycler.setLayoutManager(new LinearLayoutManager(getContext()));
         adaptador = new AdaptadorMetas(getContext(), listaMetas);
         recycler.setAdapter(adaptador);
 
-        // FAB → Ir a agregar meta
+        // CLICK: abrir detalle de meta
+        adaptador.setOnMetaClickListener(meta -> {
+            Bundle b = new Bundle();
+            b.putInt("metaId", meta.getId());
+            Navigation.findNavController(requireView())
+                    .navigate(R.id.pantallaDetalleMeta, b);
+        });
+
+        // META COMPLETADA → popup
+        adaptador.setOnMetaCompletadaListener(meta -> mostrarPopupMetaCompleta(meta));
+
+        // FAB → agregar meta
         fabAgregar.setOnClickListener(v ->
-                Navigation.findNavController(v)
-                        .navigate(R.id.nav_metas)
-        );
+                Navigation.findNavController(v).navigate(R.id.pantallaAgregarMeta));
 
         cargarMetas();
 
@@ -77,31 +81,43 @@ public class PantallaMetas extends Fragment {
     }
 
     private void cargarMetas() {
-        controlador.obtenerTodas(metas -> {
+        controlador.obtenerTodas(metas -> requireActivity().runOnUiThread(() -> {
 
-            requireActivity().runOnUiThread(() -> {
+            listaMetas.clear();
+            if (metas != null) listaMetas.addAll(metas);
 
-                listaMetas.clear();
-                if (metas != null) listaMetas.addAll(metas);
-                adaptador.notifyDataSetChanged();
-
-                actualizarResumen();
-            });
-        });
+            adaptador.notifyDataSetChanged();
+            actualizarResumen();
+        }));
     }
 
     private void actualizarResumen() {
 
-        double totalObjetivo = 0;
         double totalActual = 0;
+        double totalObjetivo = 0;
 
         for (Meta m : listaMetas) {
-            totalObjetivo += m.getCantidadObjetivo();
             totalActual += m.getCantidadActual();
+            totalObjetivo += m.getCantidadObjetivo();
         }
 
         txtResumenCantidad.setText(
-                String.format("%.2f € ahorrados de %.2f €", totalActual, totalObjetivo)
+                String.format("%.2f € / %.2f €", totalActual, totalObjetivo)
         );
+    }
+
+    private void mostrarPopupMetaCompleta(Meta meta) {
+
+        new AlertDialog.Builder(requireContext())
+                .setTitle("🎉 ¡Meta completada!")
+                .setMessage("Enhorabuena, has conseguido tu objetivo \""
+                        + meta.getNombre() + "\".\n\n¡Sigue así crack! 💪🔥")
+                .setPositiveButton("Aceptar", (d, w) -> {
+
+                    // Opcional: eliminar meta automáticamente
+                    controlador.eliminar(meta, filas -> cargarMetas());
+                })
+                .setCancelable(true)
+                .show();
     }
 }

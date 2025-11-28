@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F3F3F3">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="20dp">
+
+        <!-- TITULO -->
+        <TextView
+            android:id="@+id/txtTituloMeta"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Nombre Meta"
+            android:textSize="28sp"
+            android:textColor="#333333"
+            android:textStyle="bold"
+            android:layout_marginBottom="10dp"/>
+
+        <!-- TARJETA PRINCIPAL -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="#FFFFFF"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="5dp"
+            android:layout_marginBottom="20dp">
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:padding="18dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <!-- Cantidades -->
+                <TextView
+                    android:id="@+id/txtCantidadesDetalle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="400 € / 1000 €"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:textColor="#4CAF50"
+                    android:layout_marginBottom="10dp"/>
+
+                <!-- Porcentaje -->
+                <TextView
+                    android:id="@+id/txtPorcentajeDetalle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="40%"
+                    android:textSize="24sp"
+                    android:textStyle="bold"
+                    android:textColor="#333333"
+                    android:layout_marginBottom="10dp"/>
+
+                <!-- Barra de progreso -->
+                <ProgressBar
+                    android:id="@+id/barraDetalleMeta"
+                    style="@android:style/Widget.ProgressBar.Horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="12dp"
+                    android:max="100"
+                    android:progress="40"
+                    android:progressDrawable="@drawable/progress_meta_estilo"
+                    android:layout_marginBottom="15dp"/>
+
+                <!-- Fecha límite -->
+                <TextView
+                    android:id="@+id/txtFechaDetalle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Fecha objetivo: 12/11/2025"
+                    android:textSize="16sp"
+                    android:textColor="#666666"/>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- BOTÓN AGREGAR AHORRO -->
+        <Button
+            android:id="@+id/btnAgregarAhorro"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Agregar ahorro"
+            android:textSize="18sp"
+            android:layout_marginBottom="15dp"
+            android:padding="12dp"
+            android:backgroundTint="#4CAF50"
+            android:textColor="#FFFFFF"
+            app:cornerRadius="8dp"/>
+
+        <!-- BOTÓN ELIMINAR META -->
+        <Button
+            android:id="@+id/btnEliminarMeta"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Eliminar meta"
+            android:textSize="18sp"
+            android:padding="12dp"
+            android:backgroundTint="#E53935"
+            android:textColor="#FFFFFF"
+            app:cornerRadius="8dp"/>
+    </LinearLayout>
+</ScrollView>
