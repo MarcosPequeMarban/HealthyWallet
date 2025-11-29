@@ -11,6 +11,10 @@ import java.util.concurrent.ExecutorService;
 
 public class FormacionControlador {
 
+    // --------------------------
+    //      CALLBACKS
+    // --------------------------
+
     public interface CallbackListaFormacion {
         void onResult(List<Formacion> lista);
     }
@@ -18,6 +22,14 @@ public class FormacionControlador {
     public interface CallbackInt {
         void onResult(int valor);
     }
+
+    public interface FormacionCallback {
+        void onResult(Formacion formacion);
+    }
+
+    // --------------------------
+    //       CAMPOS
+    // --------------------------
 
     private final FormacionDao dao;
     private final ExecutorService executor;
@@ -27,6 +39,10 @@ public class FormacionControlador {
         dao = db.formacionDao();
         executor = GestorBaseDatos.databaseExecutor;
     }
+
+    // --------------------------
+    //     OPERACIONES CRUD
+    // --------------------------
 
     public void insertar(Formacion formacion, CallbackInt callback) {
         executor.execute(() -> callback.onResult((int) dao.insertar(formacion)));
@@ -38,5 +54,31 @@ public class FormacionControlador {
 
     public void eliminarPorId(int id, CallbackInt callback) {
         executor.execute(() -> callback.onResult(dao.eliminarPorId(id)));
+    }
+
+    public void eliminarTodo(Runnable callback) {
+        executor.execute(() -> {
+            dao.eliminarTodo();
+            callback.run();
+        });
+    }
+
+    // --------------------------
+    //   REEMPLAZAR RECURSO
+    // --------------------------
+
+    public void reemplazarRecurso(int id, String nuevoTitulo, String tipo, FormacionCallback callback) {
+        executor.execute(() -> {
+            Formacion nuevo = new Formacion(
+                    nuevoTitulo,
+                    tipo,
+                    false,
+                    String.valueOf(System.currentTimeMillis())
+            );
+
+            nuevo.setId(id);
+            dao.actualizar(nuevo);
+            callback.onResult(nuevo);
+        });
     }
 }

@@ -12,7 +12,6 @@
     <!--  Negro / Texto -->
     <color name="colorNegro">#FF000000</color>
     <color name="colorTextoGris">#FF6E6E6E</color>     <!-- Gris texto -->
-    <color name="colorGrisClaro">#FFEFEFEF</color>     <!-- Fondo suave -->
 
     <!--  Azul / tono para enlaces o educación (opcional) -->
     <color name="colorAzul">#3498DB</color>
@@ -20,10 +19,19 @@
     <!--  Rojo de advertencia (para gastos altos, alertas) -->
     <color name="colorRojo">#E74C3C</color>
     <color name="colorTextoNegro">#FF000000</color>        <!-- Negro estándar -->
-    <color name="colorNavFondo">#FFFFFFFF</color>         <!-- Blanco para la barra de navegación -->
+
 
     <color name="meta_verde">#4CAF50</color>
     <color name="meta_amarillo">#FFC107</color>
     <color name="meta_rojo">#F44336</color>
 
+    <color name="nav_fondo">#F4F7F4</color>   <!-- Gris muy claro tipo N26/Revolut -->
+    <color name="nav_verde">#4CAF50</color>   <!-- Verde corporativo -->
+    <color name="nav_gris">#9E9E9E</color>    <!-- Gris para iconos inactivos -->
+    <color name="colorVerdeClaro">#A5D6A7</color>
+
+    <color name="colorGrisClaro">#F3F3F3</color>
+    <color name="colorNavFondo">#E9F7EF</color>
+
+    <color name="colorFondoGeneral">#FAFFFA</color>
 </resources>

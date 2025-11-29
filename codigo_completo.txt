@@ -171,12 +171,15 @@ public class AdaptadorFormacion extends RecyclerView.Adapter<AdaptadorFormacion.
 package com.example.healthywallet.adapters;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.healthywallet.R;
@@ -189,6 +192,34 @@ public class AdaptadorMetas extends RecyclerView.Adapter<AdaptadorMetas.ViewHold
     private final Context context;
     private final List<Meta> lista;
 
+    private OnMetaClickListener listenerNormal;
+    private OnMetaCompletadaListener listenerCompletada;
+
+    // ---------------------------------------------------------
+    // LISTENER PARA ABRIR EL DETALLE
+    // ---------------------------------------------------------
+    public interface OnMetaClickListener {
+        void onMetaClick(Meta meta);
+    }
+
+    public void setOnMetaClickListener(OnMetaClickListener l) {
+        this.listenerNormal = l;
+    }
+
+    // ---------------------------------------------------------
+    // LISTENER PARA META COMPLETADA (100%)
+    // ---------------------------------------------------------
+    public interface OnMetaCompletadaListener {
+        void onMetaCompletada(Meta meta);
+    }
+
+    public void setOnMetaCompletadaListener(OnMetaCompletadaListener l) {
+        this.listenerCompletada = l;
+    }
+
+    // ---------------------------------------------------------
+    // CONSTRUCTOR
+    // ---------------------------------------------------------
     public AdaptadorMetas(Context context, List<Meta> lista) {
         this.context = context;
         this.lista = lista;
@@ -197,17 +228,67 @@ public class AdaptadorMetas extends RecyclerView.Adapter<AdaptadorMetas.ViewHold
     @NonNull
     @Override
     public ViewHolderMeta onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View vista = LayoutInflater.from(context).inflate(R.layout.item_meta, parent, false);
-        return new ViewHolderMeta(vista);
+        View v = LayoutInflater.from(context).inflate(R.layout.item_meta, parent, false);
+        return new ViewHolderMeta(v);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolderMeta holder, int position) {
+
         Meta meta = lista.get(position);
 
+        // NOMBRE
         holder.txtNombre.setText(meta.getNombre());
-        holder.txtCantidad.setText(meta.getCantidadActual() + " / " + meta.getCantidadObjetivo());
-        holder.txtFecha.setText(meta.getFechaObjetivo());
+
+        // FECHA OBJETIVO
+        holder.txtFecha.setText("Fecha objetivo: " + meta.getFechaObjetivo());
+
+        // CANTIDADES
+        holder.txtCantidades.setText(
+                String.format("%.2f â‚¬ / %.2f â‚¬", meta.getCantidadActual(), meta.getCantidadObjetivo())
+        );
+
+        // PORCENTAJE
+        double porcentaje = (meta.getCantidadActual() / meta.getCantidadObjetivo()) * 100.0;
+        if (porcentaje > 100) porcentaje = 100;
+
+        holder.txtPorcentaje.setText(String.format("%.0f%%", porcentaje));
+        holder.barra.setProgress((int) porcentaje);
+
+        // ---------------------------------------------------------
+        // COLORES SEGÃšN PROGRESO
+        // ---------------------------------------------------------
+        if (porcentaje >= 100) {
+            holder.barra.setProgressTintList(context.getColorStateList(R.color.meta_verde));
+            holder.card.setCardBackgroundColor(Color.parseColor("#D1FFD8")); // verde triunfo
+        }
+        else if (porcentaje >= 80) {
+            holder.barra.setProgressTintList(context.getColorStateList(R.color.meta_verde));
+            holder.card.setCardBackgroundColor(Color.parseColor("#E8F5E9"));
+        }
+        else if (porcentaje >= 40) {
+            holder.barra.setProgressTintList(context.getColorStateList(R.color.meta_amarillo));
+            holder.card.setCardBackgroundColor(Color.parseColor("#FFFDE7"));
+        }
+        else {
+            holder.barra.setProgressTintList(context.getColorStateList(R.color.meta_rojo));
+            holder.card.setCardBackgroundColor(Color.parseColor("#FFEBEE"));
+        }
+
+        // ---------------------------------------------------------
+        // CLICK (NORMAL o META COMPLETADA)
+        // ---------------------------------------------------------
+        final double porcentajeFinal = porcentaje;
+        holder.itemView.setOnClickListener(v -> {
+
+            if (porcentajeFinal >= 100) {
+                if (listenerCompletada != null)
+                    listenerCompletada.onMetaCompletada(meta);
+            } else {
+                if (listenerNormal != null)
+                    listenerNormal.onMetaClick(meta);
+            }
+        });
     }
 
     @Override
@@ -215,16 +296,24 @@ public class AdaptadorMetas extends RecyclerView.Adapter<AdaptadorMetas.ViewHold
         return lista.size();
     }
 
+    // ---------------------------------------------------------
+    // VIEW HOLDER
+    // ---------------------------------------------------------
     static class ViewHolderMeta extends RecyclerView.ViewHolder {
 
-        TextView txtNombre, txtCantidad, txtFecha;
+        CardView card;
+        TextView txtNombre, txtCantidades, txtPorcentaje, txtFecha;
+        ProgressBar barra;
 
         public ViewHolderMeta(@NonNull View itemView) {
             super(itemView);
 
+            card = itemView.findViewById(R.id.cardViewMeta);
             txtNombre = itemView.findViewById(R.id.txtNombreMeta);
-            txtCantidad = itemView.findViewById(R.id.txtCantidadMeta);
+            txtCantidades = itemView.findViewById(R.id.txtCantidadesMeta);
+            txtPorcentaje = itemView.findViewById(R.id.txtPorcentajeMeta);
             txtFecha = itemView.findViewById(R.id.txtFechaMeta);
+            barra = itemView.findViewById(R.id.barraProgresoMeta);
         }
     }
 }
@@ -299,6 +388,7 @@ public class AdaptadorMovimientos extends RecyclerView.Adapter<AdaptadorMovimien
 package com.example.healthywallet.adapters;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -336,6 +426,23 @@ public class AdaptadorPresupuestos extends RecyclerView.Adapter<AdaptadorPresupu
         holder.txtCategoria.setText(p.getCategoria());
         holder.txtLimite.setText("LÃ­mite: " + p.getLimite() + " â‚¬");
         holder.txtGastoActual.setText("Gastado: " + p.getGastoActual() + " â‚¬");
+
+        double limite = p.getLimite();
+        double gasto = p.getGastoActual();
+
+        // ðŸ”¥ COLOR DINÃMICO DEL ITEM SEGÃšN EL NIVEL DE GASTO
+        if (gasto > limite) {
+            // PASADO â†’ ROJO
+            holder.itemView.setBackgroundColor(Color.parseColor("#FF8A80"));
+        }
+        else if (gasto >= limite * 0.80) {
+            // CERCA DEL LÃMITE â†’ AMARILLO
+            holder.itemView.setBackgroundColor(Color.parseColor("#FFF176"));
+        }
+        else {
+            // NORMAL â†’ BLANCO
+            holder.itemView.setBackgroundColor(Color.parseColor("#FFFFFF"));
+        }
     }
 
     @Override
@@ -467,6 +574,7 @@ import java.util.concurrent.ExecutorService;
 
 public class MetaControlador {
 
+    // === CALLBACKS ===
     public interface CallbackListaMeta {
         void onResult(List<Meta> lista);
     }
@@ -475,41 +583,73 @@ public class MetaControlador {
         void onResult(Meta meta);
     }
 
+    public interface CallbackLong {
+        void onResult(long valor);
+    }
+
     public interface CallbackInt {
         void onResult(int valor);
     }
 
+    // === CAMPOS ===
     private final MetaDao dao;
     private final ExecutorService executor;
 
+    // === CONSTRUCTOR ===
     public MetaControlador(Context context) {
         GestorBaseDatos db = GestorBaseDatos.obtenerInstancia(context);
         dao = db.metaDao();
         executor = GestorBaseDatos.databaseExecutor;
     }
 
-    public void insertar(Meta meta, CallbackInt callback) {
-        executor.execute(() -> callback.onResult((int) dao.insertar(meta)));
+    // === CRUD ===
+
+    /** Insertar una meta y devolver el ID generado */
+    public void insertar(Meta meta, CallbackLong callback) {
+        executor.execute(() -> {
+            long id = dao.insertar(meta);
+            callback.onResult(id);
+        });
     }
 
+    /** Actualizar una meta */
     public void actualizar(Meta meta, CallbackInt callback) {
-        executor.execute(() -> callback.onResult(dao.actualizar(meta)));
+        executor.execute(() -> {
+            int filas = dao.actualizar(meta);
+            callback.onResult(filas);
+        });
     }
 
+    /** Obtener meta por ID */
     public void obtenerPorId(int id, CallbackMeta callback) {
-        executor.execute(() -> callback.onResult(dao.obtenerPorId(id)));
+        executor.execute(() -> {
+            Meta meta = dao.obtenerPorId(id);
+            callback.onResult(meta);
+        });
     }
 
+    /** Obtener todas las metas */
     public void obtenerTodas(CallbackListaMeta callback) {
-        executor.execute(() -> callback.onResult(dao.obtenerTodas()));
+        executor.execute(() -> {
+            List<Meta> lista = dao.obtenerTodas();
+            callback.onResult(lista);
+        });
     }
 
+    /** Actualizar solo la cantidad actual */
     public void actualizarCantidad(int id, double nuevaCantidad, CallbackInt callback) {
-        executor.execute(() -> callback.onResult(dao.actualizarCantidad(nuevaCantidad, id)));
+        executor.execute(() -> {
+            int filas = dao.actualizarCantidad(nuevaCantidad, id);
+            callback.onResult(filas);
+        });
     }
 
+    /** Eliminar una meta */
     public void eliminar(Meta meta, CallbackInt callback) {
-        executor.execute(() -> callback.onResult(dao.eliminar(meta)));
+        executor.execute(() -> {
+            int filas = dao.eliminar(meta);
+            callback.onResult(filas);
+        });
     }
 }
 
@@ -1231,6 +1371,152 @@ public class PantallaEducacion extends Fragment {
     }
 }
 
+--- FILE: C:\AndroidProjects\HealthyWallet\app\src\main\java\com\example\healthywallet\ui\inicio\PantallaBalanceGeneral.java ---
+
+package com.example.healthywallet.ui.inicio;
+
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+
+import com.example.healthywallet.R;
+import com.example.healthywallet.controller.MovimientosControlador;
+import com.example.healthywallet.controller.PresupuestoControlador;
+import com.example.healthywallet.controller.MetaControlador;
+import com.example.healthywallet.database.entities.Movimiento;
+import com.example.healthywallet.database.entities.Presupuesto;
+import com.example.healthywallet.database.entities.Meta;
+
+import java.util.HashMap;
+import java.util.List;
+
+public class PantallaBalanceGeneral extends Fragment {
+
+    private MovimientosControlador movController;
+    private PresupuestoControlador presController;
+    private MetaControlador metaController;
+
+    private TextView txtBalanceTotal, txtDetalleBalance;
+    private TextView txtCat1, txtCat2, txtCat3;
+    private TextView txtPresupuestoResumen, txtMetasResumen;
+
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
+
+        View vista = inflater.inflate(R.layout.pantalla_balance_general, container, false);
+
+        movController = new MovimientosControlador(getContext());
+        presController = new PresupuestoControlador(getContext());
+        metaController = new MetaControlador(getContext());
+
+        txtBalanceTotal = vista.findViewById(R.id.txtBalanceTotal);
+        txtDetalleBalance = vista.findViewById(R.id.txtDetalleBalance);
+
+        txtCat1 = vista.findViewById(R.id.txtCat1);
+        txtCat2 = vista.findViewById(R.id.txtCat2);
+        txtCat3 = vista.findViewById(R.id.txtCat3);
+
+        txtPresupuestoResumen = vista.findViewById(R.id.txtPresupuestoResumen);
+        txtMetasResumen = vista.findViewById(R.id.txtMetasResumen);
+
+        cargarDatos();
+
+        return vista;
+    }
+
+    private void cargarDatos() {
+
+        // 1ï¸âƒ£ INGRESOS Y GASTOS
+        movController.obtenerTodos(movs -> {
+            double ingresos = 0, gastos = 0;
+
+            HashMap<String, Double> categorias = new HashMap<>();
+
+            for (Movimiento m : movs) {
+
+                if ("Ingreso".equals(m.getTipo()))
+                    ingresos += m.getCantidad();
+                else
+                    gastos += m.getCantidad();
+
+                // Top categorÃ­as
+                if (!"Ingreso".equals(m.getTipo())) {
+                    categorias.put(
+                            m.getCategoria(),
+                            categorias.getOrDefault(m.getCategoria(), 0.0) + m.getCantidad()
+                    );
+                }
+            }
+
+            double balance = ingresos - gastos;
+
+            // Actualizar UI
+            requireActivity().runOnUiThread(() -> {
+                txtBalanceTotal.setText(String.format("%.2f â‚¬", balance));
+                txtDetalleBalance.setText(
+                        String.format("+%.2f ingresos | -%.2f gastos", ingresos, gastos)
+                );
+
+                mostrarTopCategorias(categorias);
+            });
+        });
+
+        // 2ï¸âƒ£ PRESUPUESTOS
+        presController.obtenerTodos(list -> {
+            double limite = 0, usado = 0;
+
+            for (Presupuesto p : list) {
+                limite += p.getLimite();
+                usado += p.getGastoActual();
+            }
+
+            requireActivity().runOnUiThread(() ->
+                    txtPresupuestoResumen.setText(
+                            String.format("%.2f â‚¬ usados de %.2f â‚¬", usado, limite)
+                    )
+            );
+        });
+
+        // 3ï¸âƒ£ METAS
+        metaController.obtenerTodas(list -> {
+            int activas = 0, completadas = 0;
+
+            for (Meta m : list) {
+                if (m.getCantidadActual() >= m.getCantidadObjetivo())
+                    completadas++;
+                else
+                    activas++;
+            }
+
+            requireActivity().runOnUiThread(() ->
+                    txtMetasResumen.setText(
+                            String.format("%d activas | %d completadas", activas, completadas)
+                    )
+            );
+        });
+    }
+
+    private void mostrarTopCategorias(HashMap<String, Double> categorias) {
+        List<String> sorted = categorias.entrySet()
+                .stream()
+                .sorted((a, b) -> Double.compare(b.getValue(), a.getValue()))
+                .map(e -> e.getKey() + ": " + e.getValue() + " â‚¬")
+                .toList();
+
+        txtCat1.setText(sorted.size() > 0 ? "1. " + sorted.get(0) : "-");
+        txtCat2.setText(sorted.size() > 1 ? "2. " + sorted.get(1) : "-");
+        txtCat3.setText(sorted.size() > 2 ? "3. " + sorted.get(2) : "-");
+    }
+}
+
 --- FILE: C:\AndroidProjects\HealthyWallet\app\src\main\java\com\example\healthywallet\ui\inicio\PantallaInicio.java ---
 
 package com.example.healthywallet.ui.inicio;
@@ -1254,7 +1540,6 @@ import com.example.healthywallet.controller.MovimientosControlador;
 import com.example.healthywallet.controller.PresupuestoControlador;
 import com.example.healthywallet.database.entities.Formacion;
 import com.example.healthywallet.database.entities.Meta;
-import com.example.healthywallet.database.entities.Movimiento;
 import com.example.healthywallet.database.entities.Presupuesto;
 
 import java.util.List;
@@ -1268,6 +1553,7 @@ public class PantallaInicio extends Fragment {
     private TextView txtResumenMetasInicio;
     private TextView txtResumenEducacionInicio;
 
+    private CardView cardBalanceGeneral;  // NUEVA TARJETA
     private CardView cardMovimientos, cardPresupuestos, cardMetas, cardEducacion;
 
     // Controllers
@@ -1278,9 +1564,11 @@ public class PantallaInicio extends Fragment {
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState) {
+    public View onCreateView(
+            @NonNull LayoutInflater inflater,
+            @Nullable ViewGroup container,
+            @Nullable Bundle savedInstanceState
+    ) {
 
         View vista = inflater.inflate(R.layout.pantalla_inicio, container, false);
 
@@ -1297,12 +1585,17 @@ public class PantallaInicio extends Fragment {
         txtResumenMetasInicio = vista.findViewById(R.id.txtResumenMetasInicio);
         txtResumenEducacionInicio = vista.findViewById(R.id.txtResumenEducacionInicio);
 
+        cardBalanceGeneral = vista.findViewById(R.id.cardBalanceGeneral); 
         cardMovimientos = vista.findViewById(R.id.cardMovimientos);
         cardPresupuestos = vista.findViewById(R.id.cardPresupuestos);
         cardMetas = vista.findViewById(R.id.cardMetas);
         cardEducacion = vista.findViewById(R.id.cardEducacion);
 
         // NavegaciÃ³n
+        cardBalanceGeneral.setOnClickListener(v ->
+                Navigation.findNavController(v).navigate(R.id.pantallaBalanceGeneral)
+        );
+
         cardMovimientos.setOnClickListener(v ->
                 Navigation.findNavController(v).navigate(R.id.nav_movimientos));
 
@@ -1315,7 +1608,6 @@ public class PantallaInicio extends Fragment {
         cardEducacion.setOnClickListener(v ->
                 Navigation.findNavController(v).navigate(R.id.nav_educacion));
 
-        // Cargar datos
         cargarDatos();
 
         return vista;
@@ -1324,7 +1616,7 @@ public class PantallaInicio extends Fragment {
 
     private void cargarDatos() {
 
-        // ------ MOVIMIENTOS ------
+        // -------- MOVIMIENTOS --------
         movimientosControlador.obtenerSumaPorTipo("Ingreso", ingresos ->
                 movimientosControlador.obtenerSumaPorTipo("Gasto", gastos -> {
 
@@ -1336,10 +1628,11 @@ public class PantallaInicio extends Fragment {
                                 String.format("+%.2f ingresos | -%.2f gastos", ingresos, gastos)
                         );
                     });
+
                 })
         );
 
-        // ------ PRESUPUESTOS ------
+        // -------- PRESUPUESTOS --------
         presupuestoControlador.obtenerTodos(presupuestos -> {
 
             double totalLimite = 0, totalGasto = 0;
@@ -1357,10 +1650,11 @@ public class PantallaInicio extends Fragment {
             requireActivity().runOnUiThread(() ->
                     txtResumenPresupuestosInicio.setText(
                             String.format("%.2f â‚¬ gastados / %.2f â‚¬", finalTotalGasto, finalTotalLimite)
-                    ));
+                    )
+            );
         });
 
-        // ------ METAS ------
+        // -------- METAS --------
         metaControlador.obtenerTodas(metas -> {
 
             int activas = 0;
@@ -1384,15 +1678,384 @@ public class PantallaInicio extends Fragment {
                     ));
         });
 
-        // ------ EDUCACIÃ“N ------
+        // -------- EDUCACIÃ“N --------
         formacionControlador.obtenerTodas(modulos -> {
+
             int total = (modulos != null ? modulos.size() : 0);
 
             requireActivity().runOnUiThread(() ->
                     txtResumenEducacionInicio.setText(
                             String.format("%d mÃ³dulos registrados", total)
-                    ));
+                    )
+            );
         });
+    }
+}
+
+--- FILE: C:\AndroidProjects\HealthyWallet\app\src\main\java\com\example\healthywallet\ui\metas\PantallaAgregarAhorro.java ---
+
+package com.example.healthywallet.ui.metas;
+
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.ProgressBar;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
+
+import com.example.healthywallet.R;
+import com.example.healthywallet.controller.MetaControlador;
+import com.example.healthywallet.database.entities.Meta;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+public class PantallaAgregarAhorro extends Fragment {
+
+    private TextView txtNombreMeta, txtResumen;
+    private ProgressBar barra;
+    private EditText inputCantidad;
+    private FloatingActionButton btnGuardar;
+
+    private MetaControlador controlador;
+    private Meta metaActual;
+
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
+
+        View vista = inflater.inflate(R.layout.pantalla_agregar_ahorro, container, false);
+
+        controlador = new MetaControlador(requireContext());
+
+        txtNombreMeta = vista.findViewById(R.id.txtNombreMetaAhorro);
+        txtResumen = vista.findViewById(R.id.txtResumenAhorro);
+        barra = vista.findViewById(R.id.barraMetaAhorro);
+        inputCantidad = vista.findViewById(R.id.inputCantidadAhorro);
+        btnGuardar = vista.findViewById(R.id.btnGuardarAhorro);
+
+        int metaId = getArguments().getInt("metaId", -1);
+        if (metaId == -1) {
+            Toast.makeText(requireContext(), "Error al cargar meta", Toast.LENGTH_SHORT).show();
+            Navigation.findNavController(vista).navigateUp();
+            return vista;
+        }
+
+        cargarMeta(metaId);
+        configurarBotonGuardar(vista);
+
+        return vista;
+    }
+
+    private void cargarMeta(int id) {
+        controlador.obtenerPorId(id, meta -> {
+
+            requireActivity().runOnUiThread(() -> {
+
+                if (meta == null) {
+                    Toast.makeText(requireContext(), "Meta no encontrada", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                metaActual = meta;
+
+                txtNombreMeta.setText(meta.getNombre());
+
+                txtResumen.setText(
+                        String.format("%.2f â‚¬ / %.2f â‚¬",
+                                meta.getCantidadActual(), meta.getCantidadObjetivo())
+                );
+
+                double porcentaje = (meta.getCantidadActual() / meta.getCantidadObjetivo()) * 100;
+                barra.setProgress((int) porcentaje);
+            });
+        });
+    }
+
+    private void configurarBotonGuardar(View vista) {
+
+        btnGuardar.setOnClickListener(v -> {
+
+            String cantidadStr = inputCantidad.getText().toString().trim();
+
+            if (cantidadStr.isEmpty()) {
+                Toast.makeText(requireContext(), "Introduce una cantidad", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            double cantidad;
+            try {
+                cantidad = Double.parseDouble(cantidadStr);
+            } catch (Exception e) {
+                Toast.makeText(requireContext(), "Formato invÃ¡lido", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            if (cantidad <= 0) {
+                Toast.makeText(requireContext(), "La cantidad debe ser mayor que 0", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // sumamos al progreso actual
+            double nuevoTotal = metaActual.getCantidadActual() + cantidad;
+            metaActual.setCantidadActual(nuevoTotal);
+
+            controlador.actualizar(metaActual, filas -> {
+                requireActivity().runOnUiThread(() -> {
+
+                    if (filas > 0) {
+                        Toast.makeText(requireContext(), "Ahorro aÃ±adido", Toast.LENGTH_SHORT).show();
+                        Navigation.findNavController(vista).navigateUp();
+                    } else {
+                        Toast.makeText(requireContext(), "Error al guardar", Toast.LENGTH_SHORT).show();
+                    }
+
+                });
+            });
+        });
+
+    }
+}
+
+--- FILE: C:\AndroidProjects\HealthyWallet\app\src\main\java\com\example\healthywallet\ui\metas\PantallaAgregarMeta.java ---
+
+package com.example.healthywallet.ui.metas;
+
+import android.app.DatePickerDialog;
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.DatePicker;
+import android.widget.EditText;
+import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
+
+import com.example.healthywallet.R;
+import com.example.healthywallet.controller.MetaControlador;
+import com.example.healthywallet.database.entities.Meta;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import java.util.Calendar;
+
+public class PantallaAgregarMeta extends Fragment {
+
+    private EditText inputNombreMeta, inputCantidadObjetivo, inputCantidadActual, inputFechaObjetivo;
+    private FloatingActionButton btnGuardar;
+    private MetaControlador controlador;
+
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
+
+        View vista = inflater.inflate(R.layout.pantalla_agregar_meta, container, false);
+
+        controlador = new MetaControlador(requireContext());
+
+        // Referencias UI
+        inputNombreMeta = vista.findViewById(R.id.inputNombreMeta);
+        inputCantidadObjetivo = vista.findViewById(R.id.inputCantidadObjetivo);
+        inputCantidadActual = vista.findViewById(R.id.inputCantidadActual);
+        inputFechaObjetivo = vista.findViewById(R.id.inputFechaObjetivo);
+        btnGuardar = vista.findViewById(R.id.btnGuardarMeta);
+
+        configurarFecha();
+        configurarBotonGuardar();
+
+        return vista;
+    }
+
+    private void configurarFecha() {
+        inputFechaObjetivo.setOnClickListener(v -> {
+
+            Calendar calendar = Calendar.getInstance();
+            int year = calendar.get(Calendar.YEAR);
+            int month = calendar.get(Calendar.MONTH);
+            int day = calendar.get(Calendar.DAY_OF_MONTH);
+
+            DatePickerDialog dialog = new DatePickerDialog(
+                    requireContext(),
+                    (DatePicker view, int y, int m, int d) ->
+                            inputFechaObjetivo.setText(d + "/" + (m + 1) + "/" + y),
+                    year, month, day
+            );
+
+            dialog.show();
+        });
+    }
+
+    private void configurarBotonGuardar() {
+
+        btnGuardar.setOnClickListener(v -> {
+
+            String nombre = inputNombreMeta.getText().toString().trim();
+            String objStr = inputCantidadObjetivo.getText().toString().trim();
+            String actualStr = inputCantidadActual.getText().toString().trim();
+            String fecha = inputFechaObjetivo.getText().toString().trim();
+
+            if (nombre.isEmpty() || objStr.isEmpty() || fecha.isEmpty()) {
+                Toast.makeText(requireContext(), "Completa todos los campos obligatorios", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            double objetivo, actual;
+
+            try {
+                objetivo = Double.parseDouble(objStr);
+                actual = actualStr.isEmpty() ? 0 : Double.parseDouble(actualStr);
+            } catch (Exception e) {
+                Toast.makeText(requireContext(), "Formato de cantidad invÃ¡lido", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            if (objetivo <= 0) {
+                Toast.makeText(requireContext(), "La meta debe tener una cantidad mayor a 0", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            Meta meta = new Meta(nombre, objetivo, actual, fecha);
+
+            controlador.insertar(meta, id -> {
+                requireActivity().runOnUiThread(() -> {
+                    if (id > 0) {
+                        Toast.makeText(requireContext(), "Meta creada", Toast.LENGTH_SHORT).show();
+                        Navigation.findNavController(v).navigateUp();
+                    } else {
+                        Toast.makeText(requireContext(), "Error al guardar", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            });
+
+        });
+    }
+}
+
+--- FILE: C:\AndroidProjects\HealthyWallet\app\src\main\java\com\example\healthywallet\ui\metas\PantallaDetalleMeta.java ---
+
+package com.example.healthywallet.ui.metas;
+
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ProgressBar;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
+
+import com.example.healthywallet.R;
+import com.example.healthywallet.controller.MetaControlador;
+import com.example.healthywallet.database.entities.Meta;
+
+public class PantallaDetalleMeta extends Fragment {
+
+    private TextView txtTitulo, txtCantidades, txtPorcentaje, txtFecha;
+    private ProgressBar barra;
+    private Button btnAgregarAhorro, btnEliminar;
+
+    private MetaControlador controlador;
+    private Meta metaActual;
+    private int metaId;
+
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
+
+        View vista = inflater.inflate(R.layout.pantalla_detalle_meta, container, false);
+
+        controlador = new MetaControlador(requireContext());
+
+        txtTitulo = vista.findViewById(R.id.txtTituloMeta);
+        txtCantidades = vista.findViewById(R.id.txtCantidadesDetalle);
+        txtPorcentaje = vista.findViewById(R.id.txtPorcentajeDetalle);
+        txtFecha = vista.findViewById(R.id.txtFechaDetalle);
+        barra = vista.findViewById(R.id.barraDetalleMeta);
+        btnAgregarAhorro = vista.findViewById(R.id.btnAgregarAhorro);
+        btnEliminar = vista.findViewById(R.id.btnEliminarMeta);
+
+        // Recuperar ID de la meta
+        metaId = getArguments().getInt("metaId", -1);
+
+        if (metaId == -1) {
+            Toast.makeText(requireContext(), "Error al cargar meta", Toast.LENGTH_SHORT).show();
+            return vista;
+        }
+
+        cargarMeta();
+
+        btnAgregarAhorro.setOnClickListener(v -> {
+            Bundle bundle = new Bundle();
+            bundle.putInt("metaId", metaId);
+
+            Navigation.findNavController(v)
+                    .navigate(R.id.pantallaAgregarAhorro, bundle);
+        });
+
+        btnEliminar.setOnClickListener(v -> eliminarMeta());
+
+        return vista;
+    }
+
+    private void cargarMeta() {
+        controlador.obtenerPorId(metaId, meta -> requireActivity().runOnUiThread(() -> {
+            metaActual = meta;
+
+            if (metaActual == null) return;
+
+            txtTitulo.setText(metaActual.getNombre());
+            txtCantidades.setText(metaActual.getCantidadActual() + " â‚¬ / " +
+                    metaActual.getCantidadObjetivo() + " â‚¬");
+            txtFecha.setText("Fecha objetivo: " + metaActual.getFechaObjetivo());
+
+            double porcentaje = (metaActual.getCantidadActual() /
+                    metaActual.getCantidadObjetivo()) * 100;
+
+            if (porcentaje > 100) porcentaje = 100;
+
+            txtPorcentaje.setText(String.format("%.0f%%", porcentaje));
+            barra.setProgress((int) porcentaje);
+        }));
+    }
+
+    private void eliminarMeta() {
+
+        if (metaActual == null) {
+            Toast.makeText(requireContext(), "Error: meta no cargada", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        controlador.eliminar(metaActual, filas -> requireActivity().runOnUiThread(() -> {
+
+            boolean ok = filas > 0;
+
+            if (ok) {
+                Toast.makeText(requireContext(), "Meta eliminada", Toast.LENGTH_SHORT).show();
+                Navigation.findNavController(requireView()).navigateUp();
+            } else {
+                Toast.makeText(requireContext(), "Error al eliminar", Toast.LENGTH_SHORT).show();
+            }
+
+        }));
     }
 }
 
@@ -1400,6 +2063,7 @@ public class PantallaInicio extends Fragment {
 
 package com.example.healthywallet.ui.metas;
 
+import android.app.AlertDialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -1428,7 +2092,6 @@ public class PantallaMetas extends Fragment {
     private AdaptadorMetas adaptador;
     private FloatingActionButton fabAgregar;
 
-    private TextView txtResumenTitulo;
     private TextView txtResumenCantidad;
 
     private MetaControlador controlador;
@@ -1444,26 +2107,30 @@ public class PantallaMetas extends Fragment {
 
         View vista = inflater.inflate(R.layout.pantalla_metas, container, false);
 
-        // Controlador
         controlador = new MetaControlador(requireContext());
 
-        // UI
         recycler = vista.findViewById(R.id.recyclerMetas);
         fabAgregar = vista.findViewById(R.id.fabAgregarMeta);
-
-        txtResumenTitulo = vista.findViewById(R.id.txtResumenTitulo);
         txtResumenCantidad = vista.findViewById(R.id.txtResumenCantidad);
 
-        // Recycler configurado
         recycler.setLayoutManager(new LinearLayoutManager(getContext()));
         adaptador = new AdaptadorMetas(getContext(), listaMetas);
         recycler.setAdapter(adaptador);
 
-        // FAB â†’ Ir a agregar meta
+        // CLICK: abrir detalle de meta
+        adaptador.setOnMetaClickListener(meta -> {
+            Bundle b = new Bundle();
+            b.putInt("metaId", meta.getId());
+            Navigation.findNavController(requireView())
+                    .navigate(R.id.pantallaDetalleMeta, b);
+        });
+
+        // META COMPLETADA â†’ popup
+        adaptador.setOnMetaCompletadaListener(meta -> mostrarPopupMetaCompleta(meta));
+
+        // FAB â†’ agregar meta
         fabAgregar.setOnClickListener(v ->
-                Navigation.findNavController(v)
-                        .navigate(R.id.nav_metas)
-        );
+                Navigation.findNavController(v).navigate(R.id.pantallaAgregarMeta));
 
         cargarMetas();
 
@@ -1477,32 +2144,44 @@ public class PantallaMetas extends Fragment {
     }
 
     private void cargarMetas() {
-        controlador.obtenerTodas(metas -> {
+        controlador.obtenerTodas(metas -> requireActivity().runOnUiThread(() -> {
 
-            requireActivity().runOnUiThread(() -> {
+            listaMetas.clear();
+            if (metas != null) listaMetas.addAll(metas);
 
-                listaMetas.clear();
-                if (metas != null) listaMetas.addAll(metas);
-                adaptador.notifyDataSetChanged();
-
-                actualizarResumen();
-            });
-        });
+            adaptador.notifyDataSetChanged();
+            actualizarResumen();
+        }));
     }
 
     private void actualizarResumen() {
 
-        double totalObjetivo = 0;
         double totalActual = 0;
+        double totalObjetivo = 0;
 
         for (Meta m : listaMetas) {
-            totalObjetivo += m.getCantidadObjetivo();
             totalActual += m.getCantidadActual();
+            totalObjetivo += m.getCantidadObjetivo();
         }
 
         txtResumenCantidad.setText(
-                String.format("%.2f â‚¬ ahorrados de %.2f â‚¬", totalActual, totalObjetivo)
+                String.format("%.2f â‚¬ / %.2f â‚¬", totalActual, totalObjetivo)
         );
+    }
+
+    private void mostrarPopupMetaCompleta(Meta meta) {
+
+        new AlertDialog.Builder(requireContext())
+                .setTitle("ðŸŽ‰ Â¡Meta completada!")
+                .setMessage("Enhorabuena, has conseguido tu objetivo \""
+                        + meta.getNombre() + "\".\n\nÂ¡Sigue asÃ­ crack! ðŸ’ªðŸ”¥")
+                .setPositiveButton("Aceptar", (d, w) -> {
+
+                    // Opcional: eliminar meta automÃ¡ticamente
+                    controlador.eliminar(meta, filas -> cargarMetas());
+                })
+                .setCancelable(true)
+                .show();
     }
 }
 
@@ -1515,6 +2194,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -1541,6 +2221,15 @@ public class PantallaAgregarMovimiento extends Fragment {
 
     private MovimientosControlador controlador;
 
+    // ðŸ”¥ NUEVAS CATEGORÃAS
+    private final String[] categoriasGasto = {
+            "Comida", "Transporte", "EducaciÃ³n", "Ocio", "Hogar", "Salud", "Otros"
+    };
+
+    private final String[] categoriasIngreso = {
+            "Trabajo", "Beca", "Regalo", "Venta", "Premio", "Extra", "Otros ingresos"
+    };
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -1560,26 +2249,70 @@ public class PantallaAgregarMovimiento extends Fragment {
         btnGuardar = vista.findViewById(R.id.btnGuardarMovimiento);
 
         configurarSpinners();
+        configurarCambioCategorias();
         configurarSelectorFecha();
         configurarBotonGuardar();
 
         return vista;
     }
 
+    // âœ” SPINNER TIPO (Ingreso / Gasto)
     private void configurarSpinners() {
 
-        // Spinner tipo: Ingreso / Gasto
         String[] tipos = {"Ingreso", "Gasto"};
-        spinnerTipo.setAdapter(new ArrayAdapter<>(requireContext(),
-                android.R.layout.simple_spinner_dropdown_item, tipos));
 
-        // Spinner categorÃ­as
-        String[] categorias = {"Comida", "Transporte", "EducaciÃ³n", "Ocio", "Otros"};
+        ArrayAdapter<String> adapterTipo = new ArrayAdapter<>(
+                requireContext(),
+                android.R.layout.simple_spinner_dropdown_item,
+                tipos
+        );
 
-        spinnerCategoria.setAdapter(new ArrayAdapter<>(requireContext(),
-                android.R.layout.simple_spinner_dropdown_item, categorias));
+        spinnerTipo.setAdapter(adapterTipo);
+
+        // Por defecto â†’ categorÃ­as de gasto
+        ArrayAdapter<String> adapterCat = new ArrayAdapter<>(
+                requireContext(),
+                android.R.layout.simple_spinner_dropdown_item,
+                categoriasGasto
+        );
+        spinnerCategoria.setAdapter(adapterCat);
     }
 
+
+    // âœ” CAMBIO DINÃMICO DE CATEGORÃAS SEGÃšN EL TIPO
+    private void configurarCambioCategorias() {
+
+        spinnerTipo.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                String tipo = spinnerTipo.getSelectedItem().toString();
+
+                ArrayAdapter<String> adapter;
+
+                if (tipo.equals("Ingreso")) {
+                    adapter = new ArrayAdapter<>(
+                            requireContext(),
+                            android.R.layout.simple_spinner_dropdown_item,
+                            categoriasIngreso
+                    );
+                } else {
+                    adapter = new ArrayAdapter<>(
+                            requireContext(),
+                            android.R.layout.simple_spinner_dropdown_item,
+                            categoriasGasto
+                    );
+                }
+
+                spinnerCategoria.setAdapter(adapter);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {}
+        });
+    }
+
+    // âœ” SELECTOR DE FECHA
     private void configurarSelectorFecha() {
         inputFecha.setOnClickListener(v -> {
 
@@ -1591,7 +2324,8 @@ public class PantallaAgregarMovimiento extends Fragment {
             DatePickerDialog dialog = new DatePickerDialog(
                     requireContext(),
                     (DatePicker view, int year, int month, int dayOfMonth) -> {
-                        String fecha = dayOfMonth + "/" + (month + 1) + "/" + year;
+                        String fecha = String.format("%02d/%02d/%04d",
+                                dayOfMonth, month + 1, year);
                         inputFecha.setText(fecha);
                     },
                     aÃ±o, mes, dia
@@ -1601,6 +2335,7 @@ public class PantallaAgregarMovimiento extends Fragment {
         });
     }
 
+    // âœ” GUARDAR MOVIMIENTO EN BD
     private void configurarBotonGuardar() {
 
         btnGuardar.setOnClickListener(v -> {
@@ -1611,7 +2346,7 @@ public class PantallaAgregarMovimiento extends Fragment {
 
             if (cantidadStr.isEmpty() || fecha.isEmpty()) {
                 Toast.makeText(requireContext(),
-                        "Rellena al menos cantidad y fecha",
+                        "Rellena cantidad y fecha",
                         Toast.LENGTH_SHORT).show();
                 return;
             }
@@ -1646,6 +2381,7 @@ public class PantallaAgregarMovimiento extends Fragment {
                                 "Movimiento guardado",
                                 Toast.LENGTH_SHORT).show();
 
+                        // Volver a Movimientos
                         Navigation.findNavController(v)
                                 .navigate(R.id.nav_movimientos);
 
@@ -1669,6 +2405,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -1690,6 +2427,7 @@ public class PantallaMovimientos extends Fragment {
 
     private RecyclerView recyclerView;
     private FloatingActionButton fabAgregarMovimiento;
+    private TextView txtBalanceMensual;
 
     private MovimientosControlador movimientosControlador;
     private AdaptadorMovimientos adaptador;
@@ -1707,6 +2445,9 @@ public class PantallaMovimientos extends Fragment {
         recyclerView = vista.findViewById(R.id.recyclerMovimientos);
         fabAgregarMovimiento = vista.findViewById(R.id.fabAgregarMovimiento);
 
+        // âœ” ESTE ES EL QUE EXISTE EN TU XML
+        txtBalanceMensual = vista.findViewById(R.id.txtBalanceCantidad);
+
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         fabAgregarMovimiento.setOnClickListener(v ->
@@ -1716,6 +2457,12 @@ public class PantallaMovimientos extends Fragment {
         cargarLista();
 
         return vista;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        cargarLista(); // refrescar al volver
     }
 
     private void cargarLista() {
@@ -1729,10 +2476,126 @@ public class PantallaMovimientos extends Fragment {
 
                 adaptador = new AdaptadorMovimientos(requireContext(), listaSegura);
                 recyclerView.setAdapter(adaptador);
+
+                actualizarBalance(listaSegura);
+            });
+        });
+    }
+
+    private void actualizarBalance(List<Movimiento> lista) {
+
+        double total = 0;
+
+        for (Movimiento mov : lista) {
+            if (mov.getTipo().equals("Ingreso")) {
+                total += mov.getCantidad();
+            } else {
+                total -= mov.getCantidad();
+            }
+        }
+
+        txtBalanceMensual.setText(String.format("%.2f â‚¬", total));
+    }
+}
+
+--- FILE: C:\AndroidProjects\HealthyWallet\app\src\main\java\com\example\healthywallet\ui\presupuestos\PantallaAgregarPresupuesto.java ---
+
+package com.example.healthywallet.ui.presupuestos;
+
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Spinner;
+import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
+
+import com.example.healthywallet.R;
+import com.example.healthywallet.controller.PresupuestoControlador;
+import com.example.healthywallet.database.entities.Presupuesto;
+
+public class PantallaAgregarPresupuesto extends Fragment {
+
+    private Spinner spinnerCategoria;
+    private EditText inputLimite;
+    private Button btnGuardar;
+
+    private PresupuestoControlador controlador;
+
+    public PantallaAgregarPresupuesto() { }
+
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
+
+        View vista = inflater.inflate(R.layout.pantalla_agregar_presupuesto, container, false);
+
+        controlador = new PresupuestoControlador(requireContext());
+
+        spinnerCategoria = vista.findViewById(R.id.spinnerCategoriaPresupuesto);
+        inputLimite = vista.findViewById(R.id.inputLimite);
+        btnGuardar = vista.findViewById(R.id.btnGuardarPresupuesto);
+
+        configurarSpinner();
+        configurarBotonGuardar(vista);
+
+        return vista;
+    }
+
+    private void configurarSpinner() {
+        String[] categorias = {"Comida", "Transporte", "EducaciÃ³n", "Ocio", "Hogar", "Otros"};
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                requireContext(),
+                android.R.layout.simple_spinner_dropdown_item,
+                categorias
+        );
+
+        spinnerCategoria.setAdapter(adapter);
+    }
+
+    private void configurarBotonGuardar(View vista) {
+        btnGuardar.setOnClickListener(v -> {
+
+            // ValidaciÃ³n bÃ¡sica
+            String limiteStr = inputLimite.getText().toString().trim();
+            if (limiteStr.isEmpty()) {
+                Toast.makeText(requireContext(), "Introduce un lÃ­mite vÃ¡lido", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            double limite;
+            try {
+                limite = Double.parseDouble(limiteStr);
+            } catch (Exception e) {
+                Toast.makeText(requireContext(), "Formato de cantidad incorrecto", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            String categoria = spinnerCategoria.getSelectedItem().toString();
+
+            // Crear presupuesto
+            Presupuesto nuevo = new Presupuesto(categoria, limite, 0);
+
+            controlador.insertar(nuevo, id -> {
+                requireActivity().runOnUiThread(() -> {
+                    Toast.makeText(requireContext(), "Presupuesto creado", Toast.LENGTH_SHORT).show();
+                    Navigation.findNavController(vista).popBackStack();
+                });
             });
         });
     }
 }
+
 
 --- FILE: C:\AndroidProjects\HealthyWallet\app\src\main\java\com\example\healthywallet\ui\presupuestos\PantallaPresupuestos.java ---
 
@@ -1754,7 +2617,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.healthywallet.R;
 import com.example.healthywallet.adapters.AdaptadorPresupuestos;
+import com.example.healthywallet.controller.MovimientosControlador;
 import com.example.healthywallet.controller.PresupuestoControlador;
+import com.example.healthywallet.database.entities.Movimiento;
 import com.example.healthywallet.database.entities.Presupuesto;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -1783,24 +2648,20 @@ public class PantallaPresupuestos extends Fragment {
 
         View vista = inflater.inflate(R.layout.pantalla_presupuestos, container, false);
 
-        // Controlador
         controlador = new PresupuestoControlador(requireContext());
 
-        // UI
         recycler = vista.findViewById(R.id.recyclerPresupuestos);
         fabAgregar = vista.findViewById(R.id.fabAgregarPresupuesto);
         txtResumen = vista.findViewById(R.id.txtResumenPresupuesto);
         barraProgreso = vista.findViewById(R.id.progresoGeneralPresupuesto);
 
-        // Recycler
         recycler.setLayoutManager(new LinearLayoutManager(getContext()));
         adaptador = new AdaptadorPresupuestos(getContext(), lista);
         recycler.setAdapter(adaptador);
 
-        // FAB â†’ Agregar presupuesto
         fabAgregar.setOnClickListener(v ->
                 Navigation.findNavController(v)
-                        .navigate(R.id.nav_presupuestos)
+                        .navigate(R.id.action_presupuestos_to_agregarPresupuesto)
         );
 
         cargarPresupuestos();
@@ -1814,16 +2675,45 @@ public class PantallaPresupuestos extends Fragment {
     }
 
     private void cargarPresupuestos() {
-
         controlador.obtenerTodos(presupuestos -> {
-
             requireActivity().runOnUiThread(() -> {
 
                 lista.clear();
                 if (presupuestos != null) lista.addAll(presupuestos);
 
-                adaptador.notifyDataSetChanged();
+                // Recalcular gastoActual segÃºn movimientos reales
+                recalcularGastosPresupuestos();
+            });
+        });
+    }
 
+    private void recalcularGastosPresupuestos() {
+
+        MovimientosControlador movControlador = new MovimientosControlador(requireContext());
+
+        movControlador.obtenerTodos(movimientos -> {
+
+            requireActivity().runOnUiThread(() -> {
+
+                for (Presupuesto p : lista) {
+
+                    double suma = 0;
+
+                    for (Movimiento m : movimientos) {
+                        if (m.getCategoria().equalsIgnoreCase(p.getCategoria())
+                                && m.getTipo().equalsIgnoreCase("Gasto")) {
+
+                            suma += m.getCantidad();
+                        }
+                    }
+
+                    // Actualiza el gasto actual REAL basado en movimientos
+                    p.setGastoActual(suma);
+
+                    controlador.actualizar(p, filas -> {});
+                }
+
+                adaptador.notifyDataSetChanged();
                 actualizarResumen();
             });
         });
@@ -1832,7 +2722,7 @@ public class PantallaPresupuestos extends Fragment {
     private void actualizarResumen() {
 
         double totalLimite = 0;
-        double totalGasto = 0;  
+        double totalGasto = 0;
 
         for (Presupuesto p : lista) {
             totalLimite += p.getLimite();
@@ -1841,7 +2731,6 @@ public class PantallaPresupuestos extends Fragment {
 
         txtResumen.setText(String.format("%.2f â‚¬ gastados de %.2f â‚¬", totalGasto, totalLimite));
 
-        // Configurar barra
         barraProgreso.setMax((int) totalLimite);
         barraProgreso.setProgress((int) totalGasto);
     }
@@ -2022,44 +2911,83 @@ public class Validaciones {
 --- LAYOUT: C:\AndroidProjects\HealthyWallet\app\src\main\res\layout\item_meta.xml ---
 
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:card="http://schemas.android.com/apk/res-auto"
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/cardViewMeta"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="12dp"
-    card:cardCornerRadius="14dp"
-    card:cardElevation="5dp">
+    android:layout_marginVertical="10dp"
+    android:layout_marginHorizontal="4dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="5dp"
+    android:backgroundTint="#FFFFFF">
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="18dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
+        <!-- NOMBRE Y PORCENTAJE -->
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical">
+
+            <!-- Nombre -->
+            <TextView
+                android:id="@+id/txtNombreMeta"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Nombre Meta"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="#333333"/>
+
+            <!-- Porcentaje -->
+            <TextView
+                android:id="@+id/txtPorcentajeMeta"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="40%"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="#4CAF50"/>
+        </LinearLayout>
+
+        <!-- Cantidades -->
         <TextView
-            android:id="@+id/txtNombreMeta"
+            android:id="@+id/txtCantidadesMeta"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Nombre de la meta"
-            android:textSize="18sp"
-            android:textStyle="bold"/>
+            android:text="400 â‚¬ / 1000 â‚¬"
+            android:textSize="14sp"
+            android:textColor="#777777"
+            android:layout_marginTop="6dp"/>
 
-        <TextView
-            android:id="@+id/txtCantidadMeta"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="0 / 0"
-            android:layout_marginTop="4dp"
-            android:textSize="16sp"/>
+        <!-- Barra de progreso -->
+        <ProgressBar
+            android:id="@+id/barraProgresoMeta"
+            style="@android:style/Widget.ProgressBar.Horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="10dp"
+            android:progress="40"
+            android:max="100"
+            android:progressDrawable="@drawable/progress_meta_estilo"
+            android:layout_marginTop="12dp"/>
 
+        <!-- Fecha objetivo -->
         <TextView
             android:id="@+id/txtFechaMeta"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="01/01/2025"
-            android:layout_marginTop="4dp"
-            android:textSize="14sp"/>
-
+            android:text="Fecha objetivo: 12/07/2025"
+            android:textSize="13sp"
+            android:textColor="#999999"
+            android:layout_marginTop="10dp"/>
     </LinearLayout>
 
 </androidx.cardview.widget.CardView>
@@ -2161,6 +3089,291 @@ public class Validaciones {
     </LinearLayout>
 
 </androidx.cardview.widget.CardView>
+
+--- LAYOUT: C:\AndroidProjects\HealthyWallet\app\src\main\res\layout\pantalla_agregar_ahorro.xml ---
+
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F5F5F5">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="22dp">
+
+        <!-- HEADER -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@drawable/ic_metas"
+                app:tint="#4CAF50" />
+
+            <TextView
+                android:id="@+id/txtTituloAhorro"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="AÃ±adir ahorro"
+                android:textSize="26sp"
+                android:textStyle="bold"
+                android:textColor="#333333"
+                android:layout_marginStart="12dp"/>
+        </LinearLayout>
+
+        <!-- TARJETA META -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="#FFFFFF"
+            android:layout_marginTop="24dp"
+            app:cardElevation="5dp"
+            app:cardCornerRadius="18dp">
+
+            <LinearLayout
+                android:padding="20dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/txtNombreMetaAhorro"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Nombre meta"
+                    android:textColor="#333333"
+                    android:textSize="20sp"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:id="@+id/txtResumenAhorro"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="400 â‚¬ / 1000 â‚¬"
+                    android:textColor="#777777"
+                    android:textSize="16sp"
+                    android:layout_marginTop="6dp"/>
+
+                <ProgressBar
+                    android:id="@+id/barraMetaAhorro"
+                    style="@android:style/Widget.ProgressBar.Horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="10dp"
+                    android:progress="40"
+                    android:max="100"
+                    android:progressDrawable="@drawable/progress_meta_estilo"
+                    android:layout_marginTop="12dp"/>
+
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+
+        <!-- TARJETA FORMULARIO -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="#FFFFFF"
+            android:layout_marginTop="20dp"
+            app:cardElevation="5dp"
+            app:cardCornerRadius="18dp">
+
+            <LinearLayout
+                android:padding="20dp"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:text="Cantidad a aÃ±adir (â‚¬)"
+                    android:textSize="14sp"
+                    android:textColor="#666666"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <EditText
+                    android:id="@+id/inputCantidadAhorro"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Ej: 50"
+                    android:inputType="numberDecimal"
+                    android:padding="14dp"
+                    android:textSize="18sp" />
+            </LinearLayout>
+
+        </androidx.cardview.widget.CardView>
+
+
+        <!-- BOTÃ“N GUARDAR -->
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/btnGuardarAhorro"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_marginTop="28dp"
+            android:src="@drawable/ic_check"
+            android:contentDescription="Guardar"
+            app:tint="#FFFFFF"
+            android:backgroundTint="#4CAF50"/>
+
+    </LinearLayout>
+
+</ScrollView>
+
+--- LAYOUT: C:\AndroidProjects\HealthyWallet\app\src\main\res\layout\pantalla_agregar_meta.xml ---
+
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F5F5F5">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:padding="22dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <!-- HEADER -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@drawable/ic_metas"
+                app:tint="#4CAF50"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Nueva Meta"
+                android:textColor="#333333"
+                android:textStyle="bold"
+                android:textSize="26sp"
+                android:layout_marginStart="12dp"/>
+        </LinearLayout>
+
+
+        <!-- TARJETA FORMULARIO -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:backgroundTint="#FFFFFF"
+            app:cardCornerRadius="18dp"
+            app:cardElevation="6dp">
+
+            <LinearLayout
+                android:padding="22dp"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <!-- Nombre -->
+                <TextView
+                    android:text="Nombre de la meta"
+                    android:textColor="#666666"
+                    android:textSize="14sp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <EditText
+                    android:id="@+id/inputNombreMeta"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Ej: Ahorro para coche"
+                    android:padding="12dp"
+                    android:textSize="18sp"
+                    android:layout_marginBottom="16dp"/>
+
+
+                <!-- Cantidad objetivo -->
+                <TextView
+                    android:text="Cantidad objetivo (â‚¬)"
+                    android:textColor="#666666"
+                    android:textSize="14sp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <EditText
+                    android:id="@+id/inputCantidadObjetivo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="numberDecimal"
+                    android:padding="12dp"
+                    android:textSize="18sp"
+                    android:hint="Ej: 1000"
+                    android:layout_marginBottom="16dp"/>
+
+
+                <!-- Cantidad inicial -->
+                <TextView
+                    android:text="Cantidad actual (â‚¬)"
+                    android:textSize="14sp"
+                    android:textColor="#666666"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+                <EditText
+                    android:id="@+id/inputCantidadActual"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="numberDecimal"
+                    android:padding="12dp"
+                    android:textSize="18sp"
+                    android:hint="Ej: 0"
+                    android:layout_marginBottom="16dp"/>
+
+
+                <!-- Fecha objetivo -->
+                <TextView
+                    android:text="Fecha objetivo"
+                    android:textColor="#666666"
+                    android:textSize="14sp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <EditText
+                    android:id="@+id/inputFechaObjetivo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:focusable="false"
+                    android:padding="12dp"
+                    android:textSize="18sp"
+                    android:hint="Seleccionar fecha"
+                    android:layout_marginBottom="16dp"/>
+
+            </LinearLayout>
+
+        </androidx.cardview.widget.CardView>
+
+
+        <!-- BOTÃ“N GUARDAR -->
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/btnGuardarMeta"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_marginTop="28dp"
+            android:src="@drawable/ic_check"
+            app:tint="#FFFFFF"
+            android:backgroundTint="#4CAF50" />
+
+    </LinearLayout>
+
+</ScrollView>
 
 --- LAYOUT: C:\AndroidProjects\HealthyWallet\app\src\main\res\layout\pantalla_agregar_movimiento.xml ---
 
@@ -2329,6 +3542,78 @@ public class Validaciones {
 
 </ScrollView>
 
+--- LAYOUT: C:\AndroidProjects\HealthyWallet\app\src\main\res\layout\pantalla_agregar_presupuesto.xml ---
+
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="20dp"
+    android:background="#FFFFFF">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- TÃ­tulo -->
+        <TextView
+            android:id="@+id/txtTituloAgregarPresupuesto"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Crear Presupuesto"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="20dp"
+            android:textColor="#000000" />
+
+        <!-- CategorÃ­a -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="CategorÃ­a"
+            android:textSize="15sp"
+            android:layout_marginBottom="6dp"
+            android:textColor="#000000" />
+
+        <Spinner
+            android:id="@+id/spinnerCategoriaPresupuesto"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:layout_marginBottom="20dp" />
+
+        <!-- LÃ­mite -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="LÃ­mite (â‚¬)"
+            android:textSize="15sp"
+            android:layout_marginBottom="6dp"
+            android:textColor="#000000" />
+
+        <EditText
+            android:id="@+id/inputLimite"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Ej: 150.00"
+            android:inputType="numberDecimal"
+            android:padding="12dp"
+            android:layout_marginBottom="30dp" />
+
+        <!-- BotÃ³n Guardar -->
+        <Button
+            android:id="@+id/btnGuardarPresupuesto"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Guardar"
+            android:textAllCaps="false"
+            android:textSize="16sp"
+            android:padding="12dp" />
+
+    </LinearLayout>
+</ScrollView>
+
 --- LAYOUT: C:\AndroidProjects\HealthyWallet\app\src\main\res\layout\pantalla_ajustes.xml ---
 
 <?xml version="1.0" encoding="utf-8"?>
@@ -2338,6 +3623,307 @@ public class Validaciones {
     android:layout_height="match_parent">
 
 </LinearLayout>
+
+--- LAYOUT: C:\AndroidProjects\HealthyWallet\app\src\main\res\layout\pantalla_balance_general.xml ---
+
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F3F3F3">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="20dp">
+
+        <!-- HEADER -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Balance mensual"
+            android:textSize="26sp"
+            android:textStyle="bold"
+            android:textColor="#333333"/>
+
+        <!-- TARJETA BALANCE DEL MES -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:backgroundTint="#FFFFFF"
+            app:cardElevation="4dp"
+            app:cardCornerRadius="14dp">
+
+            <LinearLayout
+                android:padding="18dp"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Balance del mes"
+                    android:textSize="16sp"
+                    android:textColor="#888888"/>
+
+                <TextView
+                    android:id="@+id/txtBalanceMes"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0,00 â‚¬"
+                    android:textSize="24sp"
+                    android:textStyle="bold"
+                    android:textColor="#4CAF50"
+                    android:layout_marginTop="6dp"/>
+
+                <TextView
+                    android:id="@+id/txtDetalleBalanceMes"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="+0 ingresos | -0 gastos"
+                    android:textSize="14sp"
+                    android:textColor="#777777"
+                    android:layout_marginTop="6dp"/>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+
+        <!-- TARJETA TOP 3 CATEGORÃAS -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:backgroundTint="#FFFFFF"
+            app:cardElevation="4dp"
+            app:cardCornerRadius="14dp">
+
+            <LinearLayout
+                android:padding="18dp"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Top categorÃ­as del mes"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="#333333"/>
+
+                <TextView
+                    android:id="@+id/txtTop1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="1. --"
+                    android:layout_marginTop="10dp"
+                    android:textColor="#777777"/>
+
+                <TextView
+                    android:id="@+id/txtTop2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="2. --"
+                    android:layout_marginTop="6dp"
+                    android:textColor="#777777"/>
+
+                <TextView
+                    android:id="@+id/txtTop3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="3. --"
+                    android:layout_marginTop="6dp"
+                    android:textColor="#777777"/>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+
+        <!-- TARJETA PRESUPUESTOS -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:backgroundTint="#FFFFFF"
+            app:cardElevation="4dp"
+            app:cardCornerRadius="14dp">
+
+            <LinearLayout
+                android:padding="18dp"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Presupuestos del mes"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="#333333"/>
+
+                <TextView
+                    android:id="@+id/txtPresupuestoMes"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0 â‚¬ usados / 0 â‚¬"
+                    android:textColor="#777777"
+                    android:layout_marginTop="6dp"/>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+
+        <!-- TARJETA METAS -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:backgroundTint="#FFFFFF"
+            app:cardElevation="4dp"
+            app:cardCornerRadius="14dp">
+
+            <LinearLayout
+                android:padding="18dp"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Metas (este mes)"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="#333333"/>
+
+                <TextView
+                    android:id="@+id/txtMetasMes"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0 ahorrado este mes"
+                    android:layout_marginTop="6dp"
+                    android:textColor="#777777"/>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+    </LinearLayout>
+</ScrollView>
+
+--- LAYOUT: C:\AndroidProjects\HealthyWallet\app\src\main\res\layout\pantalla_detalle_meta.xml ---
+
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F3F3F3">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="20dp">
+
+        <!-- TITULO -->
+        <TextView
+            android:id="@+id/txtTituloMeta"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Nombre Meta"
+            android:textSize="28sp"
+            android:textColor="#333333"
+            android:textStyle="bold"
+            android:layout_marginBottom="10dp"/>
+
+        <!-- TARJETA PRINCIPAL -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="#FFFFFF"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="5dp"
+            android:layout_marginBottom="20dp">
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:padding="18dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <!-- Cantidades -->
+                <TextView
+                    android:id="@+id/txtCantidadesDetalle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="400 â‚¬ / 1000 â‚¬"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:textColor="#4CAF50"
+                    android:layout_marginBottom="10dp"/>
+
+                <!-- Porcentaje -->
+                <TextView
+                    android:id="@+id/txtPorcentajeDetalle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="40%"
+                    android:textSize="24sp"
+                    android:textStyle="bold"
+                    android:textColor="#333333"
+                    android:layout_marginBottom="10dp"/>
+
+                <!-- Barra de progreso -->
+                <ProgressBar
+                    android:id="@+id/barraDetalleMeta"
+                    style="@android:style/Widget.ProgressBar.Horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="12dp"
+                    android:max="100"
+                    android:progress="40"
+                    android:progressDrawable="@drawable/progress_meta_estilo"
+                    android:layout_marginBottom="15dp"/>
+
+                <!-- Fecha lÃ­mite -->
+                <TextView
+                    android:id="@+id/txtFechaDetalle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Fecha objetivo: 12/11/2025"
+                    android:textSize="16sp"
+                    android:textColor="#666666"/>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- BOTÃ“N AGREGAR AHORRO -->
+        <Button
+            android:id="@+id/btnAgregarAhorro"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Agregar ahorro"
+            android:textSize="18sp"
+            android:layout_marginBottom="15dp"
+            android:padding="12dp"
+            android:backgroundTint="#4CAF50"
+            android:textColor="#FFFFFF"
+            app:cornerRadius="8dp"/>
+
+        <!-- BOTÃ“N ELIMINAR META -->
+        <Button
+            android:id="@+id/btnEliminarMeta"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Eliminar meta"
+            android:textSize="18sp"
+            android:padding="12dp"
+            android:backgroundTint="#E53935"
+            android:textColor="#FFFFFF"
+            app:cornerRadius="8dp"/>
+    </LinearLayout>
+</ScrollView>
 
 --- LAYOUT: C:\AndroidProjects\HealthyWallet\app\src\main\res\layout\pantalla_educacion.xml ---
 
@@ -2612,8 +4198,7 @@ public class Validaciones {
 --- LAYOUT: C:\AndroidProjects\HealthyWallet\app\src\main\res\layout\pantalla_inicio.xml ---
 
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -2629,12 +4214,12 @@ public class Validaciones {
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
 
             <ImageView
-                android:layout_width="28dp"
-                android:layout_height="28dp"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
                 android:src="@drawable/ic_home"
                 app:tint="#4CAF50"/>
 
@@ -2642,28 +4227,29 @@ public class Validaciones {
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Inicio"
-                android:textSize="26sp"
-                android:textColor="#333333"
                 android:textStyle="bold"
+                android:textColor="#333333"
+                android:textSize="26sp"
                 android:layout_marginStart="12dp"/>
         </LinearLayout>
 
 
-        <!-- TARJETA BALANCE GENERAL -->
+        <!-- TARJETA: BALANCE TOTAL (click â†’ balance general) -->
         <androidx.cardview.widget.CardView
+            android:id="@+id/cardBalanceGeneral"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="18dp"
+            android:backgroundTint="#FFFFFF"
             android:foreground="?attr/selectableItemBackground"
-            app:cardElevation="4dp"
             app:cardCornerRadius="14dp"
-            android:backgroundTint="#FFFFFF">
+            app:cardElevation="4dp">
 
             <LinearLayout
                 android:orientation="vertical"
+                android:padding="18dp"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="18dp">
+                android:layout_height="wrap_content">
 
                 <TextView
                     android:id="@+id/txtBalanceTituloInicio"
@@ -2679,30 +4265,29 @@ public class Validaciones {
                     android:layout_height="wrap_content"
                     android:text="0,00 â‚¬"
                     android:textColor="#4CAF50"
-                    android:textSize="24sp"
                     android:textStyle="bold"
+                    android:textSize="24sp"
                     android:layout_marginTop="6dp"/>
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
 
-
-        <!-- TARJETA: PRESUPUESTOS -->
+        <!-- TARJETA PRESUPUESTOS -->
         <androidx.cardview.widget.CardView
             android:id="@+id/cardPresupuestos"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
+            android:backgroundTint="#FFFFFF"
             android:foreground="?attr/selectableItemBackground"
             app:cardCornerRadius="14dp"
-            app:cardElevation="3dp"
-            android:backgroundTint="#FFFFFF">
+            app:cardElevation="3dp">
 
             <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="16dp">
+                android:padding="16dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -2723,23 +4308,22 @@ public class Validaciones {
         </androidx.cardview.widget.CardView>
 
 
-
-        <!-- TARJETA: MOVIMIENTOS -->
+        <!-- TARJETA MOVIMIENTOS -->
         <androidx.cardview.widget.CardView
             android:id="@+id/cardMovimientos"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
+            android:backgroundTint="#FFFFFF"
             android:foreground="?attr/selectableItemBackground"
             app:cardCornerRadius="14dp"
-            app:cardElevation="3dp"
-            android:backgroundTint="#FFFFFF">
+            app:cardElevation="3dp">
 
             <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="16dp">
+                android:padding="16dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -2760,23 +4344,22 @@ public class Validaciones {
         </androidx.cardview.widget.CardView>
 
 
-
-        <!-- TARJETA: METAS -->
+        <!-- TARJETA METAS -->
         <androidx.cardview.widget.CardView
             android:id="@+id/cardMetas"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
+            android:backgroundTint="#FFFFFF"
             android:foreground="?attr/selectableItemBackground"
             app:cardCornerRadius="14dp"
-            app:cardElevation="3dp"
-            android:backgroundTint="#FFFFFF">
+            app:cardElevation="3dp">
 
             <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="16dp">
+                android:padding="16dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -2797,37 +4380,36 @@ public class Validaciones {
         </androidx.cardview.widget.CardView>
 
 
-
-        <!-- TARJETA: EDUCACIÃ“N FINANCIERA -->
+        <!-- TARJETA EDUCACIÃ“N -->
         <androidx.cardview.widget.CardView
             android:id="@+id/cardEducacion"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
+            android:backgroundTint="#FFFFFF"
             android:foreground="?attr/selectableItemBackground"
             app:cardCornerRadius="14dp"
-            app:cardElevation="3dp"
-            android:backgroundTint="#FFFFFF">
+            app:cardElevation="3dp">
 
             <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="16dp">
+                android:padding="16dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="EducaciÃ³n financiera"
+                    android:textColor="#333333"
                     android:textSize="18sp"
-                    android:textStyle="bold"
-                    android:textColor="#333333"/>
+                    android:textStyle="bold"/>
 
                 <TextView
                     android:id="@+id/txtResumenEducacionInicio"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="0 mÃ³dulos completados"
+                    android:text="0 mÃ³dulos registrados"
                     android:textColor="#777777"
                     android:layout_marginTop="6dp"/>
             </LinearLayout>
@@ -2839,19 +4421,21 @@ public class Validaciones {
 --- LAYOUT: C:\AndroidProjects\HealthyWallet\app\src\main\res\layout\pantalla_metas.xml ---
 
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F3F3F3">
+    android:background="#F5F5F5">
 
+    <!-- CONTENEDOR PRINCIPAL -->
     <LinearLayout
         android:orientation="vertical"
+        android:padding="22dp"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="20dp">
+        android:layout_height="match_parent">
 
-        <!-- Header estilo Revolut -->
+        <!-- HEADER -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -2859,80 +4443,84 @@ public class Validaciones {
             android:orientation="horizontal">
 
             <ImageView
-                android:layout_width="28dp"
-                android:layout_height="28dp"
-                android:src="@drawable/ic_metas" />
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@drawable/ic_metas"
+                app:tint="#4CAF50"/>
 
             <TextView
                 android:id="@+id/tituloMetas"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Metas"
-                android:textSize="26sp"
+                android:textSize="28sp"
                 android:textStyle="bold"
-                android:textColor="#333333"
+                android:textColor="#222222"
                 android:layout_marginStart="12dp"/>
         </LinearLayout>
 
-        <!-- Tarjeta resumen (opcional pero muy profesional) -->
+
+        <!-- TARJETA RESUMEN -->
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="18dp"
-            android:padding="18dp"
-            app:cardElevation="4dp"
-            app:cardCornerRadius="14dp"
+            android:layout_marginTop="20dp"
+            app:cardElevation="6dp"
+            app:cardCornerRadius="18dp"
             android:backgroundTint="#FFFFFF">
 
             <LinearLayout
                 android:orientation="vertical"
-                android:layout_width="wrap_content"
+                android:padding="20dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
                 <TextView
                     android:id="@+id/txtResumenTitulo"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
                     android:text="Progreso general"
-                    android:textSize="16sp"
-                    android:textColor="#888888" />
+                    android:textSize="15sp"
+                    android:textColor="#777777"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
 
                 <TextView
                     android:id="@+id/txtResumenCantidad"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="0 / 0 â‚¬"
-                    android:textSize="22sp"
+                    android:text="0 â‚¬ / 0 â‚¬"
+                    android:textSize="24sp"
                     android:textStyle="bold"
                     android:textColor="#4CAF50"
-                    android:layout_marginTop="4dp"/>
+                    android:layout_marginTop="6dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
             </LinearLayout>
 
         </androidx.cardview.widget.CardView>
 
-        <!-- Lista de metas -->
+
+        <!-- LISTA DE METAS -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerMetas"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:layout_marginTop="20dp"/>
+            android:layout_marginTop="24dp"/>
 
     </LinearLayout>
 
-    <!-- BotÃ³n FAB estilo Revolut/N26 -->
+
+    <!-- BOTÃ“N FLOTANTE AÃ‘ADIR -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabAgregarMeta"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/ic_add"
-        app:tint="#FFFFFF"
-        app:backgroundTint="#4CAF50"
-        app:elevation="6dp"
-        android:layout_margin="20dp"
-        app:layout_anchorGravity="bottom|end"
         android:contentDescription="AÃ±adir meta"
-        app:layout_anchor="@id/recyclerMetas"/>
+        app:tint="#FFFFFF"
+        android:backgroundTint="#4CAF50"
+        android:layout_margin="22dp"
+        android:layout_gravity="bottom|end"
+        app:elevation="8dp"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
@@ -3189,42 +4777,107 @@ public class Validaciones {
     xmlns:tools="http://schemas.android.com/tools"
     app:startDestination="@id/nav_inicio">
 
+    <!-- INICIO -->
     <fragment
         android:id="@+id/nav_inicio"
         android:name="com.example.healthywallet.ui.inicio.PantallaInicio"
         android:label="Inicio"
         tools:layout="@layout/pantalla_inicio" />
 
+    <!-- MOVIMIENTOS -->
     <fragment
         android:id="@+id/nav_movimientos"
         android:name="com.example.healthywallet.ui.movimientos.PantallaMovimientos"
         android:label="Movimientos"
-        tools:layout="@layout/pantalla_movimientos" />
+        tools:layout="@layout/pantalla_movimientos" >
 
-    <fragment
-        android:id="@+id/nav_presupuestos"
-        android:name="com.example.healthywallet.ui.presupuestos.PantallaPresupuestos"
-        android:label="Presupuestos"
-        tools:layout="@layout/pantalla_presupuestos" />
+        <action
+            android:id="@+id/action_movimientos_to_agregarMovimiento"
+            app:destination="@id/fragmentoAgregarMovimiento" />
+    </fragment>
 
-    <fragment
-        android:id="@+id/nav_metas"
-        android:name="com.example.healthywallet.ui.metas.PantallaMetas"
-        android:label="Metas"
-        tools:layout="@layout/pantalla_metas" />
-
-    <fragment
-        android:id="@+id/nav_educacion"
-        android:name="com.example.healthywallet.ui.educacion.PantallaEducacion"
-        android:label="EducaciÃ³n"
-        tools:layout="@layout/pantalla_educacion" />
-
+    <!-- AGREGAR MOVIMIENTO -->
     <fragment
         android:id="@+id/fragmentoAgregarMovimiento"
         android:name="com.example.healthywallet.ui.movimientos.PantallaAgregarMovimiento"
         android:label="Agregar movimiento"
         tools:layout="@layout/pantalla_agregar_movimiento" />
 
+    <!-- PRESUPUESTOS -->
+    <fragment
+        android:id="@+id/nav_presupuestos"
+        android:name="com.example.healthywallet.ui.presupuestos.PantallaPresupuestos"
+        android:label="Presupuestos"
+        tools:layout="@layout/pantalla_presupuestos">
+
+        <action
+            android:id="@+id/action_presupuestos_to_agregarPresupuesto"
+            app:destination="@id/pantallaAgregarPresupuesto" />
+    </fragment>
+
+    <!-- AGREGAR PRESUPUESTO -->
+    <fragment
+        android:id="@+id/pantallaAgregarPresupuesto"
+        android:name="com.example.healthywallet.ui.presupuestos.PantallaAgregarPresupuesto"
+        android:label="Agregar Presupuesto"
+        tools:layout="@layout/pantalla_agregar_presupuesto" />
+
+    <!-- METAS -->
+    <fragment
+        android:id="@+id/nav_metas"
+        android:name="com.example.healthywallet.ui.metas.PantallaMetas"
+        android:label="Metas"
+        tools:layout="@layout/pantalla_metas">
+
+        <!-- AcciÃ³n â†’ Detalle -->
+        <action
+            android:id="@+id/action_metas_to_detalleMeta"
+            app:destination="@id/pantallaDetalleMeta" />
+
+        <!-- AcciÃ³n â†’ Agregar Meta -->
+        <action
+            android:id="@+id/action_metas_to_agregarMeta"
+            app:destination="@id/pantallaAgregarMeta" />
+    </fragment>
+
+    <!-- DETALLE META -->
+    <fragment
+        android:id="@+id/pantallaDetalleMeta"
+        android:name="com.example.healthywallet.ui.metas.PantallaDetalleMeta"
+        android:label="Detalle Meta"
+        tools:layout="@layout/pantalla_detalle_meta">
+
+        <!-- Desde detalle â†’ agregar ahorro -->
+        <action
+            android:id="@+id/action_detalle_to_agregarAhorro"
+            app:destination="@id/pantallaAgregarAhorro" />
+    </fragment>
+
+    <!-- AGREGAR META -->
+    <fragment
+        android:id="@+id/pantallaAgregarMeta"
+        android:name="com.example.healthywallet.ui.metas.PantallaAgregarMeta"
+        android:label="Agregar Meta"
+        tools:layout="@layout/pantalla_agregar_meta" />
+
+    <!-- AGREGAR AHORRO A META -->
+    <fragment
+        android:id="@+id/pantallaAgregarAhorro"
+        android:name="com.example.healthywallet.ui.metas.PantallaAgregarAhorro"
+        android:label="Agregar Ahorro"
+        tools:layout="@layout/pantalla_agregar_ahorro" />
+
+    <!-- EDUCACIÃ“N -->
+    <fragment
+        android:id="@+id/nav_educacion"
+        android:name="com.example.healthywallet.ui.educacion.PantallaEducacion"
+        android:label="EducaciÃ³n"
+        tools:layout="@layout/pantalla_educacion" />
+    <fragment
+        android:id="@+id/pantallaBalanceGeneral"
+        android:name="com.example.healthywallet.ui.inicio.PantallaBalanceGeneral"
+        android:label="Balance General"
+        tools:layout="@layout/pantalla_balance_general" />
 
 </navigation>
 
@@ -3381,6 +5034,48 @@ public class Validaciones {
         android:pathData="M3,13h2v-2H3v2zM3,17h2v-2H3v2zM3,9h2V7H3v2zM7,13h14v-2H7v2zM7,17h14v-2H7v2zM7,7v2h14V7H7z"/>
 </vector>
 
+--- DRAWABLE: C:\AndroidProjects\HealthyWallet\app\src\main\res\drawable\ic_placeholder_chart.xml ---
+
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="200dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+    <!-- LÃ­neas de barras minimalistas -->
+    <path
+        android:pathData="M5,20L5,10"
+        android:strokeColor="#4CAF50"
+        android:strokeWidth="2"
+        android:strokeLineCap="round" />
+
+    <path
+        android:pathData="M10,20L10,6"
+        android:strokeColor="#4CAF50"
+        android:strokeWidth="2"
+        android:strokeLineCap="round" />
+
+    <path
+        android:pathData="M15,20L15,14"
+        android:strokeColor="#4CAF50"
+        android:strokeWidth="2"
+        android:strokeLineCap="round" />
+
+    <path
+        android:pathData="M20,20L20,4"
+        android:strokeColor="#4CAF50"
+        android:strokeWidth="2"
+        android:strokeLineCap="round" />
+
+    <!-- LÃ­nea base -->
+    <path
+        android:pathData="M3,20L22,20"
+        android:strokeColor="#DDDDDD"
+        android:strokeWidth="2"
+        android:strokeLineCap="round" />
+</vector>
+
 --- DRAWABLE: C:\AndroidProjects\HealthyWallet\app\src\main\res\drawable\ic_presupuesto.xml ---
 
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
@@ -3394,3 +5089,27 @@ public class Validaciones {
         android:fillColor="#4CAF50"
         android:pathData="M21,7H3c-1.1,0 -2,0.9 -2,2v10c0,1.1 0.9,2 2,2h18c1.1,0 2,-0.9 2,-2V9c0,-1.1 -0.9,-2 -2,-2zM21,19H3V9h18v10zM16,13c-1.1,0 -2,0.9 -2,2s0.9,2 2,2 2,-0.9 2,-2 -0.9,-2 -2,-2z"/>
 </vector>
+
+--- DRAWABLE: C:\AndroidProjects\HealthyWallet\app\src\main\res\drawable\progress_meta_estilo.xml ---
+
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Fondo -->
+    <item android:id="@android:id/background">
+        <shape>
+            <corners android:radius="50dp" />
+            <solid android:color="#E0E0E0"/>
+        </shape>
+    </item>
+
+    <!-- Progreso -->
+    <item android:id="@android:id/progress">
+        <clip>
+            <shape>
+                <corners android:radius="50dp" />
+                <solid android:color="#4CAF50"/> <!-- Verde bonito -->
+            </shape>
+        </clip>
+    </item>
+
+</layer-list>

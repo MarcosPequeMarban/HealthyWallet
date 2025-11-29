@@ -4,6 +4,8 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -11,15 +13,23 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.healthywallet.R;
+import com.example.healthywallet.controller.MetaControlador;
 import com.example.healthywallet.controller.MovimientosControlador;
-import com.example.healthywallet.database.entities.Movimiento;
+import com.example.healthywallet.controller.PresupuestoControlador;
+import com.example.healthywallet.database.entities.Meta;
+import com.example.healthywallet.database.entities.Presupuesto;
 
 import java.util.List;
 
 public class PantallaBalanceGeneral extends Fragment {
 
-    private TextView txtIngresosMes, txtGastosMes, txtTop1, txtTop2, txtTop3;
-    private MovimientosControlador controlador;
+    TextView txtBalanceMes, txtIngresosGastosMes;
+    ProgressBar barraAhorroMes, barraPresupuestoMes, barraMetas;
+    LinearLayout layoutCategorias;
+
+    MovimientosControlador movC;
+    PresupuestoControlador preC;
+    MetaControlador metaC;
 
     @Nullable
     @Override
@@ -29,50 +39,102 @@ public class PantallaBalanceGeneral extends Fragment {
 
         View v = inflater.inflate(R.layout.pantalla_balance_general, container, false);
 
-        txtIngresosMes = v.findViewById(R.id.txtIngresosMes);
-        txtGastosMes = v.findViewById(R.id.txtGastosMes);
-        txtTop1 = v.findViewById(R.id.txtTop1);
-        txtTop2 = v.findViewById(R.id.txtTop2);
-        txtTop3 = v.findViewById(R.id.txtTop3);
+        txtBalanceMes = v.findViewById(R.id.txtBalanceMes);
+        txtIngresosGastosMes = v.findViewById(R.id.txtIngresosGastosMes);
 
-        controlador = new MovimientosControlador(requireContext());
+        barraAhorroMes = v.findViewById(R.id.barraAhorroMes);
+        barraPresupuestoMes = v.findViewById(R.id.barraPresupuestoMes);
+        barraMetas = v.findViewById(R.id.barraMetas);
 
-        cargarBalance();
+        layoutCategorias = v.findViewById(R.id.layoutCategorias);
+
+        movC = new MovimientosControlador(getContext());
+        preC = new PresupuestoControlador(getContext());
+        metaC = new MetaControlador(getContext());
+
+        cargarBalanceMes();
+        cargarPresupuestos();
+        cargarMetas();
+        cargarCategorias();
 
         return v;
     }
 
-    private void cargarBalance() {
-        controlador.obtenerTodos(movs -> {
+    // -----------------------------
+    // BALANCE DEL MES
+    // -----------------------------
+    private void cargarBalanceMes() {
 
-            requireActivity().runOnUiThread(() -> {
+        movC.obtenerSumaPorTipo("Ingreso", ingresos ->
+                movC.obtenerSumaPorTipo("Gasto", gastos -> {
 
-                double ingresos = 0;
-                double gastos = 0;
+                    double balance = ingresos - gastos;
 
-                // contador por categorías
-                java.util.Map<String, Double> categorias = new java.util.HashMap<>();
+                    requireActivity().runOnUiThread(() -> {
+                        txtBalanceMes.setText(String.format("%.2f €", balance));
+                        txtIngresosGastosMes.setText(
+                                String.format("+%.2f ingresos | -%.2f gastos", ingresos, gastos)
+                        );
+                    });
+                })
+        );
+    }
 
-                for (Movimiento m : movs) {
+    // -----------------------------
+    // PRESUPUESTOS
+    // -----------------------------
+    private void cargarPresupuestos() {
 
-                    if (m.getTipo().equals("Ingreso")) ingresos += m.getCantidad();
-                    else gastos += m.getCantidad();
+        preC.obtenerTodos(lista -> {
 
-                    categorias.put(m.getCategoria(),
-                            categorias.getOrDefault(m.getCategoria(), 0.0) + m.getCantidad());
+            double gasto = 0;
+            double limite = 0;
+
+            if (lista != null) {
+                for (Presupuesto p : lista) {
+                    gasto += p.getGastoActual();
+                    limite += p.getLimite();
                 }
+            }
 
-                txtIngresosMes.setText(String.format("%.2f €", ingresos));
-                txtGastosMes.setText(String.format("%.2f €", gastos));
+            final int porcentaje = (int) ((limite == 0) ? 0 : (gasto / limite) * 100);
 
-                // top categorías
-                List<java.util.Map.Entry<String, Double>> lista = new java.util.ArrayList<>(categorias.entrySet());
-                lista.sort((a, b) -> Double.compare(b.getValue(), a.getValue()));
-
-                if (lista.size() > 0) txtTop1.setText(lista.get(0).getKey() + " — " + lista.get(0).getValue() + " €");
-                if (lista.size() > 1) txtTop2.setText(lista.get(1).getKey() + " — " + lista.get(1).getValue() + " €");
-                if (lista.size() > 2) txtTop3.setText(lista.get(2).getKey() + " — " + lista.get(2).getValue() + " €");
-            });
+            requireActivity().runOnUiThread(() ->
+                    barraPresupuestoMes.setProgress(porcentaje)
+            );
         });
+    }
+
+    // -----------------------------
+    // METAS
+    // -----------------------------
+    private void cargarMetas() {
+
+        metaC.obtenerTodas(lista -> {
+
+            double progreso = 0;
+            double total = 0;
+
+            if (lista != null) {
+                for (Meta m : lista) {
+                    progreso += m.getCantidadActual();
+                    total += m.getCantidadObjetivo();
+                }
+            }
+
+            final int porcentaje = (int) ((total == 0) ? 0 : (progreso / total) * 100);
+
+            requireActivity().runOnUiThread(() ->
+                    barraMetas.setProgress(porcentaje)
+            );
+        });
+    }
+
+    // -----------------------------
+    // CATEGORÍAS
+    // -----------------------------
+    private void cargarCategorias() {
+        // EN FUTURO: insertar labels dinámicas de categorías
+        // evitando errores por falta de datos
     }
 }

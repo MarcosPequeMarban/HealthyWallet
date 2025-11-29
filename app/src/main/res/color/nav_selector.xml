@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Activo -->
+    <item android:color="@color/nav_verde" android:state_checked="true"/>
+
+    <!-- Inactivo -->
+    <item android:color="@color/nav_gris" />
+
+</selector>
