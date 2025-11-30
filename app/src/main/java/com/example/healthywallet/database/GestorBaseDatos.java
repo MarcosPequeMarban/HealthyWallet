@@ -14,14 +14,13 @@ import com.example.healthywallet.database.DAO.FormacionDao;
 import com.example.healthywallet.database.DAO.MetaDao;
 import com.example.healthywallet.database.DAO.MovimientoDao;
 import com.example.healthywallet.database.DAO.PresupuestoDao;
-import com.example.healthywallet.database.DAO.RecursoEducativoDao;
 
 import com.example.healthywallet.database.entities.Categoria;
 import com.example.healthywallet.database.entities.Formacion;
 import com.example.healthywallet.database.entities.Meta;
 import com.example.healthywallet.database.entities.Movimiento;
 import com.example.healthywallet.database.entities.Presupuesto;
-import com.example.healthywallet.database.entities.RecursoEducativo;
+import com.example.healthywallet.database.entities.Usuario;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -33,10 +32,9 @@ import java.util.concurrent.Executors;
                 Presupuesto.class,
                 Meta.class,
                 Formacion.class,
-                RecursoEducativo.class   // ⭐ NUEVO
+                Usuario.class
         },
-        version = 3,  // ⭐ IMPORTANTE
-        exportSchema = true
+        version = 3
 )
 public abstract class GestorBaseDatos extends RoomDatabase {
 
@@ -45,7 +43,6 @@ public abstract class GestorBaseDatos extends RoomDatabase {
     public abstract PresupuestoDao presupuestoDao();
     public abstract MetaDao metaDao();
     public abstract FormacionDao formacionDao();
-    public abstract RecursoEducativoDao recursoEducativoDao();  // ⭐ NUEVO DAO
 
     private static volatile GestorBaseDatos INSTANCIA;
 
@@ -59,7 +56,7 @@ public abstract class GestorBaseDatos extends RoomDatabase {
         public void migrate(@NonNull SupportSQLiteDatabase database) {}
     };
 
-    // ⭐ Migración 2→3 para crear la nueva tabla
+    // Migración 2→3 para crear la nueva tabla
     static final Migration MIGRACION_2_3 = new Migration(2, 3) {
         @Override
         public void migrate(@NonNull SupportSQLiteDatabase db) {
@@ -84,7 +81,7 @@ public abstract class GestorBaseDatos extends RoomDatabase {
                                     GestorBaseDatos.class,
                                     "HealthyWalletDB"
                             )
-                            .addMigrations(MIGRACION_1_2, MIGRACION_2_3)  // ⭐ IMPORTANTE
+                            .addMigrations(MIGRACION_1_2, MIGRACION_2_3)
                             .build();
                 }
             }

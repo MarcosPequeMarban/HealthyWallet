@@ -56,29 +56,5 @@ public class FormacionControlador {
         executor.execute(() -> callback.onResult(dao.eliminarPorId(id)));
     }
 
-    public void eliminarTodo(Runnable callback) {
-        executor.execute(() -> {
-            dao.eliminarTodo();
-            callback.run();
-        });
-    }
 
-    // --------------------------
-    //   REEMPLAZAR RECURSO
-    // --------------------------
-
-    public void reemplazarRecurso(int id, String nuevoTitulo, String tipo, FormacionCallback callback) {
-        executor.execute(() -> {
-            Formacion nuevo = new Formacion(
-                    nuevoTitulo,
-                    tipo,
-                    false,
-                    String.valueOf(System.currentTimeMillis())
-            );
-
-            nuevo.setId(id);
-            dao.actualizar(nuevo);
-            callback.onResult(nuevo);
-        });
-    }
 }
