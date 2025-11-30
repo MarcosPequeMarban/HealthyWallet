@@ -23,13 +23,12 @@ public interface MetaDao {
     @Delete
     int eliminar(Meta meta);
 
-    @Query("SELECT * FROM metas ORDER BY fechaObjetivo ASC")
-    List<Meta> obtenerTodas();
+    @Query("SELECT * FROM metas WHERE userId = :userId ORDER BY fechaObjetivo ASC")
+    List<Meta> obtenerTodas(int userId);
 
-    @Query("SELECT * FROM metas WHERE id = :id LIMIT 1")
-    Meta obtenerPorId(int id);
+    @Query("SELECT * FROM metas WHERE id = :id AND userId = :userId LIMIT 1")
+    Meta obtenerPorId(int id, int userId);
 
-    @Query("UPDATE metas SET cantidadActual = :cantidad WHERE id = :id")
-    int actualizarCantidad(double cantidad, int id);
-
+    @Query("UPDATE metas SET cantidadActual = :cantidad WHERE id = :id AND userId = :userId")
+    int actualizarCantidad(double cantidad, int id, int userId);
 }

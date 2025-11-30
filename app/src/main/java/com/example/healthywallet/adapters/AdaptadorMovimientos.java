@@ -17,7 +17,7 @@ import java.util.List;
 public class AdaptadorMovimientos extends RecyclerView.Adapter<AdaptadorMovimientos.ViewHolderMovimiento> {
 
     private final Context context;
-    private final List<Movimiento> lista;
+    private List<Movimiento> lista;
 
     public AdaptadorMovimientos(Context context, List<Movimiento> lista) {
         this.context = context;
@@ -37,13 +37,20 @@ public class AdaptadorMovimientos extends RecyclerView.Adapter<AdaptadorMovimien
 
         holder.txtTipo.setText(mov.getTipo());
         holder.txtCategoria.setText(mov.getCategoria());
-        holder.txtCantidad.setText(String.valueOf(mov.getCantidad()) + " €");
+        holder.txtCantidad.setText(mov.getCantidad() + " €");
         holder.txtFecha.setText(mov.getFecha());
     }
 
     @Override
     public int getItemCount() {
         return lista.size();
+    }
+
+    /** Método para refrescar la lista */
+    public void actualizarLista(List<Movimiento> nuevaLista) {
+        lista.clear();
+        lista.addAll(nuevaLista);
+        notifyDataSetChanged();
     }
 
     static class ViewHolderMovimiento extends RecyclerView.ViewHolder {

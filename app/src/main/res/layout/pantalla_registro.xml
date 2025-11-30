@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="24dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:layout_gravity="center">
+
+        <!-- LOGO -->
+        <ImageView
+            android:id="@+id/logoRegistro"
+            android:layout_width="130dp"
+            android:layout_height="130dp"
+            android:src="@drawable/logo_wallet"
+            android:layout_marginBottom="24dp"
+            android:contentDescription="Logo Healthy Wallet" />
+
+        <!-- TÍTULO -->
+        <TextView
+            android:id="@+id/tvTituloRegistro"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Crear cuenta"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="32dp" />
+
+        <!-- NOMBRE -->
+        <EditText
+            android:id="@+id/etNombreRegistro"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:hint="Nombre completo"
+            android:background="@drawable/edittext_borde"
+            android:padding="12dp"
+            android:inputType="textPersonName" />
+
+        <!-- EMAIL -->
+        <EditText
+            android:id="@+id/etEmailRegistro"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:hint="Correo electrónico"
+            android:background="@drawable/edittext_borde"
+            android:layout_marginTop="16dp"
+            android:padding="12dp"
+            android:inputType="textEmailAddress" />
+
+        <!-- CONTRASEÑA -->
+        <EditText
+            android:id="@+id/etPassRegistro"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:hint="Contraseña"
+            android:background="@drawable/edittext_borde"
+            android:layout_marginTop="16dp"
+            android:padding="12dp"
+            android:inputType="textPassword" />
+
+        <!-- REPETIR CONTRASEÑA -->
+        <EditText
+            android:id="@+id/etPassConfirmarRegistro"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:hint="Confirmar contraseña"
+            android:background="@drawable/edittext_borde"
+            android:layout_marginTop="16dp"
+            android:padding="12dp"
+            android:inputType="textPassword" />
+
+        <!-- BOTÓN REGISTRARSE -->
+        <Button
+            android:id="@+id/btnRegistrar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="REGISTRARSE"
+            android:layout_marginTop="24dp"
+            android:backgroundTint="@color/teal_700"
+            android:textColor="@color/colorBlanco"
+            android:padding="12dp" />
+
+        <!-- IR A LOGIN -->
+        <TextView
+            android:id="@+id/tvIrLogin"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="¿Ya tienes cuenta? Inicia sesión"
+            android:textColor="@color/teal_700"
+            android:textStyle="bold"
+            android:layout_marginTop="16dp" />
+
+    </LinearLayout>
+
+</ScrollView>

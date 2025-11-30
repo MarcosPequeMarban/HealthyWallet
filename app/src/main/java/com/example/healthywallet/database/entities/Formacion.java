@@ -2,9 +2,18 @@ package com.example.healthywallet.database.entities;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.ForeignKey;
 import androidx.room.PrimaryKey;
 
-@Entity(tableName = "formacion")
+@Entity(
+        tableName = "formacion",
+        foreignKeys = @ForeignKey(
+                entity = Usuario.class,
+                parentColumns = "id",
+                childColumns = "userId",
+                onDelete = ForeignKey.CASCADE
+        )
+)
 public class Formacion {
 
     @PrimaryKey(autoGenerate = true)
@@ -19,12 +28,17 @@ public class Formacion {
     @ColumnInfo(name = "nivel")
     private String nivel;
 
-    public Formacion(String titulo, String descripcion, String nivel) {
+    @ColumnInfo(name = "userId", index = true)
+    private int userId;  // ← NUEVO: dueño de este recurso formativo
+
+    public Formacion(String titulo, String descripcion, String nivel, int userId) {
         this.titulo = titulo;
         this.descripcion = descripcion;
         this.nivel = nivel;
+        this.userId = userId;
     }
 
+    // Getters y Setters
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
 
@@ -36,4 +50,7 @@ public class Formacion {
 
     public String getNivel() { return nivel; }
     public void setNivel(String nivel) { this.nivel = nivel; }
+
+    public int getUserId() { return userId; }
+    public void setUserId(int userId) { this.userId = userId; }
 }

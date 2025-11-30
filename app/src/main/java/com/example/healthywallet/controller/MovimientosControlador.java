@@ -1,7 +1,7 @@
 package com.example.healthywallet.controller;
 
 import android.content.Context;
-import android.util.Log;
+import android.content.SharedPreferences;
 
 import com.example.healthywallet.database.GestorBaseDatos;
 import com.example.healthywallet.database.DAO.MovimientoDao;
@@ -30,53 +30,58 @@ public class MovimientosControlador {
 
     private final MovimientoDao dao;
     private final ExecutorService executor;
+    private final int userId;
 
     public MovimientosControlador(Context context) {
         GestorBaseDatos db = GestorBaseDatos.obtenerInstancia(context);
         dao = db.movimientoDao();
         executor = GestorBaseDatos.databaseExecutor;
+
+        SharedPreferences prefs = context.getSharedPreferences("session", Context.MODE_PRIVATE);
+        userId = prefs.getInt("usuarioId", -1);
     }
 
-    // Insertar
     public void insertar(Movimiento mov, CallbackInt callback) {
+        mov.setUserId(userId);
         executor.execute(() -> {
             int result = (int) dao.insertar(mov);
             callback.onResult(result);
         });
     }
 
-    // Actualizar
     public void actualizar(Movimiento mov, CallbackInt callback) {
+        mov.setUserId(userId);
         executor.execute(() -> {
             int result = dao.actualizar(mov);
             callback.onResult(result);
         });
     }
 
-    // Obtener por ID
     public void obtenerPorId(int id, CallbackMovimiento callback) {
         executor.execute(() -> {
-            Movimiento mov = dao.obtenerPorId(id);
+            Movimiento mov = dao.obtenerPorId(id, userId);
             callback.onResult(mov);
         });
     }
 
-    // Obtener todos
     public void obtenerTodos(CallbackListaMovimiento callback) {
-        executor.execute(() -> callback.onResult(dao.obtenerTodos()));
-    }
-
-    // Obtener por tipo
-    public void obtenerPorTipo(String tipo, CallbackListaMovimiento callback) {
-        executor.execute(() -> callback.onResult(dao.obtenerPorTipo(tipo)));
-    }
-
-    // Obtener suma por tipo
-    public void obtenerSumaPorTipo(String tipo, CallbackDouble callback) {
         executor.execute(() -> {
-            Double valor = dao.obtenerSumaPorTipo(tipo);
-            callback.onResult(valor != null ? valor : 0.0);
+            List<Movimiento> lista = dao.obtenerTodos(userId);
+            callback.onResult(lista);
         });
     }
 
+    public void obtenerPorTipo(String tipo, CallbackListaMovimiento callback) {
+        executor.execute(() -> {
+            List<Movimiento> lista = dao.obtenerPorTipo(tipo, userId);
+            callback.onResult(lista);
+        });
+    }
+
+    public void obtenerSumaPorTipo(String tipo, CallbackDouble callback) {
+        executor.execute(() -> {
+            Double valor = dao.obtenerSumaPorTipo(tipo, userId);
+            callback.onResult(valor != null ? valor : 0.0);
+        });
+    }
 }

@@ -23,22 +23,24 @@ import java.util.List;
 
 public class PantallaBalanceGeneral extends Fragment {
 
-    TextView txtBalanceMes, txtIngresosGastosMes;
-    ProgressBar barraAhorroMes, barraPresupuestoMes, barraMetas;
-    LinearLayout layoutCategorias;
+    private TextView txtBalanceMes, txtIngresosGastosMes;
+    private ProgressBar barraAhorroMes, barraPresupuestoMes, barraMetas;
+    private LinearLayout layoutCategorias;
 
-    MovimientosControlador movC;
-    PresupuestoControlador preC;
-    MetaControlador metaC;
+    private MovimientosControlador movC;
+    private PresupuestoControlador preC;
+    private MetaControlador metaC;
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState) {
+    public View onCreateView(
+            @NonNull LayoutInflater inflater,
+            @Nullable ViewGroup container,
+            @Nullable Bundle savedInstanceState) {
 
         View v = inflater.inflate(R.layout.pantalla_balance_general, container, false);
 
+        // Referencias UI
         txtBalanceMes = v.findViewById(R.id.txtBalanceMes);
         txtIngresosGastosMes = v.findViewById(R.id.txtIngresosGastosMes);
 
@@ -48,9 +50,10 @@ public class PantallaBalanceGeneral extends Fragment {
 
         layoutCategorias = v.findViewById(R.id.layoutCategorias);
 
-        movC = new MovimientosControlador(getContext());
-        preC = new PresupuestoControlador(getContext());
-        metaC = new MetaControlador(getContext());
+        // Controladores
+        movC = new MovimientosControlador(requireContext());
+        preC = new PresupuestoControlador(requireContext());
+        metaC = new MetaControlador(requireContext());
 
         cargarBalanceMes();
         cargarPresupuestos();
@@ -60,9 +63,7 @@ public class PantallaBalanceGeneral extends Fragment {
         return v;
     }
 
-    // -----------------------------
-    // BALANCE DEL MES
-    // -----------------------------
+
     private void cargarBalanceMes() {
 
         movC.obtenerSumaPorTipo("Ingreso", ingresos ->
@@ -70,19 +71,20 @@ public class PantallaBalanceGeneral extends Fragment {
 
                     double balance = ingresos - gastos;
 
+                    if (!isAdded()) return;
+
                     requireActivity().runOnUiThread(() -> {
                         txtBalanceMes.setText(String.format("%.2f €", balance));
                         txtIngresosGastosMes.setText(
                                 String.format("+%.2f ingresos | -%.2f gastos", ingresos, gastos)
                         );
                     });
+
                 })
         );
     }
 
-    // -----------------------------
-    // PRESUPUESTOS
-    // -----------------------------
+
     private void cargarPresupuestos() {
 
         preC.obtenerTodos(lista -> {
@@ -99,15 +101,15 @@ public class PantallaBalanceGeneral extends Fragment {
 
             final int porcentaje = (int) ((limite == 0) ? 0 : (gasto / limite) * 100);
 
+            if (!isAdded()) return;
+
             requireActivity().runOnUiThread(() ->
                     barraPresupuestoMes.setProgress(porcentaje)
             );
         });
     }
 
-    // -----------------------------
-    // METAS
-    // -----------------------------
+
     private void cargarMetas() {
 
         metaC.obtenerTodas(lista -> {
@@ -124,17 +126,16 @@ public class PantallaBalanceGeneral extends Fragment {
 
             final int porcentaje = (int) ((total == 0) ? 0 : (progreso / total) * 100);
 
+            if (!isAdded()) return;
+
             requireActivity().runOnUiThread(() ->
                     barraMetas.setProgress(porcentaje)
             );
         });
     }
 
-    // -----------------------------
-    // CATEGORÍAS
-    // -----------------------------
+
     private void cargarCategorias() {
-        // EN FUTURO: insertar labels dinámicas de categorías
-        // evitando errores por falta de datos
+
     }
 }

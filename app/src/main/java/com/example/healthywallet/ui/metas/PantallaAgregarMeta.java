@@ -98,7 +98,7 @@ public class PantallaAgregarMeta extends Fragment {
                 return;
             }
 
-            Meta meta = new Meta(nombre, objetivo, actual, fecha);
+            Meta meta = new Meta(nombre, objetivo, actual, fecha, 0);
 
             controlador.insertar(meta, id -> {
                 requireActivity().runOnUiThread(() -> {

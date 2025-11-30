@@ -1,6 +1,8 @@
 package com.example.healthywallet.ui.movimientos;
 
 import android.app.DatePickerDialog;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,7 +34,6 @@ public class PantallaAgregarMovimiento extends Fragment {
 
     private MovimientosControlador controlador;
 
-    // 🔥 NUEVAS CATEGORÍAS
     private final String[] categoriasGasto = {
             "Comida", "Transporte", "Educación", "Ocio", "Hogar", "Salud", "Otros"
     };
@@ -67,7 +68,6 @@ public class PantallaAgregarMovimiento extends Fragment {
         return vista;
     }
 
-    // ✔ SPINNER TIPO (Ingreso / Gasto)
     private void configurarSpinners() {
 
         String[] tipos = {"Ingreso", "Gasto"};
@@ -89,8 +89,6 @@ public class PantallaAgregarMovimiento extends Fragment {
         spinnerCategoria.setAdapter(adapterCat);
     }
 
-
-    // ✔ CAMBIO DINÁMICO DE CATEGORÍAS SEGÚN EL TIPO
     private void configurarCambioCategorias() {
 
         spinnerTipo.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -123,7 +121,6 @@ public class PantallaAgregarMovimiento extends Fragment {
         });
     }
 
-    // ✔ SELECTOR DE FECHA
     private void configurarSelectorFecha() {
         inputFecha.setOnClickListener(v -> {
 
@@ -146,7 +143,6 @@ public class PantallaAgregarMovimiento extends Fragment {
         });
     }
 
-    // ✔ GUARDAR MOVIMIENTO EN BD
     private void configurarBotonGuardar() {
 
         btnGuardar.setOnClickListener(v -> {
@@ -175,12 +171,24 @@ public class PantallaAgregarMovimiento extends Fragment {
             String tipo = spinnerTipo.getSelectedItem().toString();
             String categoria = spinnerCategoria.getSelectedItem().toString();
 
+            // Obtener ID del usuario logueado
+            SharedPreferences prefs = requireContext().getSharedPreferences("session", Context.MODE_PRIVATE);
+            int userId = prefs.getInt("usuarioId", -1);
+
+            if (userId == -1) {
+                Toast.makeText(requireContext(),
+                        "Error: usuario no encontrado",
+                        Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             Movimiento mov = new Movimiento(
                     tipo,
                     categoria,
                     cantidad,
                     fecha,
-                    descripcion
+                    descripcion,
+                    userId   // ← NUEVO
             );
 
             controlador.insertar(mov, id -> {
@@ -192,7 +200,6 @@ public class PantallaAgregarMovimiento extends Fragment {
                                 "Movimiento guardado",
                                 Toast.LENGTH_SHORT).show();
 
-                        // Volver a Movimientos
                         Navigation.findNavController(v)
                                 .navigate(R.id.nav_movimientos);
 

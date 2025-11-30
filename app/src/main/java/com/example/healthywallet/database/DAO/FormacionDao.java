@@ -15,9 +15,11 @@ public interface FormacionDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     long insertar(Formacion formacion);
 
-    @Query("SELECT * FROM formacion ORDER BY nivel ASC")
-    List<Formacion> obtenerTodas();
 
-    @Query("DELETE FROM formacion WHERE id = :id")
-    int eliminarPorId(int id);
+    @Query("SELECT * FROM formacion WHERE userId = :userId ORDER BY nivel ASC")
+    List<Formacion> obtenerTodas(int userId);
+
+
+    @Query("DELETE FROM formacion WHERE id = :id AND userId = :userId")
+    int eliminarPorId(int id, int userId);
 }

@@ -1,5 +1,7 @@
 package com.example.healthywallet.ui.presupuestos;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -81,16 +83,27 @@ public class PantallaAgregarPresupuesto extends Fragment {
 
             String categoria = spinnerCategoria.getSelectedItem().toString();
 
-            // Crear presupuesto
-            Presupuesto nuevo = new Presupuesto(categoria, limite, 0);
+            // Obtener ID del usuario logueado
+            SharedPreferences prefs = requireContext()
+                    .getSharedPreferences("session", Context.MODE_PRIVATE);
+            int userId = prefs.getInt("usuarioId", -1);
+
+            if (userId == -1) {
+                Toast.makeText(requireContext(),
+                        "Error: usuario no identificado", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // Crear presupuesto con userId
+            Presupuesto nuevo = new Presupuesto(categoria, limite, 0, userId);
 
             controlador.insertar(nuevo, id -> {
                 requireActivity().runOnUiThread(() -> {
-                    Toast.makeText(requireContext(), "Presupuesto creado", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(requireContext(),
+                            "Presupuesto creado", Toast.LENGTH_SHORT).show();
                     Navigation.findNavController(vista).popBackStack();
                 });
             });
         });
     }
 }
-

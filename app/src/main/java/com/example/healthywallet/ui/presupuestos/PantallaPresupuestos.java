@@ -1,5 +1,7 @@
 package com.example.healthywallet.ui.presupuestos;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -36,6 +38,9 @@ public class PantallaPresupuestos extends Fragment {
     private final List<Presupuesto> lista = new ArrayList<>();
 
     private PresupuestoControlador controlador;
+    private MovimientosControlador movControlador;
+
+    private int userId;
 
     public PantallaPresupuestos() {}
 
@@ -48,6 +53,11 @@ public class PantallaPresupuestos extends Fragment {
         View vista = inflater.inflate(R.layout.pantalla_presupuestos, container, false);
 
         controlador = new PresupuestoControlador(requireContext());
+        movControlador = new MovimientosControlador(requireContext());
+
+        SharedPreferences prefs = requireContext()
+                .getSharedPreferences("session", Context.MODE_PRIVATE);
+        userId = prefs.getInt("usuarioId", -1);
 
         recycler = vista.findViewById(R.id.recyclerPresupuestos);
         fabAgregar = vista.findViewById(R.id.fabAgregarPresupuesto);
@@ -74,21 +84,22 @@ public class PantallaPresupuestos extends Fragment {
     }
 
     private void cargarPresupuestos() {
-        controlador.obtenerTodos(presupuestos -> {
+
+        controlador.obtenerTodos(listaPresupuestos -> {
+
             requireActivity().runOnUiThread(() -> {
 
                 lista.clear();
-                if (presupuestos != null) lista.addAll(presupuestos);
 
-                // Recalcular gastoActual según movimientos reales
+                if (listaPresupuestos != null)
+                    lista.addAll(listaPresupuestos);
+
                 recalcularGastosPresupuestos();
             });
         });
     }
 
     private void recalcularGastosPresupuestos() {
-
-        MovimientosControlador movControlador = new MovimientosControlador(requireContext());
 
         movControlador.obtenerTodos(movimientos -> {
 
@@ -99,16 +110,16 @@ public class PantallaPresupuestos extends Fragment {
                     double suma = 0;
 
                     for (Movimiento m : movimientos) {
-                        if (m.getCategoria().equalsIgnoreCase(p.getCategoria())
-                                && m.getTipo().equalsIgnoreCase("Gasto")) {
+
+                        if (m.getUserId() == p.getUserId() &&         // ← FILTRO IMPORTANTE
+                                m.getCategoria().equalsIgnoreCase(p.getCategoria()) &&
+                                m.getTipo().equalsIgnoreCase("Gasto")) {
 
                             suma += m.getCantidad();
                         }
                     }
 
-                    // Actualiza el gasto actual REAL basado en movimientos
                     p.setGastoActual(suma);
-
                     controlador.actualizar(p, filas -> {});
                 }
 

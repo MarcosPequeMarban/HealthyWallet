@@ -1,6 +1,7 @@
 package com.example.healthywallet.controller;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 
 import com.example.healthywallet.database.GestorBaseDatos;
 import com.example.healthywallet.database.DAO.PresupuestoDao;
@@ -29,14 +30,19 @@ public class PresupuestoControlador {
 
     private final PresupuestoDao dao;
     private final ExecutorService executor;
+    private final int userId;   // ← userId del usuario actual
 
     public PresupuestoControlador(Context context) {
         GestorBaseDatos db = GestorBaseDatos.obtenerInstancia(context);
         dao = db.presupuestoDao();
         executor = GestorBaseDatos.databaseExecutor;
+
+        SharedPreferences prefs = context.getSharedPreferences("session", Context.MODE_PRIVATE);
+        userId = prefs.getInt("usuarioId", -1);
     }
 
     public void insertar(Presupuesto p, CallbackLong callback) {
+        p.setUserId(userId);
         executor.execute(() -> callback.onResult(dao.insertar(p)));
     }
 
@@ -45,15 +51,15 @@ public class PresupuestoControlador {
     }
 
     public void obtenerPorId(int id, CallbackPresupuesto callback) {
-        executor.execute(() -> callback.onResult(dao.obtenerPorId(id)));
+        executor.execute(() -> callback.onResult(dao.obtenerPorId(id, userId)));
     }
 
     public void obtenerTodos(CallbackListaPresupuesto callback) {
-        executor.execute(() -> callback.onResult(dao.obtenerTodos()));
+        executor.execute(() -> callback.onResult(dao.obtenerTodos(userId)));
     }
 
     public void actualizarGasto(int id, double gasto, CallbackInt callback) {
-        executor.execute(() -> callback.onResult(dao.actualizarGasto(id, gasto)));
+        executor.execute(() -> callback.onResult(dao.actualizarGasto(id, userId, gasto)));
     }
 
     public void eliminar(Presupuesto p, CallbackInt callback) {

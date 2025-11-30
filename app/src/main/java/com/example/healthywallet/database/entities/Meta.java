@@ -2,9 +2,18 @@ package com.example.healthywallet.database.entities;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.ForeignKey;
 import androidx.room.PrimaryKey;
 
-@Entity(tableName = "metas")
+@Entity(
+        tableName = "metas",
+        foreignKeys = @ForeignKey(
+                entity = Usuario.class,
+                parentColumns = "id",
+                childColumns = "userId",
+                onDelete = ForeignKey.CASCADE
+        )
+)
 public class Meta {
 
     @PrimaryKey(autoGenerate = true)
@@ -22,13 +31,18 @@ public class Meta {
     @ColumnInfo(name = "fechaObjetivo")
     private String fechaObjetivo;
 
-    public Meta(String nombre, double cantidadObjetivo, double cantidadActual, String fechaObjetivo) {
+    @ColumnInfo(name = "userId", index = true)
+    private int userId;  // ← NUEVO: dueño de la meta
+
+    public Meta(String nombre, double cantidadObjetivo, double cantidadActual, String fechaObjetivo, int userId) {
         this.nombre = nombre;
         this.cantidadObjetivo = cantidadObjetivo;
         this.cantidadActual = cantidadActual;
         this.fechaObjetivo = fechaObjetivo;
+        this.userId = userId;
     }
 
+    // Getters y setters
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
 
@@ -43,4 +57,7 @@ public class Meta {
 
     public String getFechaObjetivo() { return fechaObjetivo; }
     public void setFechaObjetivo(String fechaObjetivo) { this.fechaObjetivo = fechaObjetivo; }
+
+    public int getUserId() { return userId; }
+    public void setUserId(int userId) { this.userId = userId; }
 }

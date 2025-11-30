@@ -2,7 +2,35 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    app:startDestination="@id/nav_inicio">
+    app:startDestination="@id/pantallaLogin">
+
+    <!-- LOGIN -->
+    <fragment
+        android:id="@+id/pantallaLogin"
+        android:name="com.example.healthywallet.ui.usuario.PantallaLogin"
+        android:label="Iniciar Sesión"
+        tools:layout="@layout/pantalla_login">
+
+        <action
+            android:id="@+id/action_pantallaLogin_to_pantallaRegistroUsuario"
+            app:destination="@id/pantallaRegistroUsuario" />
+
+        <action
+            android:id="@+id/action_pantallaLogin_to_nav_inicio"
+            app:destination="@id/nav_inicio" />
+    </fragment>
+
+    <!-- REGISTRO -->
+    <fragment
+        android:id="@+id/pantallaRegistroUsuario"
+        android:name="com.example.healthywallet.ui.usuario.PantallaRegistroUsuario"
+        android:label="Registrarse"
+        tools:layout="@layout/pantalla_registro">
+
+        <action
+            android:id="@+id/action_pantallaRegistroUsuario_to_pantallaLogin"
+            app:destination="@id/pantallaLogin" />
+    </fragment>
 
     <!-- INICIO -->
     <fragment
@@ -16,7 +44,7 @@
         android:id="@+id/nav_movimientos"
         android:name="com.example.healthywallet.ui.movimientos.PantallaMovimientos"
         android:label="Movimientos"
-        tools:layout="@layout/pantalla_movimientos" >
+        tools:layout="@layout/pantalla_movimientos">
 
         <action
             android:id="@+id/action_movimientos_to_agregarMovimiento"
@@ -56,12 +84,10 @@
         android:label="Metas"
         tools:layout="@layout/pantalla_metas">
 
-        <!-- Acción → Detalle -->
         <action
             android:id="@+id/action_metas_to_detalleMeta"
             app:destination="@id/pantallaDetalleMeta" />
 
-        <!-- Acción → Agregar Meta -->
         <action
             android:id="@+id/action_metas_to_agregarMeta"
             app:destination="@id/pantallaAgregarMeta" />
@@ -74,7 +100,6 @@
         android:label="Detalle Meta"
         tools:layout="@layout/pantalla_detalle_meta">
 
-        <!-- Desde detalle → agregar ahorro -->
         <action
             android:id="@+id/action_detalle_to_agregarAhorro"
             app:destination="@id/pantallaAgregarAhorro" />
@@ -87,7 +112,7 @@
         android:label="Agregar Meta"
         tools:layout="@layout/pantalla_agregar_meta" />
 
-    <!-- AGREGAR AHORRO A META -->
+    <!-- AGREGAR AHORRO -->
     <fragment
         android:id="@+id/pantallaAgregarAhorro"
         android:name="com.example.healthywallet.ui.metas.PantallaAgregarAhorro"
@@ -100,6 +125,8 @@
         android:name="com.example.healthywallet.ui.educacion.PantallaEducacion"
         android:label="Educación"
         tools:layout="@layout/pantalla_educacion" />
+
+    <!-- BALANCE -->
     <fragment
         android:id="@+id/pantallaBalanceGeneral"
         android:name="com.example.healthywallet.ui.inicio.PantallaBalanceGeneral"

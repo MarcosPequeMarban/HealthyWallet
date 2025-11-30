@@ -1,6 +1,7 @@
 package com.example.healthywallet.controller;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 
 import com.example.healthywallet.database.GestorBaseDatos;
 import com.example.healthywallet.database.DAO.MetaDao;
@@ -31,18 +32,23 @@ public class MetaControlador {
     // === CAMPOS ===
     private final MetaDao dao;
     private final ExecutorService executor;
+    private final int userId;
 
     // === CONSTRUCTOR ===
     public MetaControlador(Context context) {
         GestorBaseDatos db = GestorBaseDatos.obtenerInstancia(context);
         dao = db.metaDao();
         executor = GestorBaseDatos.databaseExecutor;
+
+        SharedPreferences prefs = context.getSharedPreferences("session", Context.MODE_PRIVATE);
+        userId = prefs.getInt("usuarioId", -1);
     }
 
     // === CRUD ===
 
     /** Insertar una meta y devolver el ID generado */
     public void insertar(Meta meta, CallbackLong callback) {
+        meta.setUserId(userId);
         executor.execute(() -> {
             long id = dao.insertar(meta);
             callback.onResult(id);
@@ -60,15 +66,15 @@ public class MetaControlador {
     /** Obtener meta por ID */
     public void obtenerPorId(int id, CallbackMeta callback) {
         executor.execute(() -> {
-            Meta meta = dao.obtenerPorId(id);
+            Meta meta = dao.obtenerPorId(id, userId);
             callback.onResult(meta);
         });
     }
 
-    /** Obtener todas las metas */
+    /** Obtener todas las metas del usuario */
     public void obtenerTodas(CallbackListaMeta callback) {
         executor.execute(() -> {
-            List<Meta> lista = dao.obtenerTodas();
+            List<Meta> lista = dao.obtenerTodas(userId);
             callback.onResult(lista);
         });
     }
@@ -76,7 +82,7 @@ public class MetaControlador {
     /** Actualizar solo la cantidad actual */
     public void actualizarCantidad(int id, double nuevaCantidad, CallbackInt callback) {
         executor.execute(() -> {
-            int filas = dao.actualizarCantidad(nuevaCantidad, id);
+            int filas = dao.actualizarCantidad(nuevaCantidad, id, userId);
             callback.onResult(filas);
         });
     }

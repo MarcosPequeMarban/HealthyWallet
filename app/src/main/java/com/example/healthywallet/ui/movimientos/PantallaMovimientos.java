@@ -43,8 +43,6 @@ public class PantallaMovimientos extends Fragment {
 
         recyclerView = vista.findViewById(R.id.recyclerMovimientos);
         fabAgregarMovimiento = vista.findViewById(R.id.fabAgregarMovimiento);
-
-        // ✔ ESTE ES EL QUE EXISTE EN TU XML
         txtBalanceMensual = vista.findViewById(R.id.txtBalanceCantidad);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -54,29 +52,32 @@ public class PantallaMovimientos extends Fragment {
         );
 
         cargarLista();
-
         return vista;
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        cargarLista(); // refrescar al volver
+        cargarLista();
     }
 
     private void cargarLista() {
 
-        movimientosControlador.obtenerTodos(movimientos -> {
+        movimientosControlador.obtenerTodos(lista -> {
 
             requireActivity().runOnUiThread(() -> {
 
-                List<Movimiento> listaSegura =
-                        (movimientos != null) ? movimientos : Collections.emptyList();
+                List<Movimiento> movimientos =
+                        (lista != null) ? lista : Collections.emptyList();
 
-                adaptador = new AdaptadorMovimientos(requireContext(), listaSegura);
-                recyclerView.setAdapter(adaptador);
+                if (adaptador == null) {
+                    adaptador = new AdaptadorMovimientos(requireContext(), movimientos);
+                    recyclerView.setAdapter(adaptador);
+                } else {
+                    adaptador.actualizarLista(movimientos);
+                }
 
-                actualizarBalance(listaSegura);
+                actualizarBalance(movimientos);
             });
         });
     }
@@ -86,7 +87,7 @@ public class PantallaMovimientos extends Fragment {
         double total = 0;
 
         for (Movimiento mov : lista) {
-            if (mov.getTipo().equals("Ingreso")) {
+            if ("Ingreso".equals(mov.getTipo())) {
                 total += mov.getCantidad();
             } else {
                 total -= mov.getCantidad();

@@ -1,5 +1,7 @@
 package com.example.healthywallet.ui.metas;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,6 +29,7 @@ public class PantallaDetalleMeta extends Fragment {
     private MetaControlador controlador;
     private Meta metaActual;
     private int metaId;
+    private int userId;
 
     @Nullable
     @Override
@@ -38,6 +41,10 @@ public class PantallaDetalleMeta extends Fragment {
 
         controlador = new MetaControlador(requireContext());
 
+        // Obtener usuario logueado
+        SharedPreferences prefs = requireContext().getSharedPreferences("session", Context.MODE_PRIVATE);
+        userId = prefs.getInt("usuarioId", -1);
+
         txtTitulo = vista.findViewById(R.id.txtTituloMeta);
         txtCantidades = vista.findViewById(R.id.txtCantidadesDetalle);
         txtPorcentaje = vista.findViewById(R.id.txtPorcentajeDetalle);
@@ -46,22 +53,21 @@ public class PantallaDetalleMeta extends Fragment {
         btnAgregarAhorro = vista.findViewById(R.id.btnAgregarAhorro);
         btnEliminar = vista.findViewById(R.id.btnEliminarMeta);
 
-        // Recuperar ID de la meta
-        metaId = getArguments().getInt("metaId", -1);
-
-        if (metaId == -1) {
+        // Obtener argumento
+        Bundle args = getArguments();
+        if (args == null || !args.containsKey("metaId")) {
             Toast.makeText(requireContext(), "Error al cargar meta", Toast.LENGTH_SHORT).show();
             return vista;
         }
+
+        metaId = args.getInt("metaId");
 
         cargarMeta();
 
         btnAgregarAhorro.setOnClickListener(v -> {
             Bundle bundle = new Bundle();
             bundle.putInt("metaId", metaId);
-
-            Navigation.findNavController(v)
-                    .navigate(R.id.pantallaAgregarAhorro, bundle);
+            Navigation.findNavController(v).navigate(R.id.pantallaAgregarAhorro, bundle);
         });
 
         btnEliminar.setOnClickListener(v -> eliminarMeta());
@@ -71,41 +77,49 @@ public class PantallaDetalleMeta extends Fragment {
 
     private void cargarMeta() {
         controlador.obtenerPorId(metaId, meta -> requireActivity().runOnUiThread(() -> {
+
+            if (meta == null) {
+                Toast.makeText(requireContext(), "Meta no encontrada", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             metaActual = meta;
 
-            if (metaActual == null) return;
-
             txtTitulo.setText(metaActual.getNombre());
-            txtCantidades.setText(metaActual.getCantidadActual() + " € / " +
-                    metaActual.getCantidadObjetivo() + " €");
+            txtCantidades.setText(
+                    String.format("%.2f € / %.2f €",
+                            metaActual.getCantidadActual(),
+                            metaActual.getCantidadObjetivo())
+            );
+
             txtFecha.setText("Fecha objetivo: " + metaActual.getFechaObjetivo());
 
-            double porcentaje = (metaActual.getCantidadActual() /
-                    metaActual.getCantidadObjetivo()) * 100;
+            double porcentaje = 0;
+            if (metaActual.getCantidadObjetivo() > 0)
+                porcentaje = (metaActual.getCantidadActual() / metaActual.getCantidadObjetivo()) * 100;
 
             if (porcentaje > 100) porcentaje = 100;
 
             txtPorcentaje.setText(String.format("%.0f%%", porcentaje));
             barra.setProgress((int) porcentaje);
+
         }));
     }
 
     private void eliminarMeta() {
 
         if (metaActual == null) {
-            Toast.makeText(requireContext(), "Error: meta no cargada", Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), "Meta no cargada", Toast.LENGTH_SHORT).show();
             return;
         }
 
         controlador.eliminar(metaActual, filas -> requireActivity().runOnUiThread(() -> {
 
-            boolean ok = filas > 0;
-
-            if (ok) {
+            if (filas > 0) {
                 Toast.makeText(requireContext(), "Meta eliminada", Toast.LENGTH_SHORT).show();
                 Navigation.findNavController(requireView()).navigateUp();
             } else {
-                Toast.makeText(requireContext(), "Error al eliminar", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), "Error al eliminar la meta", Toast.LENGTH_SHORT).show();
             }
 
         }));

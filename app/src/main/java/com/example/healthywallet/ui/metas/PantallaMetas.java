@@ -1,11 +1,11 @@
 package com.example.healthywallet.ui.metas;
 
-import android.app.AlertDialog;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -27,14 +27,12 @@ public class PantallaMetas extends Fragment {
 
     private RecyclerView recycler;
     private AdaptadorMetas adaptador;
-    private FloatingActionButton fabAgregar;
-
-    private TextView txtResumenCantidad;
+    private FloatingActionButton fabAgregarMeta;
 
     private MetaControlador controlador;
-    private final List<Meta> listaMetas = new ArrayList<>();
+    private int userId;
 
-    public PantallaMetas() { }
+    private final List<Meta> lista = new ArrayList<>();
 
     @Nullable
     @Override
@@ -46,28 +44,19 @@ public class PantallaMetas extends Fragment {
 
         controlador = new MetaControlador(requireContext());
 
+        SharedPreferences prefs = requireContext().getSharedPreferences("session", Context.MODE_PRIVATE);
+        userId = prefs.getInt("usuarioId", -1);
+
         recycler = vista.findViewById(R.id.recyclerMetas);
-        fabAgregar = vista.findViewById(R.id.fabAgregarMeta);
-        txtResumenCantidad = vista.findViewById(R.id.txtResumenCantidad);
+        fabAgregarMeta = vista.findViewById(R.id.fabAgregarMeta);
 
         recycler.setLayoutManager(new LinearLayoutManager(getContext()));
-        adaptador = new AdaptadorMetas(getContext(), listaMetas);
+        adaptador = new AdaptadorMetas(requireContext(), lista);
         recycler.setAdapter(adaptador);
 
-        // CLICK: abrir detalle de meta
-        adaptador.setOnMetaClickListener(meta -> {
-            Bundle b = new Bundle();
-            b.putInt("metaId", meta.getId());
-            Navigation.findNavController(requireView())
-                    .navigate(R.id.pantallaDetalleMeta, b);
-        });
-
-        // META COMPLETADA → popup
-        adaptador.setOnMetaCompletadaListener(meta -> mostrarPopupMetaCompleta(meta));
-
-        // FAB → agregar meta
-        fabAgregar.setOnClickListener(v ->
-                Navigation.findNavController(v).navigate(R.id.pantallaAgregarMeta));
+        fabAgregarMeta.setOnClickListener(v ->
+                Navigation.findNavController(v).navigate(R.id.action_metas_to_agregarMeta)
+        );
 
         cargarMetas();
 
@@ -81,43 +70,12 @@ public class PantallaMetas extends Fragment {
     }
 
     private void cargarMetas() {
-        controlador.obtenerTodas(metas -> requireActivity().runOnUiThread(() -> {
-
-            listaMetas.clear();
-            if (metas != null) listaMetas.addAll(metas);
-
-            adaptador.notifyDataSetChanged();
-            actualizarResumen();
-        }));
-    }
-
-    private void actualizarResumen() {
-
-        double totalActual = 0;
-        double totalObjetivo = 0;
-
-        for (Meta m : listaMetas) {
-            totalActual += m.getCantidadActual();
-            totalObjetivo += m.getCantidadObjetivo();
-        }
-
-        txtResumenCantidad.setText(
-                String.format("%.2f € / %.2f €", totalActual, totalObjetivo)
-        );
-    }
-
-    private void mostrarPopupMetaCompleta(Meta meta) {
-
-        new AlertDialog.Builder(requireContext())
-                .setTitle("🎉 ¡Meta completada!")
-                .setMessage("Enhorabuena, has conseguido tu objetivo \""
-                        + meta.getNombre() + "\".\n\n¡Sigue así crack! 💪🔥")
-                .setPositiveButton("Aceptar", (d, w) -> {
-
-                    // Opcional: eliminar meta automáticamente
-                    controlador.eliminar(meta, filas -> cargarMetas());
-                })
-                .setCancelable(true)
-                .show();
+        controlador.obtenerTodas(metas -> {
+            requireActivity().runOnUiThread(() -> {
+                lista.clear();
+                if (metas != null) lista.addAll(metas);
+                adaptador.notifyDataSetChanged();
+            });
+        });
     }
 }

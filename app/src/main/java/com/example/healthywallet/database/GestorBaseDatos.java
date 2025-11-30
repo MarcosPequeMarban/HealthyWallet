@@ -14,6 +14,7 @@ import com.example.healthywallet.database.DAO.FormacionDao;
 import com.example.healthywallet.database.DAO.MetaDao;
 import com.example.healthywallet.database.DAO.MovimientoDao;
 import com.example.healthywallet.database.DAO.PresupuestoDao;
+import com.example.healthywallet.database.DAO.UsuarioDao;
 
 import com.example.healthywallet.database.entities.Categoria;
 import com.example.healthywallet.database.entities.Formacion;
@@ -34,33 +35,38 @@ import java.util.concurrent.Executors;
                 Formacion.class,
                 Usuario.class
         },
-        version = 3
+        version = 5   // ← VERSIÓN ACTUALIZADA
 )
 public abstract class GestorBaseDatos extends RoomDatabase {
 
+    // ==== DAOs ====
     public abstract MovimientoDao movimientoDao();
-    public abstract CategoriaDao categoriaDao();
     public abstract PresupuestoDao presupuestoDao();
     public abstract MetaDao metaDao();
     public abstract FormacionDao formacionDao();
+    public abstract CategoriaDao categoriaDao();
+    public abstract UsuarioDao usuarioDao();
 
+    // ==== SINGLETON ====
     private static volatile GestorBaseDatos INSTANCIA;
 
+    // Hilos para operaciones de BD
     private static final int NUM_HILOS = 4;
     public static final ExecutorService databaseExecutor =
             Executors.newFixedThreadPool(NUM_HILOS);
 
-    // Migración 1→2 vacía
+    // ==== MIGRACIONES ====
+
+    // Migración 1→2 (vacía)
     static final Migration MIGRACION_1_2 = new Migration(1, 2) {
         @Override
         public void migrate(@NonNull SupportSQLiteDatabase database) {}
     };
 
-    // Migración 2→3 para crear la nueva tabla
+    // Migración 2→3 (recursos educativos)
     static final Migration MIGRACION_2_3 = new Migration(2, 3) {
         @Override
         public void migrate(@NonNull SupportSQLiteDatabase db) {
-
             db.execSQL("CREATE TABLE IF NOT EXISTS `recursos_educativos` (" +
                     "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
                     "`tipo` TEXT NOT NULL, " +
@@ -68,10 +74,35 @@ public abstract class GestorBaseDatos extends RoomDatabase {
                     "`url` TEXT NOT NULL, " +
                     "`completado` INTEGER NOT NULL, " +
                     "`fechaCompletado` INTEGER NOT NULL, " +
-                    "`fechaRecomendado` INTEGER NOT NULL )");
+                    "`fechaRecomendado` INTEGER NOT NULL)");
         }
     };
 
+    // Migración 3→4 (tabla usuarios)
+    static final Migration MIGRACION_3_4 = new Migration(3, 4) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase db) {
+            db.execSQL("CREATE TABLE IF NOT EXISTS usuarios (" +
+                    "id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                    "nombre TEXT NOT NULL, " +
+                    "email TEXT NOT NULL, " +
+                    "password TEXT NOT NULL)");
+        }
+    };
+
+    // Migración 4→5 (añadir userId a todas las tablas multicuenta)
+    static final Migration MIGRACION_4_5 = new Migration(4, 5) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase db) {
+
+            db.execSQL("ALTER TABLE presupuestos ADD COLUMN userId INTEGER NOT NULL DEFAULT -1");
+            db.execSQL("ALTER TABLE movimientos ADD COLUMN userId INTEGER NOT NULL DEFAULT -1");
+            db.execSQL("ALTER TABLE metas ADD COLUMN userId INTEGER NOT NULL DEFAULT -1");
+            db.execSQL("ALTER TABLE formacion ADD COLUMN userId INTEGER NOT NULL DEFAULT -1");
+        }
+    };
+
+    // ==== OBTENER INSTANCIA (SINGLETON) ====
     public static GestorBaseDatos obtenerInstancia(Context context) {
         if (INSTANCIA == null) {
             synchronized (GestorBaseDatos.class) {
@@ -81,7 +112,12 @@ public abstract class GestorBaseDatos extends RoomDatabase {
                                     GestorBaseDatos.class,
                                     "HealthyWalletDB"
                             )
-                            .addMigrations(MIGRACION_1_2, MIGRACION_2_3)
+                            .addMigrations(
+                                    MIGRACION_1_2,
+                                    MIGRACION_2_3,
+                                    MIGRACION_3_4,
+                                    MIGRACION_4_5
+                            )
                             .build();
                 }
             }

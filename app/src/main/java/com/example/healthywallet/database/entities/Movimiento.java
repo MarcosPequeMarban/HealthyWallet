@@ -2,9 +2,18 @@ package com.example.healthywallet.database.entities;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.ForeignKey;
 import androidx.room.PrimaryKey;
 
-@Entity(tableName = "movimientos")
+@Entity(
+        tableName = "movimientos",
+        foreignKeys = @ForeignKey(
+                entity = Usuario.class,
+                parentColumns = "id",
+                childColumns = "userId",
+                onDelete = ForeignKey.CASCADE
+        )
+)
 public class Movimiento {
 
     @PrimaryKey(autoGenerate = true)
@@ -25,14 +34,19 @@ public class Movimiento {
     @ColumnInfo(name = "descripcion")
     private String descripcion;
 
-    public Movimiento(String tipo, String categoria, double cantidad, String fecha, String descripcion) {
+    @ColumnInfo(name = "userId", index = true)
+    private int userId;  // ← NUEVO: para asociar este movimiento al usuario
+
+    public Movimiento(String tipo, String categoria, double cantidad, String fecha, String descripcion, int userId) {
         this.tipo = tipo;
         this.categoria = categoria;
         this.cantidad = cantidad;
         this.fecha = fecha;
         this.descripcion = descripcion;
+        this.userId = userId;
     }
 
+    // Getters y setters
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
 
@@ -50,4 +64,7 @@ public class Movimiento {
 
     public String getDescripcion() { return descripcion; }
     public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
+
+    public int getUserId() { return userId; }
+    public void setUserId(int userId) { this.userId = userId; }
 }

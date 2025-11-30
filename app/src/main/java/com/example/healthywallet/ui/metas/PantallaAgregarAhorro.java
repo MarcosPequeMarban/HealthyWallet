@@ -1,5 +1,7 @@
 package com.example.healthywallet.ui.metas;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,6 +30,8 @@ public class PantallaAgregarAhorro extends Fragment {
 
     private MetaControlador controlador;
     private Meta metaActual;
+    private int userId;
+    private int metaId;
 
     @Nullable
     @Override
@@ -36,8 +40,11 @@ public class PantallaAgregarAhorro extends Fragment {
                              @Nullable Bundle savedInstanceState) {
 
         View vista = inflater.inflate(R.layout.pantalla_agregar_ahorro, container, false);
-
         controlador = new MetaControlador(requireContext());
+
+        // obtener usuario logueado
+        SharedPreferences prefs = requireContext().getSharedPreferences("session", Context.MODE_PRIVATE);
+        userId = prefs.getInt("usuarioId", -1);
 
         txtNombreMeta = vista.findViewById(R.id.txtNombreMetaAhorro);
         txtResumen = vista.findViewById(R.id.txtResumenAhorro);
@@ -45,14 +52,17 @@ public class PantallaAgregarAhorro extends Fragment {
         inputCantidad = vista.findViewById(R.id.inputCantidadAhorro);
         btnGuardar = vista.findViewById(R.id.btnGuardarAhorro);
 
-        int metaId = getArguments().getInt("metaId", -1);
-        if (metaId == -1) {
+        // obtener id de meta
+        Bundle args = getArguments();
+        if (args == null || !args.containsKey("metaId")) {
             Toast.makeText(requireContext(), "Error al cargar meta", Toast.LENGTH_SHORT).show();
             Navigation.findNavController(vista).navigateUp();
             return vista;
         }
 
+        metaId = args.getInt("metaId");
         cargarMeta(metaId);
+
         configurarBotonGuardar(vista);
 
         return vista;
@@ -60,11 +70,11 @@ public class PantallaAgregarAhorro extends Fragment {
 
     private void cargarMeta(int id) {
         controlador.obtenerPorId(id, meta -> {
-
             requireActivity().runOnUiThread(() -> {
 
                 if (meta == null) {
                     Toast.makeText(requireContext(), "Meta no encontrada", Toast.LENGTH_SHORT).show();
+                    Navigation.findNavController(requireView()).navigateUp();
                     return;
                 }
 
@@ -72,12 +82,17 @@ public class PantallaAgregarAhorro extends Fragment {
 
                 txtNombreMeta.setText(meta.getNombre());
 
-                txtResumen.setText(
-                        String.format("%.2f € / %.2f €",
-                                meta.getCantidadActual(), meta.getCantidadObjetivo())
-                );
+                txtResumen.setText(String.format("%.2f € / %.2f €",
+                        meta.getCantidadActual(),
+                        meta.getCantidadObjetivo()));
 
-                double porcentaje = (meta.getCantidadActual() / meta.getCantidadObjetivo()) * 100;
+                double porcentaje = 0;
+                if (meta.getCantidadObjetivo() > 0) {
+                    porcentaje = (meta.getCantidadActual() / meta.getCantidadObjetivo()) * 100;
+                }
+
+                if (porcentaje > 100) porcentaje = 100;
+
                 barra.setProgress((int) porcentaje);
             });
         });
@@ -86,6 +101,11 @@ public class PantallaAgregarAhorro extends Fragment {
     private void configurarBotonGuardar(View vista) {
 
         btnGuardar.setOnClickListener(v -> {
+
+            if (metaActual == null) {
+                Toast.makeText(requireContext(), "Error: meta no cargada", Toast.LENGTH_SHORT).show();
+                return;
+            }
 
             String cantidadStr = inputCantidad.getText().toString().trim();
 
@@ -107,7 +127,7 @@ public class PantallaAgregarAhorro extends Fragment {
                 return;
             }
 
-            // sumamos al progreso actual
+            // actualizar meta
             double nuevoTotal = metaActual.getCantidadActual() + cantidad;
             metaActual.setCantidadActual(nuevoTotal);
 
@@ -124,6 +144,5 @@ public class PantallaAgregarAhorro extends Fragment {
                 });
             });
         });
-
     }
 }
