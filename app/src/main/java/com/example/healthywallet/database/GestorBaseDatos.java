@@ -14,6 +14,7 @@ import com.example.healthywallet.database.DAO.FormacionDao;
 import com.example.healthywallet.database.DAO.MetaDao;
 import com.example.healthywallet.database.DAO.MovimientoDao;
 import com.example.healthywallet.database.DAO.PresupuestoDao;
+import com.example.healthywallet.database.DAO.UsuarioDao;
 
 import com.example.healthywallet.database.entities.Categoria;
 import com.example.healthywallet.database.entities.Formacion;
@@ -34,7 +35,7 @@ import java.util.concurrent.Executors;
                 Formacion.class,
                 Usuario.class
         },
-        version = 3
+        version = 4
 )
 public abstract class GestorBaseDatos extends RoomDatabase {
 
@@ -43,6 +44,7 @@ public abstract class GestorBaseDatos extends RoomDatabase {
     public abstract PresupuestoDao presupuestoDao();
     public abstract MetaDao metaDao();
     public abstract FormacionDao formacionDao();
+    public abstract UsuarioDao usuarioDao();
 
     private static volatile GestorBaseDatos INSTANCIA;
 
@@ -72,6 +74,17 @@ public abstract class GestorBaseDatos extends RoomDatabase {
         }
     };
 
+    // Migración 3→4 para crear tabla de usuarios
+    static final Migration MIGRACION_3_4 = new Migration(3, 4) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase db) {
+            db.execSQL("CREATE TABLE IF NOT EXISTS `usuarios` (" +
+                    "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                    "`nombre` TEXT NOT NULL, " +
+                    "`email` TEXT NOT NULL)");
+        }
+    };
+
     public static GestorBaseDatos obtenerInstancia(Context context) {
         if (INSTANCIA == null) {
             synchronized (GestorBaseDatos.class) {
@@ -81,7 +94,7 @@ public abstract class GestorBaseDatos extends RoomDatabase {
                                     GestorBaseDatos.class,
                                     "HealthyWalletDB"
                             )
-                            .addMigrations(MIGRACION_1_2, MIGRACION_2_3)
+                            .addMigrations(MIGRACION_1_2, MIGRACION_2_3, MIGRACION_3_4)
                             .build();
                 }
             }
