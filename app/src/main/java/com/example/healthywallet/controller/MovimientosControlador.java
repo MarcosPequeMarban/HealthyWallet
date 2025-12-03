@@ -6,11 +6,16 @@ import android.content.SharedPreferences;
 import com.example.healthywallet.database.GestorBaseDatos;
 import com.example.healthywallet.database.DAO.MovimientoDao;
 import com.example.healthywallet.database.entities.Movimiento;
+import com.example.healthywallet.database.entities.CategoriaGasto;
 
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 
 public class MovimientosControlador {
+
+    // =============================
+    //      CALLBACKS
+    // =============================
 
     public interface CallbackMovimiento {
         void onResult(Movimiento mov);
@@ -28,9 +33,29 @@ public class MovimientosControlador {
         void onResult(int valor);
     }
 
+    public interface CallbackCategoriaGasto {
+        void onResult(List<CategoriaGasto> lista);
+    }
+
+    public interface CallbackUnaCategoria {
+        void onResult(CategoriaGasto categoria);
+    }
+
+    public interface CallbackListaCategoriaGasto {
+        void onResult(List<CategoriaGasto> lista);
+    }
+
+    // =============================
+    //  ATRIBUTOS
+    // =============================
+
     private final MovimientoDao dao;
     private final ExecutorService executor;
     private final int userId;
+
+    // =============================
+    //  CONSTRUCTOR
+    // =============================
 
     public MovimientosControlador(Context context) {
         GestorBaseDatos db = GestorBaseDatos.obtenerInstancia(context);
@@ -40,6 +65,10 @@ public class MovimientosControlador {
         SharedPreferences prefs = context.getSharedPreferences("session", Context.MODE_PRIVATE);
         userId = prefs.getInt("usuarioId", -1);
     }
+
+    // =============================
+    //      CRUD BÁSICO
+    // =============================
 
     public void insertar(Movimiento mov, CallbackInt callback) {
         mov.setUserId(userId);
@@ -82,6 +111,35 @@ public class MovimientosControlador {
         executor.execute(() -> {
             Double valor = dao.obtenerSumaPorTipo(tipo, userId);
             callback.onResult(valor != null ? valor : 0.0);
+        });
+    }
+
+    // =============================
+    //      ESTADÍSTICAS NUEVAS
+    // =============================
+
+    public void obtenerCategoriaMayorGasto(CallbackUnaCategoria callback) {
+        executor.execute(() -> {
+            CategoriaGasto cat = dao.obtenerCategoriaMayorGasto(userId);
+            callback.onResult(cat);
+        });
+    }
+
+    public void obtenerGastosPorCategoria(CallbackListaCategoriaGasto callback) {
+        executor.execute(() -> {
+            List<CategoriaGasto> lista = dao.obtenerGastosPorCategoria(userId);
+            callback.onResult(lista);
+        });
+    }
+
+    // =============================
+    //      ELIMINAR MOVIMIENTO
+    // =============================
+
+    public void eliminar(Movimiento mov, CallbackInt callback) {
+        executor.execute(() -> {
+            int filas = dao.eliminar(mov);
+            callback.onResult(filas);
         });
     }
 }

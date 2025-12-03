@@ -2,10 +2,12 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
+    android:background="@color/fondo_app"
+    android:padding="0dp"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- Contenedor de Fragments recomendado -->
+    <!-- CONTENEDOR DE FRAGMENTS -->
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/contenedorFragments"
         android:name="androidx.navigation.fragment.NavHostFragment"
@@ -15,12 +17,19 @@
         app:defaultNavHost="true"
         app:navGraph="@navigation/nav_graph" />
 
-    <!-- Bottom Navigation -->
+    <!-- SEPARADOR ELEGANTE -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/separador_suave" />
+
+    <!-- BOTTOM NAVIGATION MEJORADO -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigation"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="70dp"
         android:background="@color/nav_fondo"
+        android:elevation="10dp"
         app:itemIconTint="@color/nav_selector"
         app:itemTextColor="@color/nav_selector"
         app:labelVisibilityMode="labeled"

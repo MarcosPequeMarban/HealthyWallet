@@ -18,6 +18,7 @@
         <action
             android:id="@+id/action_pantallaLogin_to_nav_inicio"
             app:destination="@id/nav_inicio" />
+
     </fragment>
 
     <!-- REGISTRO -->
@@ -68,6 +69,11 @@
         <action
             android:id="@+id/action_presupuestos_to_agregarPresupuesto"
             app:destination="@id/pantallaAgregarPresupuesto" />
+
+        <action
+            android:id="@+id/action_presupuestos_to_editarPresupuesto"
+            app:destination="@id/pantallaEditarPresupuesto" />
+
     </fragment>
 
     <!-- AGREGAR PRESUPUESTO -->
@@ -76,6 +82,13 @@
         android:name="com.example.healthywallet.ui.presupuestos.PantallaAgregarPresupuesto"
         android:label="Agregar Presupuesto"
         tools:layout="@layout/pantalla_agregar_presupuesto" />
+
+    <!-- EDITAR PRESUPUESTO -->
+    <fragment
+        android:id="@+id/pantallaEditarPresupuesto"
+        android:name="com.example.healthywallet.ui.presupuestos.PantallaEditarPresupuesto"
+        android:label="Editar presupuesto"
+        tools:layout="@layout/pantalla_editar_presupuesto" />
 
     <!-- METAS -->
     <fragment

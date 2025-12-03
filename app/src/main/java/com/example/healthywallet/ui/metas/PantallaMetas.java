@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -54,6 +55,45 @@ public class PantallaMetas extends Fragment {
         adaptador = new AdaptadorMetas(requireContext(), lista);
         recycler.setAdapter(adaptador);
 
+        // =======================================================
+        // AÑADIMOS LISTENER NORMAL → ABRIR DETALLE DE META
+        // =======================================================
+        adaptador.setOnMetaClickListener(meta -> {
+            Bundle bundle = new Bundle();
+            bundle.putInt("metaId", meta.getId());
+
+            Navigation.findNavController(requireView())
+                    .navigate(R.id.action_metas_to_detalleMeta, bundle);
+        });
+
+        // =======================================================
+        // AÑADIMOS LISTENER META COMPLETADA → POPUP O DETALLE
+        // =======================================================
+        adaptador.setOnMetaCompletadaListener(meta -> {
+
+            new androidx.appcompat.app.AlertDialog.Builder(requireContext())
+                    .setTitle("🎉 Meta completada")
+                    .setMessage("Has alcanzado el 100% de esta meta.\n¿Deseas eliminarla?")
+                    .setPositiveButton("Eliminar", (dialog, which) -> {
+
+                        // SOLO BORRA SI EL USUARIO LO CONFIRMA
+                        controlador.eliminar(meta, filas -> requireActivity().runOnUiThread(() -> {
+
+                            if (filas > 0) {
+                                Toast.makeText(requireContext(),
+                                        "Meta eliminada", Toast.LENGTH_SHORT).show();
+                                cargarMetas(); // refrescar la lista
+                            } else {
+                                Toast.makeText(requireContext(),
+                                        "Error al eliminar la meta", Toast.LENGTH_SHORT).show();
+                            }
+                        }));
+
+                    })
+                    .setNegativeButton("Cancelar", null)
+                    .show();
+        });
+
         fabAgregarMeta.setOnClickListener(v ->
                 Navigation.findNavController(v).navigate(R.id.action_metas_to_agregarMeta)
         );
@@ -78,4 +118,5 @@ public class PantallaMetas extends Fragment {
             });
         });
     }
+
 }

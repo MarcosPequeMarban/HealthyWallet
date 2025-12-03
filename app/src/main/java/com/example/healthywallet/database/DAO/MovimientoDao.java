@@ -8,6 +8,7 @@ import androidx.room.Delete;
 import androidx.room.Update;
 
 import com.example.healthywallet.database.entities.Movimiento;
+import com.example.healthywallet.database.entities.CategoriaGasto;
 
 import java.util.List;
 
@@ -34,4 +35,19 @@ public interface MovimientoDao {
 
     @Query("SELECT SUM(cantidad) FROM movimientos WHERE tipo = :tipo AND userId = :userId")
     Double obtenerSumaPorTipo(String tipo, int userId);
+
+    // ============= NUEVOS MÉTODOS =============
+
+    @Query("SELECT categoria AS categoria, SUM(cantidad) AS total " +
+            "FROM movimientos WHERE userId = :userId AND tipo='Gasto' " +
+            "GROUP BY categoria ORDER BY total DESC")
+    List<CategoriaGasto> obtenerGastosPorCategoria(int userId);
+
+    @Query("SELECT categoria AS categoria, SUM(cantidad) AS total " +
+            "FROM movimientos " +
+            "WHERE userId = :userId AND tipo = 'Gasto' " +
+            "GROUP BY categoria " +
+            "ORDER BY total DESC " +
+            "LIMIT 1")
+    CategoriaGasto obtenerCategoriaMayorGasto(int userId);
 }

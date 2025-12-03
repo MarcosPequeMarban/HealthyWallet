@@ -13,6 +13,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 
@@ -70,7 +71,8 @@ public class PantallaDetalleMeta extends Fragment {
             Navigation.findNavController(v).navigate(R.id.pantallaAgregarAhorro, bundle);
         });
 
-        btnEliminar.setOnClickListener(v -> eliminarMeta());
+        // CONFIRMAR antes de eliminar
+        btnEliminar.setOnClickListener(v -> confirmarEliminar());
 
         return vista;
     }
@@ -103,15 +105,40 @@ public class PantallaDetalleMeta extends Fragment {
             txtPorcentaje.setText(String.format("%.0f%%", porcentaje));
             barra.setProgress((int) porcentaje);
 
+            // =============================
+            //   POPUP DE META COMPLETADA
+            // =============================
+            if (porcentaje >= 100) {
+
+                new AlertDialog.Builder(requireContext())
+                        .setTitle("🎉 ¡Meta completada!")
+                        .setMessage("Has alcanzado tu objetivo de ahorro.")
+                        .setPositiveButton("Aceptar", null)
+                        .show();
+            }
+
         }));
     }
 
-    private void eliminarMeta() {
+    // ======================================
+    //     CONFIRMACIÓN DE ELIMINAR META
+    // ======================================
+    private void confirmarEliminar() {
 
         if (metaActual == null) {
             Toast.makeText(requireContext(), "Meta no cargada", Toast.LENGTH_SHORT).show();
             return;
         }
+
+        new AlertDialog.Builder(requireContext())
+                .setTitle("Eliminar meta")
+                .setMessage("¿Estás seguro de que quieres eliminar esta meta?")
+                .setPositiveButton("Sí", (dialog, which) -> eliminarMeta())
+                .setNegativeButton("No", null)
+                .show();
+    }
+
+    private void eliminarMeta() {
 
         controlador.eliminar(metaActual, filas -> requireActivity().runOnUiThread(() -> {
 

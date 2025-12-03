@@ -19,6 +19,21 @@ public class AdaptadorMovimientos extends RecyclerView.Adapter<AdaptadorMovimien
     private final Context context;
     private List<Movimiento> lista;
 
+    // =========================================================
+    //  LISTENER DE PULSACIÓN LARGA (NUEVO)
+    // =========================================================
+    public interface OnMovimientoLongClickListener {
+        void onLongClick(Movimiento mov);
+    }
+
+    private OnMovimientoLongClickListener longClickListener;
+
+    public void setOnMovimientoLongClickListener(OnMovimientoLongClickListener l) {
+        this.longClickListener = l;
+    }
+    // =========================================================
+
+
     public AdaptadorMovimientos(Context context, List<Movimiento> lista) {
         this.context = context;
         this.lista = lista;
@@ -39,6 +54,17 @@ public class AdaptadorMovimientos extends RecyclerView.Adapter<AdaptadorMovimien
         holder.txtCategoria.setText(mov.getCategoria());
         holder.txtCantidad.setText(mov.getCantidad() + " €");
         holder.txtFecha.setText(mov.getFecha());
+
+        // =========================================================
+        //  AÑADIR PULSACIÓN LARGA EN EL ITEM (NUEVO)
+        // =========================================================
+        holder.itemView.setOnLongClickListener(v -> {
+            if (longClickListener != null) {
+                longClickListener.onLongClick(mov);
+            }
+            return true; // importante → indica que el evento se consume
+        });
+        // =========================================================
     }
 
     @Override

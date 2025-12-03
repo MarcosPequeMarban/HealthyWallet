@@ -8,9 +8,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -68,6 +70,45 @@ public class PantallaPresupuestos extends Fragment {
         adaptador = new AdaptadorPresupuestos(getContext(), lista);
         recycler.setAdapter(adaptador);
 
+        // ======================================================
+        //  NUEVO: PULSACIÓN LARGA → MENÚ EDITAR / ELIMINAR
+        // ======================================================
+        adaptador.setOnPresupuestoLongClickListener(presupuesto -> {
+
+            new AlertDialog.Builder(requireContext())
+                    .setTitle("Opciones")
+                    .setItems(new CharSequence[]{"Editar", "Eliminar"}, (dialog, which) -> {
+
+                        if (which == 0) {
+                            // EDITAR
+                            Bundle bundle = new Bundle();
+                            bundle.putInt("presupuestoId", presupuesto.getId());
+
+                            Navigation.findNavController(requireView())
+                                    .navigate(R.id.action_presupuestos_to_editarPresupuesto, bundle);
+
+                        } else if (which == 1) {
+                            // ELIMINAR
+                            controlador.eliminar(presupuesto, filas ->
+                                    requireActivity().runOnUiThread(() -> {
+
+                                        if (filas > 0) {
+                                            Toast.makeText(requireContext(),
+                                                    "Presupuesto eliminado", Toast.LENGTH_SHORT).show();
+                                            cargarPresupuestos();
+                                        } else {
+                                            Toast.makeText(requireContext(),
+                                                    "Error al eliminar presupuesto", Toast.LENGTH_SHORT).show();
+                                        }
+
+                                    }));
+                        }
+
+                    })
+                    .show();
+        });
+        // ======================================================
+
         fabAgregar.setOnClickListener(v ->
                 Navigation.findNavController(v)
                         .navigate(R.id.action_presupuestos_to_agregarPresupuesto)
@@ -111,7 +152,7 @@ public class PantallaPresupuestos extends Fragment {
 
                     for (Movimiento m : movimientos) {
 
-                        if (m.getUserId() == p.getUserId() &&         // ← FILTRO IMPORTANTE
+                        if (m.getUserId() == p.getUserId() &&
                                 m.getCategoria().equalsIgnoreCase(p.getCategoria()) &&
                                 m.getTipo().equalsIgnoreCase("Gasto")) {
 

@@ -20,6 +20,20 @@ public class AdaptadorPresupuestos extends RecyclerView.Adapter<AdaptadorPresupu
     private final Context context;
     private final List<Presupuesto> lista;
 
+    // ==========================================================
+    //     LISTENER DE MANTENER PULSADO (NUEVO)
+    // ==========================================================
+    public interface OnPresupuestoLongClickListener {
+        void onLongClick(Presupuesto presupuesto);
+    }
+
+    private OnPresupuestoLongClickListener longClickListener;
+
+    public void setOnPresupuestoLongClickListener(OnPresupuestoLongClickListener listener) {
+        this.longClickListener = listener;
+    }
+    // ==========================================================
+
     public AdaptadorPresupuestos(Context context, List<Presupuesto> lista) {
         this.context = context;
         this.lista = lista;
@@ -43,19 +57,26 @@ public class AdaptadorPresupuestos extends RecyclerView.Adapter<AdaptadorPresupu
         double limite = p.getLimite();
         double gasto = p.getGastoActual();
 
-        // 🔥 COLOR DINÁMICO DEL ITEM SEGÚN EL NIVEL DE GASTO
+        // 🔥 COLOR DINÁMICO SEGÚN EL NIVEL DE GASTO
         if (gasto > limite) {
-            // PASADO → ROJO
             holder.itemView.setBackgroundColor(Color.parseColor("#FF8A80"));
         }
         else if (gasto >= limite * 0.80) {
-            // CERCA DEL LÍMITE → AMARILLO
             holder.itemView.setBackgroundColor(Color.parseColor("#FFF176"));
         }
         else {
-            // NORMAL → BLANCO
             holder.itemView.setBackgroundColor(Color.parseColor("#FFFFFF"));
         }
+
+        // ==========================================================
+        //     AÑADIMOS LA PULSACIÓN LARGA (NUEVO)
+        // ==========================================================
+        holder.itemView.setOnLongClickListener(v -> {
+            if (longClickListener != null) {
+                longClickListener.onLongClick(p);
+            }
+            return true; // consumimos el evento
+        });
     }
 
     @Override

@@ -5,9 +5,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -73,6 +75,37 @@ public class PantallaMovimientos extends Fragment {
                 if (adaptador == null) {
                     adaptador = new AdaptadorMovimientos(requireContext(), movimientos);
                     recyclerView.setAdapter(adaptador);
+
+                    // ==========================================================
+                    //      AÑADIR LISTENER DE PULSACIÓN LARGA  (NUEVO)
+                    // ==========================================================
+                    adaptador.setOnMovimientoLongClickListener(mov -> {
+
+                        new AlertDialog.Builder(requireContext())
+                                .setTitle("Eliminar movimiento")
+                                .setMessage("¿Seguro que deseas eliminar este movimiento?")
+                                .setPositiveButton("Eliminar", (dialog, which) -> {
+
+                                    movimientosControlador.eliminar(mov, filas ->
+                                            requireActivity().runOnUiThread(() -> {
+
+                                                if (filas > 0) {
+                                                    Toast.makeText(requireContext(),
+                                                            "Movimiento eliminado", Toast.LENGTH_SHORT).show();
+                                                    cargarLista();
+                                                } else {
+                                                    Toast.makeText(requireContext(),
+                                                            "Error al eliminar el movimiento", Toast.LENGTH_SHORT).show();
+                                                }
+                                            })
+                                    );
+
+                                })
+                                .setNegativeButton("Cancelar", null)
+                                .show();
+                    });
+                    // ==========================================================
+
                 } else {
                     adaptador.actualizarLista(movimientos);
                 }
