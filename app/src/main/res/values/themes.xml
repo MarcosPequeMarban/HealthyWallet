@@ -3,23 +3,27 @@
 
     <style name="Theme.HealthyWallet" parent="Theme.MaterialComponents.DayNight.NoActionBar">
 
-        <!-- Colores principales -->
+        <!-- PALETA PRINCIPAL -->
         <item name="colorPrimary">@color/colorVerde</item>
         <item name="colorPrimaryVariant">@color/colorVerdeOscuro</item>
         <item name="colorOnPrimary">@color/colorBlanco</item>
 
-        <!-- Colores secundarios -->
+        <!-- PALETA SECUNDARIA -->
         <item name="colorSecondary">@color/colorGrisClaro</item>
         <item name="colorOnSecondary">@color/colorTextoNegro</item>
 
-        <!-- Barra de estado -->
+        <!-- FONDOS -->
+        <item name="android:windowBackground">@color/colorBlanco</item>
         <item name="android:statusBarColor">@color/colorVerdeOscuro</item>
-
-        <!-- Barra de navegación -->
         <item name="android:navigationBarColor">@color/colorNavFondo</item>
 
-        <!-- Color de fondo general -->
-        <item name="android:windowBackground">@color/colorBlanco</item>
+        <!-- NECESARIO PARA MATERIAL COMPONENTS -->
+        <item name="materialCardViewStyle">@style/Widget.MaterialComponents.CardView</item>
+        <item name="textInputStyle">@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox</item>
+        <item name="materialButtonStyle">@style/Widget.MaterialComponents.Button</item>
+
+        <!-- RIPPLE (ondas al pulsar) -->
+        <item name="android:colorControlHighlight">@color/ripple_suave</item>
 
     </style>
 

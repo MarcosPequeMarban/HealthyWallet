@@ -1,56 +1,47 @@
 package com.example.healthywallet.database.entities;
 
-import androidx.room.ColumnInfo;
 import androidx.room.Entity;
-import androidx.room.ForeignKey;
 import androidx.room.PrimaryKey;
 
-@Entity(
-        tableName = "formacion",
-        foreignKeys = @ForeignKey(
-                entity = Usuario.class,
-                parentColumns = "id",
-                childColumns = "userId",
-                onDelete = ForeignKey.CASCADE
-        )
-)
+@Entity(tableName = "formacion")
 public class Formacion {
 
     @PrimaryKey(autoGenerate = true)
     private int id;
 
-    @ColumnInfo(name = "titulo")
     private String titulo;
+    private String url;
+    private String nivel; // PRINCIPIANTE / INTERMEDIO / EXPERTO
 
-    @ColumnInfo(name = "descripcion")
-    private String descripcion;
+    private boolean completado;     // ← IMPORTANTE
+    private long fechaCompletado;   // ← IMPORTANTE
 
-    @ColumnInfo(name = "nivel")
-    private String nivel;
+    private int userId; // MULTICUENTA
 
-    @ColumnInfo(name = "userId", index = true)
-    private int userId;  // ← NUEVO: dueño de este recurso formativo
-
-    public Formacion(String titulo, String descripcion, String nivel, int userId) {
+    public Formacion(String titulo, String url, String nivel, int userId) {
         this.titulo = titulo;
-        this.descripcion = descripcion;
+        this.url = url;
         this.nivel = nivel;
         this.userId = userId;
+        this.completado = false;
+        this.fechaCompletado = 0;
     }
 
-    // Getters y Setters
+    // ==== GETTERS ====
     public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
-
     public String getTitulo() { return titulo; }
-    public void setTitulo(String titulo) { this.titulo = titulo; }
-
-    public String getDescripcion() { return descripcion; }
-    public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
-
+    public String getUrl() { return url; }
     public String getNivel() { return nivel; }
-    public void setNivel(String nivel) { this.nivel = nivel; }
-
+    public boolean isCompletado() { return completado; }
+    public long getFechaCompletado() { return fechaCompletado; }
     public int getUserId() { return userId; }
+
+    // ==== SETTERS ====
+    public void setId(int id) { this.id = id; }
+    public void setTitulo(String titulo) { this.titulo = titulo; }
+    public void setUrl(String url) { this.url = url; }
+    public void setNivel(String nivel) { this.nivel = nivel; }
+    public void setCompletado(boolean completado) { this.completado = completado; }
+    public void setFechaCompletado(long fechaCompletado) { this.fechaCompletado = fechaCompletado; }
     public void setUserId(int userId) { this.userId = userId; }
 }

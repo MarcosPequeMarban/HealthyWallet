@@ -37,7 +37,7 @@ public class AdaptadorFormacion extends RecyclerView.Adapter<AdaptadorFormacion.
 
         holder.txtTitulo.setText(f.getTitulo());
         holder.txtNivel.setText(f.getNivel());
-        holder.txtDescripcion.setText(f.getDescripcion());
+        holder.txtDescripcion.setText("");
     }
 
     @Override

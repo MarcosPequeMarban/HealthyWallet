@@ -3,13 +3,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F3F3F3">
+    android:fillViewport="true"
+    android:background="@color/fondo_app">
 
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="20dp">
+        android:padding="22dp">
 
         <!-- HEADER -->
         <LinearLayout
@@ -19,191 +20,191 @@
             android:gravity="center_vertical">
 
             <ImageView
-                android:layout_width="30dp"
-                android:layout_height="30dp"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
                 android:src="@drawable/ic_home"
-                app:tint="#4CAF50"/>
+                app:tint="@color/colorPrincipal" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Inicio"
+                android:textSize="30sp"
                 android:textStyle="bold"
-                android:textColor="#333333"
-                android:textSize="26sp"
-                android:layout_marginStart="12dp"/>
+                android:textColor="@color/titulo_principal"
+                android:layout_marginStart="14dp" />
         </LinearLayout>
 
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="14dp" />
 
-        <!-- TARJETA: BALANCE TOTAL (click → balance general) -->
-        <androidx.cardview.widget.CardView
+        <!-- BALANCE GENERAL -->
+        <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardBalanceGeneral"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="18dp"
-            android:backgroundTint="#FFFFFF"
-            android:foreground="?attr/selectableItemBackground"
-            app:cardCornerRadius="14dp"
-            app:cardElevation="4dp">
+            android:layout_marginTop="10dp"
+            android:backgroundTint="@color/card_fondo"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="5dp"
+            app:rippleColor="@color/ripple_suave"
+            android:foreground="?attr/selectableItemBackground">
 
             <LinearLayout
                 android:orientation="vertical"
-                android:padding="18dp"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:padding="22dp">
 
                 <TextView
                     android:id="@+id/txtBalanceTituloInicio"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Balance total"
-                    android:textColor="#888888"
-                    android:textSize="16sp"/>
+                    android:textColor="@color/texto_secundario"
+                    android:textSize="16sp" />
 
                 <TextView
                     android:id="@+id/txtBalanceCantidadInicio"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="0,00 €"
-                    android:textColor="#4CAF50"
+                    android:textColor="@color/colorPrincipal"
                     android:textStyle="bold"
-                    android:textSize="24sp"
-                    android:layout_marginTop="6dp"/>
+                    android:textSize="28sp"
+                    android:layout_marginTop="6dp" />
             </LinearLayout>
-        </androidx.cardview.widget.CardView>
+        </com.google.android.material.card.MaterialCardView>
 
-
-        <!-- TARJETA PRESUPUESTOS -->
-        <androidx.cardview.widget.CardView
+        <!-- PRESUPUESTOS -->
+        <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardPresupuestos"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:backgroundTint="#FFFFFF"
-            android:foreground="?attr/selectableItemBackground"
-            app:cardCornerRadius="14dp"
-            app:cardElevation="3dp">
+            android:layout_marginTop="18dp"
+            android:backgroundTint="@color/card_fondo"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="4dp"
+            android:foreground="?attr/selectableItemBackground">
 
             <LinearLayout
                 android:orientation="vertical"
-                android:padding="16dp"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:padding="20dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Presupuestos"
-                    android:textSize="18sp"
+                    android:textSize="20sp"
                     android:textStyle="bold"
-                    android:textColor="#333333"/>
+                    android:textColor="@color/titulo_principal" />
 
                 <TextView
                     android:id="@+id/txtResumenPresupuestosInicio"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="0 € gastados / 0 €"
-                    android:textColor="#777777"
-                    android:layout_marginTop="6dp"/>
+                    android:textColor="@color/texto_secundario"
+                    android:layout_marginTop="6dp" />
             </LinearLayout>
-        </androidx.cardview.widget.CardView>
+        </com.google.android.material.card.MaterialCardView>
 
-
-        <!-- TARJETA MOVIMIENTOS -->
-        <androidx.cardview.widget.CardView
+        <!-- MOVIMIENTOS -->
+        <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardMovimientos"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:backgroundTint="#FFFFFF"
-            android:foreground="?attr/selectableItemBackground"
-            app:cardCornerRadius="14dp"
-            app:cardElevation="3dp">
+            android:layout_marginTop="18dp"
+            android:backgroundTint="@color/card_fondo"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="4dp"
+            android:foreground="?attr/selectableItemBackground">
 
             <LinearLayout
                 android:orientation="vertical"
-                android:padding="16dp"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:padding="20dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Movimientos"
-                    android:textSize="18sp"
+                    android:textSize="20sp"
                     android:textStyle="bold"
-                    android:textColor="#333333"/>
+                    android:textColor="@color/titulo_principal" />
 
                 <TextView
                     android:id="@+id/txtResumenMovimientosInicio"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="+0 ingresos | -0 gastos"
-                    android:textColor="#777777"
-                    android:layout_marginTop="6dp"/>
+                    android:textColor="@color/texto_secundario"
+                    android:layout_marginTop="6dp" />
             </LinearLayout>
-        </androidx.cardview.widget.CardView>
+        </com.google.android.material.card.MaterialCardView>
 
-
-        <!-- TARJETA METAS -->
-        <androidx.cardview.widget.CardView
+        <!-- METAS -->
+        <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardMetas"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:backgroundTint="#FFFFFF"
-            android:foreground="?attr/selectableItemBackground"
-            app:cardCornerRadius="14dp"
-            app:cardElevation="3dp">
+            android:layout_marginTop="18dp"
+            android:backgroundTint="@color/card_fondo"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="4dp"
+            android:foreground="?attr/selectableItemBackground">
 
             <LinearLayout
                 android:orientation="vertical"
-                android:padding="16dp"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:padding="20dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Metas"
-                    android:textSize="18sp"
+                    android:textSize="20sp"
                     android:textStyle="bold"
-                    android:textColor="#333333"/>
+                    android:textColor="@color/titulo_principal" />
 
                 <TextView
                     android:id="@+id/txtResumenMetasInicio"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="0 activas | 0 completadas"
-                    android:textColor="#777777"
-                    android:layout_marginTop="6dp"/>
+                    android:textColor="@color/texto_secundario"
+                    android:layout_marginTop="6dp" />
             </LinearLayout>
-        </androidx.cardview.widget.CardView>
+        </com.google.android.material.card.MaterialCardView>
 
-
-        <!-- TARJETA EDUCACIÓN -->
-        <androidx.cardview.widget.CardView
+        <!-- EDUCACIÓN -->
+        <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardEducacion"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:backgroundTint="#FFFFFF"
-            android:foreground="?attr/selectableItemBackground"
-            app:cardCornerRadius="14dp"
-            app:cardElevation="3dp">
+            android:layout_marginTop="18dp"
+            android:backgroundTint="@color/card_fondo"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="4dp"
+            android:foreground="?attr/selectableItemBackground">
 
             <LinearLayout
                 android:orientation="vertical"
-                android:padding="16dp"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:padding="20dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Educación financiera"
-                    android:textColor="#333333"
-                    android:textSize="18sp"
+                    android:textColor="@color/titulo_principal"
+                    android:textSize="20sp"
                     android:textStyle="bold"/>
 
                 <TextView
@@ -211,10 +212,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="0 módulos registrados"
-                    android:textColor="#777777"
+                    android:textColor="@color/texto_secundario"
                     android:layout_marginTop="6dp"/>
             </LinearLayout>
-        </androidx.cardview.widget.CardView>
+        </com.google.android.material.card.MaterialCardView>
 
     </LinearLayout>
 </ScrollView>

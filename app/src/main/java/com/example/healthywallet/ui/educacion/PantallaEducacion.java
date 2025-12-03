@@ -5,51 +5,206 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 
 import com.example.healthywallet.R;
+import com.example.healthywallet.controller.FormacionControlador;
+import com.example.healthywallet.database.entities.Formacion;
+import com.google.android.material.card.MaterialCardView;
+import com.google.android.material.progressindicator.LinearProgressIndicator;
+
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
 
 public class PantallaEducacion extends Fragment {
 
-    @Nullable
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    private FormacionControlador controlador;
 
-        View vista = inflater.inflate(R.layout.pantalla_educacion, container, false);
+    // ==== VISTAS ====
+    private TextView txtProgresoGlobal;
+    private LinearProgressIndicator barraProgresoGlobal;
 
-        // =========== ASIGNAR CARDS ===========
-        CardView cardVideo1 = vista.findViewById(R.id.cardVideo1);
-        CardView cardVideo2 = vista.findViewById(R.id.cardVideo2);
+    private LinearLayout contPrincipiante, contIntermedio, contExperto;
 
-        CardView cardLibro1 = vista.findViewById(R.id.cardLibro1);
+    private LinearProgressIndicator barraPrincipiante, barraIntermedio, barraExperto;
 
-        CardView cardTool1 = vista.findViewById(R.id.cardTool1);
-        CardView cardTool2 = vista.findViewById(R.id.cardTool2);
-        CardView cardTool3 = vista.findViewById(R.id.cardTool3);
+    private TextView txtLibroTitulo, txtLibroAutor;
+    private Button btnAbrirLibro;
 
-        // =========== EVENTOS ===========
-
-        abrir(cardVideo1, "https://youtu.be/ujY0DkyL--w?si=bOuKABNajrNIy-iT");
-        abrir(cardVideo2, "https://youtu.be/bkYK-akFam4?si=zZ1Oug3rfNqxzNex");
-
-        abrir(cardLibro1, "https://www.amazon.es/s?k=padre+rico+padre+pobre&__mk_es_ES=%C3%85M%C3%85%C5%BD%C3%95%C3%91&crid=3CQQ3JP79SI2&sprefix=padre+rico+padre+pobre+%2Caps%2C73&ref=nb_sb_noss_2");
-
-        abrir(cardTool1, "https://es.investing.com/");
-        abrir(cardTool2, "https://www.tradingview.com/");
-        abrir(cardTool3, "http://www.moneychimp.com/");
-
-        return vista;
+    public PantallaEducacion() {
+        super(R.layout.pantalla_educacion);
     }
 
-    private void abrir(CardView card, String url) {
-        card.setOnClickListener(v -> {
-            Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-            startActivity(i);
+    @Override
+    public void onViewCreated(View vista, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(vista, savedInstanceState);
+
+        controlador = new FormacionControlador(requireContext());
+        controlador.inicializarDatosSiNecesario();
+
+        // ==== REFERENCIAS ====
+        txtProgresoGlobal = vista.findViewById(R.id.txtProgresoGlobal);
+        barraProgresoGlobal = vista.findViewById(R.id.progresoGlobalBarra);
+
+        contPrincipiante = vista.findViewById(R.id.contenedorVideosPrincipiante);
+        contIntermedio = vista.findViewById(R.id.contenedorVideosIntermedio);
+        contExperto = vista.findViewById(R.id.contenedorVideosExperto);
+
+        barraPrincipiante = vista.findViewById(R.id.barraNivelPrincipiante);
+        barraIntermedio = vista.findViewById(R.id.barraNivelIntermedio);
+        barraExperto = vista.findViewById(R.id.barraNivelExperto);
+
+        txtLibroTitulo = vista.findViewById(R.id.txtLibroTitulo);
+        txtLibroAutor = vista.findViewById(R.id.txtLibroAutor);
+        btnAbrirLibro = vista.findViewById(R.id.btnAbrirLibro);
+
+        // === HERRAMIENTAS ===
+        MaterialCardView toolCalc = vista.findViewById(R.id.toolCalculadoraInteres);
+        MaterialCardView toolSim = vista.findViewById(R.id.toolSimuladorInversion);
+        MaterialCardView toolDic = vista.findViewById(R.id.toolDiccionarioFinanciero);
+
+        toolCalc.setOnClickListener(v -> abrirWeb("http://www.moneychimp.com/international/es/calculator/compound_interest_calculator.htm"));
+        toolSim.setOnClickListener(v -> abrirWeb("https://es.investing.com/"));
+        toolDic.setOnClickListener(v -> abrirWeb("https://es.tradingview.com/"));
+
+        // CARGA
+        cargarVideos();
+        cargarLibroSemana();
+    }
+
+    // =====================================================================================
+    //   ABRIR LINKS
+    // =====================================================================================
+    private void abrirWeb(String url) {
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+        startActivity(intent);
+    }
+
+    // =====================================================================================
+    //   CARGAR VIDEOS DESDE BASE DE DATOS
+    // =====================================================================================
+    private void cargarVideos() {
+
+        controlador.obtenerTodas(lista -> {
+            if (lista == null) return;
+
+            requireActivity().runOnUiThread(() -> {
+                contPrincipiante.removeAllViews();
+                contIntermedio.removeAllViews();
+                contExperto.removeAllViews();
+            });
+
+            List<Formacion> principiantes = new ArrayList<>();
+            List<Formacion> intermedios = new ArrayList<>();
+            List<Formacion> expertos = new ArrayList<>();
+
+            for (Formacion v : lista) {
+                switch (v.getNivel().toLowerCase()) {
+                    case "principiante":
+                        principiantes.add(v);
+                        break;
+                    case "intermedio":
+                        intermedios.add(v);
+                        break;
+                    case "experto":
+                        expertos.add(v);
+                        break;
+                }
+            }
+
+            cargarVideosEnContenedor(principiantes, contPrincipiante, barraPrincipiante);
+            cargarVideosEnContenedor(intermedios, contIntermedio, barraIntermedio);
+            cargarVideosEnContenedor(expertos, contExperto, barraExperto);
+
+            calcularProgresoGlobal();
+        });
+    }
+
+    // =====================================================================================
+    //   AGREGAR VIDEOS A SU CONTENEDOR + ACTUALIZAR BARRA
+    // =====================================================================================
+    private void cargarVideosEnContenedor(List<Formacion> lista, LinearLayout contenedor, LinearProgressIndicator barra) {
+
+        final int total = lista.size();
+        final int[] completados = {0};
+
+        requireActivity().runOnUiThread(() -> {
+
+            LayoutInflater infl = LayoutInflater.from(requireContext());
+
+            for (Formacion v : lista) {
+
+                if (v.isCompletado()) completados[0]++;
+
+                View item = infl.inflate(R.layout.item_video, contenedor, false);
+
+                TextView titulo = item.findViewById(R.id.txtTituloVideo);
+                CheckBox check = item.findViewById(R.id.checkCompletado);
+
+                titulo.setText(v.getTitulo());
+                check.setChecked(v.isCompletado());
+
+                // ✔ CLICK EN EL ITEM PARA ABRIR EL VIDEO
+                item.setOnClickListener(vw -> {
+                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(v.getUrl()));
+                    startActivity(intent);
+                });
+
+                // ✔ CLICK EN EL CHECKBOX PARA COMPLETAR
+                check.setOnCheckedChangeListener((btn, marcado) -> {
+                    v.setCompletado(marcado);
+                    controlador.actualizar(v, ok -> cargarVideos());
+                });
+
+                contenedor.addView(item);
+            }
+
+            int porcentaje = total == 0 ? 0 : (completados[0] * 100 / total);
+            barra.setProgress(porcentaje);
+        });
+    }
+
+
+    // =====================================================================================
+    //   CALCULAR PROGRESO TOTAL (%)
+    // =====================================================================================
+    private void calcularProgresoGlobal() {
+
+        controlador.calcularProgresoGlobal(porcentaje -> {
+            requireActivity().runOnUiThread(() -> {
+                barraProgresoGlobal.setProgress(porcentaje);
+                txtProgresoGlobal.setText(porcentaje + "% completado");
+            });
+        });
+    }
+
+    // =====================================================================================
+    //   LIBRO DE LA SEMANA
+    // =====================================================================================
+    private void cargarLibroSemana() {
+
+        List<String[]> libros = new ArrayList<>();
+        libros.add(new String[]{"Padre Rico Padre Pobre", "Robert Kiyosaki", "https://amzn.to/3EMYYabc"});
+        libros.add(new String[]{"El Hombre Más Rico de Babilonia", "George S. Clason", "https://amzn.to/3ABxYlq"});
+        libros.add(new String[]{"Piense y Hágase Rico", "Napoleon Hill", "https://amzn.to/4acFG8d"});
+
+        int semana = Calendar.getInstance().get(Calendar.WEEK_OF_YEAR);
+        int indice = semana % libros.size();
+
+        String[] libro = libros.get(indice);
+
+        requireActivity().runOnUiThread(() -> {
+            txtLibroTitulo.setText(libro[0]);
+            txtLibroAutor.setText(libro[1]);
+
+            btnAbrirLibro.setOnClickListener(v -> abrirWeb(libro[2]));
         });
     }
 }

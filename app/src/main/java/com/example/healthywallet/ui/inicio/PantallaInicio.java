@@ -56,7 +56,7 @@ public class PantallaInicio extends Fragment {
         SharedPreferences prefs = requireContext().getSharedPreferences("session", Context.MODE_PRIVATE);
         userId = prefs.getInt("usuarioId", -1);
 
-        // Controladores (todos ellos ya gestionan userId internamente)
+        // Controladores
         movimientosControlador = new MovimientosControlador(requireContext());
         presupuestoControlador = new PresupuestoControlador(requireContext());
         metaControlador = new MetaControlador(requireContext());
@@ -130,7 +130,6 @@ public class PantallaInicio extends Fragment {
                 })
         );
 
-
         // -------- PRESUPUESTOS --------
         presupuestoControlador.obtenerTodos(presupuestos -> {
 
@@ -177,14 +176,17 @@ public class PantallaInicio extends Fragment {
                     ));
         });
 
-        // -------- EDUCACIÓN --------
-        formacionControlador.obtenerTodas(formaciones -> {
-            int total = (formaciones != null ? formaciones.size() : 0);
-            requireActivity().runOnUiThread(() ->
-                    txtResumenEducacionInicio.setText(
-                            String.format("%d módulos registrados", total)
-                    )
-            );
-        });
+        // =====================================================================================
+        //   🌟 EDUCACIÓN FINANCIERA — TEXTO CORREGIDO
+        // =====================================================================================
+        formacionControlador.contarTodosGlobal(total ->
+                formacionControlador.contarCompletadosGlobal(completados ->
+                        requireActivity().runOnUiThread(() ->
+                                txtResumenEducacionInicio.setText(
+                                        String.format("%d de %d módulos completados", completados, total)
+                                )
+                        )
+                )
+        );
     }
 }

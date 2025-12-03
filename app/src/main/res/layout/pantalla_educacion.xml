@@ -3,265 +3,368 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F3F3F3">
+    android:background="#F2F4F7">
 
     <LinearLayout
-        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="vertical"
         android:padding="20dp">
 
-        <!-- TÍTULO PRINCIPAL -->
+
+        <!-- ========= HEADER ========= -->
         <TextView
-            android:id="@+id/txtTituloEducacion"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Educación Financiera"
-            android:textColor="#333333"
             android:textSize="26sp"
             android:textStyle="bold"
-            android:layout_marginBottom="20dp"/>
+            android:textColor="#212121" />
 
-        <!-- ===================================== -->
-        <!--               VIDEOS                  -->
-        <!-- ===================================== -->
 
+        <!-- ========= PROGRESO GLOBAL ========= -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            app:cardCornerRadius="18dp"
+            app:cardElevation="5dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="18dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/txtProgresoGlobalTitulo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Progreso del programa"
+                    android:textSize="16sp"
+                    android:textColor="#555" />
+
+                <TextView
+                    android:id="@+id/txtProgresoGlobal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0% completado"
+                    android:textStyle="bold"
+                    android:textColor="#4CAF50"
+                    android:textSize="20sp"
+                    android:layout_marginTop="4dp" />
+
+                <com.google.android.material.progressindicator.LinearProgressIndicator
+                    android:id="@+id/progresoGlobalBarra"
+                    android:layout_width="match_parent"
+                    android:layout_height="16dp"
+                    app:trackThickness="8dp"
+                    app:indicatorColor="#4CAF50"
+                    android:layout_marginTop="10dp"/>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+
+        <!-- ========= NIVELES DE VÍDEOS ========= -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="📹 Vídeos Recomendados"
-            android:textColor="#4CAF50"
+            android:layout_marginTop="25dp"
+            android:text="Rutas de Aprendizaje"
+            android:textSize="20sp"
             android:textStyle="bold"
-            android:textSize="18sp"
-            android:layout_marginBottom="12dp" />
+            android:textColor="#1A1A1A" />
 
-        <!-- VIDEO 1 -->
-        <androidx.cardview.widget.CardView
-            android:id="@+id/cardVideo1"
+
+        <!-- === NIVEL PRINCIPIANTE === -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardNivelPrincipiante"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="3dp"
-            android:backgroundTint="#FFFFFF">
+            android:layout_marginTop="15dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="3dp">
 
             <LinearLayout
-                android:orientation="vertical"
-                android:padding="16dp"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
 
                 <TextView
+                    android:id="@+id/txtNivelPrincipianteTitulo"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="El ÚNICO Curso de Inversión Que Deberías Ver"
-                    android:textStyle="bold"
-                    android:textColor="#222"
-                    android:textSize="16sp"/>
+                    android:text="Nivel Principiante"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
 
-                <TextView
-                    android:layout_width="wrap_content"
+                <com.google.android.material.progressindicator.LinearProgressIndicator
+                    android:id="@+id/barraNivelPrincipiante"
+                    android:layout_width="match_parent"
+                    android:layout_height="14dp"
+                    app:indicatorColor="#2196F3"
+                    android:layout_marginTop="10dp"/>
+
+                <LinearLayout
+                    android:id="@+id/contenedorVideosPrincipiante"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="https://youtu.be/ujY0DkyL--w?si=bOuKABNajrNIy-iT"
-                    android:textColor="#4CAF50"
-                    android:layout_marginTop="6dp"/>
+                    android:orientation="vertical"
+                    android:layout_marginTop="15dp" />
+
             </LinearLayout>
-        </androidx.cardview.widget.CardView>
+        </com.google.android.material.card.MaterialCardView>
 
-        <!-- VIDEO 2 -->
-        <androidx.cardview.widget.CardView
-            android:id="@+id/cardVideo2"
+
+        <!-- === NIVEL INTERMEDIO === -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardNivelIntermedio"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="3dp"
-            android:backgroundTint="#FFFFFF">
+            android:layout_marginTop="15dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="3dp">
 
             <LinearLayout
-                android:orientation="vertical"
-                android:padding="16dp"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                android:orientation="vertical">
 
                 <TextView
+                    android:id="@+id/txtNivelIntermedioTitulo"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Curso Completo de Inversión – La Pizarra de Andrés"
-                    android:textStyle="bold"
-                    android:textColor="#222"
-                    android:textSize="16sp"/>
+                    android:text="Nivel Intermedio"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
 
-                <TextView
-                    android:layout_width="wrap_content"
+                <com.google.android.material.progressindicator.LinearProgressIndicator
+                    android:id="@+id/barraNivelIntermedio"
+                    android:layout_width="match_parent"
+                    android:layout_height="14dp"
+                    app:indicatorColor="#FF9800"
+                    android:layout_marginTop="10dp" />
+
+                <LinearLayout
+                    android:id="@+id/contenedorVideosIntermedio"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="https://youtu.be/bkYK-akFam4?si=zZ1Oug3rfNqxzNex"
-                    android:textColor="#4CAF50"
-                    android:layout_marginTop="6dp"/>
+                    android:orientation="vertical"
+                    android:layout_marginTop="15dp" />
+
             </LinearLayout>
-        </androidx.cardview.widget.CardView>
+        </com.google.android.material.card.MaterialCardView>
 
-        <!-- ===================================== -->
-        <!--               LIBROS                  -->
-        <!-- ===================================== -->
 
+        <!-- === NIVEL EXPERTO === -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardNivelExperto"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="3dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/txtNivelExpertoTitulo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Nivel Experto"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <com.google.android.material.progressindicator.LinearProgressIndicator
+                    android:id="@+id/barraNivelExperto"
+                    android:layout_width="match_parent"
+                    android:layout_height="14dp"
+                    app:indicatorColor="#E91E63"
+                    android:layout_marginTop="10dp" />
+
+                <LinearLayout
+                    android:id="@+id/contenedorVideosExperto"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginTop="15dp" />
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+
+
+        <!-- ========= LIBRO DE LA SEMANA ========= -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="📘 Libros Recomendados"
-            android:textColor="#4CAF50"
+            android:layout_marginTop="30dp"
+            android:text="Libro de la Semana"
+            android:textSize="20sp"
             android:textStyle="bold"
-            android:textSize="18sp"
-            android:layout_marginBottom="12dp" />
+            android:textColor="#1A1A1A" />
 
-        <!-- LIBRO 1 -->
-        <androidx.cardview.widget.CardView
-            android:id="@+id/cardLibro1"
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardLibroSemana"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="3dp"
-            android:backgroundTint="#FFFFFF">
+            android:layout_marginTop="15dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="4dp">
 
             <LinearLayout
+                android:padding="18dp"
                 android:orientation="vertical"
-                android:padding="16dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
                 <TextView
+                    android:id="@+id/txtLibroTitulo"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Padre Rico Padre Pobre – Robert Kiyosaki"
-                    android:textStyle="bold"
-                    android:textColor="#222"
-                    android:textSize="16sp"/>
+                    android:text="Título del libro"
+                    android:textSize="17sp"
+                    android:textStyle="bold" />
 
                 <TextView
+                    android:id="@+id/txtLibroAutor"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="https://amzn.to/3EMYabc"
-                    android:textColor="#4CAF50"
-                    android:layout_marginTop="6dp"/>
+                    android:text="Autor"
+                    android:layout_marginTop="6dp"
+                    android:textColor="#777" />
+
+                <Button
+                    android:id="@+id/btnAbrirLibro"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:text="Ver libro" />
             </LinearLayout>
-        </androidx.cardview.widget.CardView>
+        </com.google.android.material.card.MaterialCardView>
 
-        <!-- ===================================== -->
-        <!--             HERRAMIENTAS              -->
-        <!-- ===================================== -->
 
+
+        <!-- ========= HERRAMIENTAS ÚTILES ========= -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="🛠️ Herramientas Útiles"
-            android:textColor="#4CAF50"
+            android:layout_marginTop="30dp"
+            android:text="Herramientas Útiles"
+            android:textSize="20sp"
             android:textStyle="bold"
-            android:textSize="18sp"
-            android:layout_marginBottom="12dp" />
+            android:textColor="#1A1A1A" />
 
-        <!-- TOOL 1 -->
-        <androidx.cardview.widget.CardView
-            android:id="@+id/cardTool1"
+
+        <!-- ======= HERRAMIENTA 1 (EMOJI) ======= -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/toolCalculadoraInteres"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="3dp"
-            android:backgroundTint="#FFFFFF">
+            android:layout_marginTop="15dp"
+            app:cardCornerRadius="14dp"
+            app:cardElevation="4dp">
 
             <LinearLayout
-                android:orientation="vertical"
                 android:padding="16dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
                 <TextView
+                    android:text="📈"
+                    android:textSize="26sp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Investing — Noticias y seguimiento"
-                    android:textStyle="bold"
-                    android:textColor="#222"
-                    android:textSize="16sp"/>
+                    android:contentDescription="@null"/>
 
                 <TextView
+                    android:layout_marginStart="12dp"
+                    android:text="Calculadora de interés compuesto"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="#333"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="https://es.investing.com/"
-                    android:textColor="#4CAF50"
-                    android:layout_marginTop="6dp"/>
+                    android:layout_height="wrap_content"/>
             </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
 
-        </androidx.cardview.widget.CardView>
 
-        <!-- TOOL 2 -->
-        <androidx.cardview.widget.CardView
-            android:id="@+id/cardTool2"
+        <!-- ======= HERRAMIENTA 2 (EMOJI) ======= -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/toolSimuladorInversion"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="3dp"
-            android:backgroundTint="#FFFFFF">
+            android:layout_marginTop="12dp"
+            app:cardCornerRadius="14dp"
+            app:cardElevation="4dp">
 
             <LinearLayout
-                android:orientation="vertical"
                 android:padding="16dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
                 <TextView
+                    android:text="💹"
+                    android:textSize="26sp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="TradingView — Gráficos profesionales"
-                    android:textStyle="bold"
-                    android:textColor="#222"
-                    android:textSize="16sp"/>
+                    android:contentDescription="@null"/>
 
                 <TextView
+                    android:layout_marginStart="12dp"
+                    android:text="Simulador de inversión"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="#333"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="https://www.tradingview.com/"
-                    android:textColor="#4CAF50"
-                    android:layout_marginTop="6dp"/>
+                    android:layout_height="wrap_content"/>
             </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
 
-        </androidx.cardview.widget.CardView>
 
-        <!-- TOOL 3 -->
-        <androidx.cardview.widget.CardView
-            android:id="@+id/cardTool3"
+        <!-- ======= HERRAMIENTA 3 (EMOJI) ======= -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/toolDiccionarioFinanciero"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="40dp"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="3dp"
-            android:backgroundTint="#FFFFFF">
+            android:layout_marginTop="12dp"
+            app:cardCornerRadius="14dp"
+            app:cardElevation="4dp">
 
             <LinearLayout
-                android:orientation="vertical"
                 android:padding="16dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
                 <TextView
+                    android:text="📊"
+                    android:textSize="26sp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="MoneyChimp — Calculadora de Rentabilidad"
-                    android:textStyle="bold"
-                    android:textColor="#222"
-                    android:textSize="16sp"/>
+                    android:contentDescription="@null"/>
 
                 <TextView
+                    android:layout_marginStart="12dp"
+                    android:text="Graficos del mercado"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="#333"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="http://www.moneychimp.com/"
-                    android:textColor="#4CAF50"
-                    android:layout_marginTop="6dp"/>
+                    android:layout_height="wrap_content"/>
             </LinearLayout>
-
-        </androidx.cardview.widget.CardView>
+        </com.google.android.material.card.MaterialCardView>
 
     </LinearLayout>
-
 </ScrollView>
