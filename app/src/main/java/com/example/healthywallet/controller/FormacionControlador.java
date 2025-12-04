@@ -12,16 +12,17 @@ import java.util.concurrent.ExecutorService;
 
 public class FormacionControlador {
 
-    // ==== Callbacks ====
+    // === CALLBACKS ===
     public interface CallbackListaFormacion { void onResult(List<Formacion> lista); }
     public interface CallbackInt { void onResult(int valor); }
-    public interface CallbackSimple { void onFinish(); }
-    public interface CallbackFormacion { void onResult(Formacion formacion); }
 
+
+    // === CAMPOS ===
     private final FormacionDao dao;
     private final ExecutorService executor;
     private final int userId;
 
+    // === CONSTRUCTOR ===
     public FormacionControlador(Context context) {
         GestorBaseDatos db = GestorBaseDatos.obtenerInstancia(context);
         dao = db.formacionDao();
@@ -31,93 +32,28 @@ public class FormacionControlador {
         userId = prefs.getInt("usuarioId", -1);
     }
 
-    // ===============================
-    // INSERTAR VIDEO
-    // ===============================
+
     public void insertar(Formacion formacion, CallbackInt callback) {
         formacion.setUserId(userId);
         executor.execute(() -> callback.onResult((int) dao.insertar(formacion)));
     }
 
-    // ===============================
-    // OBTENER TODOS LOS VIDEOS
-    // ===============================
     public void obtenerTodas(CallbackListaFormacion callback) {
         executor.execute(() -> callback.onResult(dao.obtenerTodas(userId)));
     }
 
-    // ===============================
-    // ELIMINAR VIDEO
-    // ===============================
-    public void eliminarPorId(int id, CallbackInt callback) {
-        executor.execute(() -> callback.onResult(dao.eliminarPorId(id, userId)));
-    }
-
-    // ===============================
-    // OBTENER VIDEOS POR NIVEL
-    // ===============================
-    public void obtenerPorNivel(String nivel, CallbackListaFormacion callback) {
-        executor.execute(() -> callback.onResult(
-                dao.obtenerPorNivel(nivel, userId)
-        ));
-    }
-
-    // ===============================
-    // MARCAR COMPLETADO / NO COMPLETADO
-    // ===============================
-    public void marcarCompletado(Formacion video, boolean nuevoEstado, CallbackSimple callback) {
-        executor.execute(() -> {
-            video.setCompletado(nuevoEstado);
-
-            if (nuevoEstado)
-                video.setFechaCompletado(System.currentTimeMillis());
-            else
-                video.setFechaCompletado(0);
-
-            dao.actualizar(video);
-            callback.onFinish();
-        });
-    }
-
-    // ===============================
-    // CONTAR TOTAL VIDEOS POR NIVEL
-    // ===============================
-    public void contarVideosNivel(String nivel, CallbackInt callback) {
-        executor.execute(() -> callback.onResult(
-                dao.contarPorNivel(nivel, userId)
-        ));
-    }
-
-    // ===============================
-    // CONTAR COMPLETADOS POR NIVEL
-    // ===============================
-    public void contarCompletadosNivel(String nivel, CallbackInt callback) {
-        executor.execute(() -> callback.onResult(
-                dao.contarCompletadosNivel(nivel, userId)
-        ));
-    }
-
-    // ===============================
-    // CONTAR TODOS GLOBAL
-    // ===============================
     public void contarTodosGlobal(CallbackInt callback) {
         executor.execute(() ->
                 callback.onResult(dao.contarTodos(userId))
         );
     }
 
-    // ===============================
-    // CONTAR COMPLETADOS GLOBAL
-    // ===============================
     public void contarCompletadosGlobal(CallbackInt callback) {
         executor.execute(() ->
                 callback.onResult(dao.contarTodosCompletados(userId))
         );
     }
 
-    // ===============================
-    // CALCULAR % PROGRESO GLOBAL
-    // ===============================
     public void calcularProgresoGlobal(CallbackInt callback) {
         executor.execute(() -> {
 
@@ -130,35 +66,11 @@ public class FormacionControlador {
         });
     }
 
-    // ===============================
-    // LIBRO DE LA SEMANA
-    // ===============================
-    public void obtenerLibroSemana(CallbackFormacion callback) {
-        executor.execute(() -> {
-            List<Formacion> libros = dao.obtenerPorNivel("LIBRO", userId);
-
-            if (libros.isEmpty()) {
-                callback.onResult(null);
-                return;
-            }
-
-            int week = (int) (System.currentTimeMillis() / (7L * 24 * 60 * 60 * 1000));
-            int index = week % libros.size();
-
-            callback.onResult(libros.get(index));
-        });
-    }
-
-    // ===============================
-    // ACTUALIZAR VIDEO
-    // ===============================
     public void actualizar(Formacion f, CallbackInt callback) {
         executor.execute(() -> callback.onResult(dao.actualizar(f)));
     }
 
-    // ===============================
-    // INSERTAR VIDEOS SI NO EXISTEN
-    // ===============================
+
     public void inicializarDatosSiNecesario() {
         executor.execute(() -> {
 

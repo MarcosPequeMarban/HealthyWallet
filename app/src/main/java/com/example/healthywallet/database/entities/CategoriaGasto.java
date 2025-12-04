@@ -9,7 +9,7 @@ public class CategoriaGasto {
         this.categoria = categoria;
         this.total = total;
     }
-
+    // ==== GETTERS ==== ==== SETTERS ====
     public String getCategoria() {
         return categoria;
     }

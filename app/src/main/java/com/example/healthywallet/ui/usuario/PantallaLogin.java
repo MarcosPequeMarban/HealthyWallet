@@ -40,7 +40,6 @@ public class PantallaLogin extends Fragment {
 
         controlador = new UsuarioControlador(requireContext());
 
-        // ❌ YA NO AUTO-INICIA SESIÓN
         // SIEMPRE MOSTRAR LOGIN
 
         btnLogin.setOnClickListener(view -> login());

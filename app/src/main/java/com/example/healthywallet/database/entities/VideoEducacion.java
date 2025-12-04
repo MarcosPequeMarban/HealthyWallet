@@ -16,9 +16,9 @@ public class VideoEducacion {
     public int completado = 0;    // 0 = no, 1 = sí
     public long fechaCompletado = 0;
 
-    public int userId;            // necesario para multicuenta
+    public int userId;
 
-    // --- SETTERS NECESARIOS ---
+    // ==== GETTERS ==== ==== SETTERS ====
     public void setCompletado(boolean valor) {
         this.completado = valor ? 1 : 0;
     }

@@ -2,7 +2,7 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item>
         <bitmap
-            android:src="@drawable/logo_texto"
+            android:src="@drawable/logo_wallet"
             android:gravity="center"
             android:antialias="true" />
     </item>

@@ -35,7 +35,7 @@ public class Movimiento {
     private String descripcion;
 
     @ColumnInfo(name = "userId", index = true)
-    private int userId;  // ← NUEVO: para asociar este movimiento al usuario
+    private int userId;
 
     public Movimiento(String tipo, String categoria, double cantidad, String fecha, String descripcion, int userId) {
         this.tipo = tipo;
@@ -46,7 +46,7 @@ public class Movimiento {
         this.userId = userId;
     }
 
-    // Getters y setters
+    // ==== GETTERS ==== ==== SETTERS ====
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
 

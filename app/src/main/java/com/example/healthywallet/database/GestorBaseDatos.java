@@ -36,9 +36,9 @@ import java.util.concurrent.Executors;
                 Meta.class,
                 Formacion.class,
                 Usuario.class,
-                VideoEducacion.class  // ← NUEVA ENTIDAD
+                VideoEducacion.class
         },
-        version = 6  // ← SUBIDA A VERSIÓN 6
+        version = 6
 )
 public abstract class GestorBaseDatos extends RoomDatabase {
 
@@ -49,7 +49,7 @@ public abstract class GestorBaseDatos extends RoomDatabase {
     public abstract FormacionDao formacionDao();
     public abstract CategoriaDao categoriaDao();
     public abstract UsuarioDao usuarioDao();
-    public abstract VideoEducacionDao videoEducacionDao();   // ← NUEVO DAO
+    public abstract VideoEducacionDao videoEducacionDao();
 
     // ==== SINGLETON ====
     private static volatile GestorBaseDatos INSTANCIA;
@@ -100,7 +100,7 @@ public abstract class GestorBaseDatos extends RoomDatabase {
         }
     };
 
-    // ==== NUEVA MIGRACIÓN 5→6 ====
+    // ==== Migracion 5→6 ====
     static final Migration MIGRACION_5_6 = new Migration(5, 6) {
         @Override public void migrate(@NonNull SupportSQLiteDatabase db) {
 
@@ -130,7 +130,7 @@ public abstract class GestorBaseDatos extends RoomDatabase {
                                     MIGRACION_2_3,
                                     MIGRACION_3_4,
                                     MIGRACION_4_5,
-                                    MIGRACION_5_6   // ← REGISTRADA
+                                    MIGRACION_5_6
                             )
                             .build();
                 }

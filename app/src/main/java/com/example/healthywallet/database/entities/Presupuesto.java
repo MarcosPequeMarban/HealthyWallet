@@ -29,7 +29,7 @@ public class Presupuesto {
     private double gastoActual;
 
     @ColumnInfo(name = "userId", index = true)
-    private int userId; // ← NUEVO: identifica al dueño del presupuesto
+    private int userId;
 
     // Constructor principal
     public Presupuesto(String categoria, double limite, double gastoActual, int userId) {
@@ -39,7 +39,7 @@ public class Presupuesto {
         this.userId = userId;
     }
 
-    // Getters y setters
+    // ==== GETTERS ==== ==== SETTERS ====
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
 

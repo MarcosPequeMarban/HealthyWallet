@@ -272,9 +272,6 @@ public class PantallaBalanceGeneral extends Fragment {
 
 
 
-    // ---------------------------------------------------------
-    // Mensajes motivadores
-    // ---------------------------------------------------------
     private String generarMensaje(int pct) {
         if (pct >= 80) return "¡Excelente progreso! 🎉";
         if (pct >= 50) return "Vas por buen camino 👍";

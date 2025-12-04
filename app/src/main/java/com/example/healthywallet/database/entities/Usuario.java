@@ -9,7 +9,7 @@ import androidx.room.PrimaryKey;
 
 @Entity(
         tableName = "usuarios",
-        indices = { @Index(value = "email", unique = true) } // Opcional pero recomendado
+        indices = { @Index(value = "email", unique = true) }
 )
 public class Usuario {
 
@@ -42,7 +42,7 @@ public class Usuario {
         this.password = password;
     }
 
-    // Getters y Setters
+    // ==== GETTERS ==== ==== SETTERS ====
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
 

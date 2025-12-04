@@ -76,9 +76,6 @@ public class PantallaMovimientos extends Fragment {
                     adaptador = new AdaptadorMovimientos(requireContext(), movimientos);
                     recyclerView.setAdapter(adaptador);
 
-                    // ==========================================================
-                    //      AÑADIR LISTENER DE PULSACIÓN LARGA  (NUEVO)
-                    // ==========================================================
                     adaptador.setOnMovimientoLongClickListener(mov -> {
 
                         new AlertDialog.Builder(requireContext())
@@ -104,7 +101,7 @@ public class PantallaMovimientos extends Fragment {
                                 .setNegativeButton("Cancelar", null)
                                 .show();
                     });
-                    // ==========================================================
+
 
                 } else {
                     adaptador.actualizarLista(movimientos);

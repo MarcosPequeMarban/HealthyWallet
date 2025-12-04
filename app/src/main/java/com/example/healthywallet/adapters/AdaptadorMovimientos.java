@@ -19,9 +19,7 @@ public class AdaptadorMovimientos extends RecyclerView.Adapter<AdaptadorMovimien
     private final Context context;
     private List<Movimiento> lista;
 
-    // =========================================================
-    //  LISTENER DE PULSACIÓN LARGA (NUEVO)
-    // =========================================================
+
     public interface OnMovimientoLongClickListener {
         void onLongClick(Movimiento mov);
     }
@@ -31,7 +29,6 @@ public class AdaptadorMovimientos extends RecyclerView.Adapter<AdaptadorMovimien
     public void setOnMovimientoLongClickListener(OnMovimientoLongClickListener l) {
         this.longClickListener = l;
     }
-    // =========================================================
 
 
     public AdaptadorMovimientos(Context context, List<Movimiento> lista) {
@@ -55,16 +52,14 @@ public class AdaptadorMovimientos extends RecyclerView.Adapter<AdaptadorMovimien
         holder.txtCantidad.setText(mov.getCantidad() + " €");
         holder.txtFecha.setText(mov.getFecha());
 
-        // =========================================================
-        //  AÑADIR PULSACIÓN LARGA EN EL ITEM (NUEVO)
-        // =========================================================
+
         holder.itemView.setOnLongClickListener(v -> {
             if (longClickListener != null) {
                 longClickListener.onLongClick(mov);
             }
-            return true; // importante → indica que el evento se consume
+            return true;
         });
-        // =========================================================
+
     }
 
     @Override
@@ -72,7 +67,7 @@ public class AdaptadorMovimientos extends RecyclerView.Adapter<AdaptadorMovimien
         return lista.size();
     }
 
-    /** Método para refrescar la lista */
+
     public void actualizarLista(List<Movimiento> nuevaLista) {
         lista.clear();
         lista.addAll(nuevaLista);

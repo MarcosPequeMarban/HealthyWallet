@@ -20,9 +20,6 @@ public class AdaptadorPresupuestos extends RecyclerView.Adapter<AdaptadorPresupu
     private final Context context;
     private final List<Presupuesto> lista;
 
-    // ==========================================================
-    //     LISTENER DE MANTENER PULSADO (NUEVO)
-    // ==========================================================
     public interface OnPresupuestoLongClickListener {
         void onLongClick(Presupuesto presupuesto);
     }
@@ -32,7 +29,7 @@ public class AdaptadorPresupuestos extends RecyclerView.Adapter<AdaptadorPresupu
     public void setOnPresupuestoLongClickListener(OnPresupuestoLongClickListener listener) {
         this.longClickListener = listener;
     }
-    // ==========================================================
+
 
     public AdaptadorPresupuestos(Context context, List<Presupuesto> lista) {
         this.context = context;
@@ -57,7 +54,7 @@ public class AdaptadorPresupuestos extends RecyclerView.Adapter<AdaptadorPresupu
         double limite = p.getLimite();
         double gasto = p.getGastoActual();
 
-        // 🔥 COLOR DINÁMICO SEGÚN EL NIVEL DE GASTO
+        //COLOR DINÁMICO SEGÚN EL NIVEL DE GASTO
         if (gasto > limite) {
             holder.itemView.setBackgroundColor(Color.parseColor("#FF8A80"));
         }
@@ -68,14 +65,12 @@ public class AdaptadorPresupuestos extends RecyclerView.Adapter<AdaptadorPresupu
             holder.itemView.setBackgroundColor(Color.parseColor("#FFFFFF"));
         }
 
-        // ==========================================================
-        //     AÑADIMOS LA PULSACIÓN LARGA (NUEVO)
-        // ==========================================================
+
         holder.itemView.setOnLongClickListener(v -> {
             if (longClickListener != null) {
                 longClickListener.onLongClick(p);
             }
-            return true; // consumimos el evento
+            return true;
         });
     }
 

@@ -32,7 +32,7 @@ public class Meta {
     private String fechaObjetivo;
 
     @ColumnInfo(name = "userId", index = true)
-    private int userId;  // ← NUEVO: dueño de la meta
+    private int userId;
 
     public Meta(String nombre, double cantidadObjetivo, double cantidadActual, String fechaObjetivo, int userId) {
         this.nombre = nombre;
@@ -42,7 +42,7 @@ public class Meta {
         this.userId = userId;
     }
 
-    // Getters y setters
+    // ==== GETTERS ==== ==== SETTERS ====
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
 

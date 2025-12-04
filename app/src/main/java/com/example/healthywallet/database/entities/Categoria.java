@@ -21,7 +21,7 @@ public class Categoria {
         this.descripcion = descripcion;
     }
 
-    // Getters y setters
+    // ==== GETTERS ==== ==== SETTERS ====
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
 

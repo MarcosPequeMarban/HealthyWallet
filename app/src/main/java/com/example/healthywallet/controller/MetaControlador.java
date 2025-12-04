@@ -46,7 +46,6 @@ public class MetaControlador {
 
     // === CRUD ===
 
-    /** Insertar una meta y devolver el ID generado */
     public void insertar(Meta meta, CallbackLong callback) {
         meta.setUserId(userId);
         executor.execute(() -> {
@@ -55,7 +54,7 @@ public class MetaControlador {
         });
     }
 
-    /** Actualizar una meta */
+
     public void actualizar(Meta meta, CallbackInt callback) {
         executor.execute(() -> {
             int filas = dao.actualizar(meta);
@@ -63,7 +62,7 @@ public class MetaControlador {
         });
     }
 
-    /** Obtener meta por ID */
+
     public void obtenerPorId(int id, CallbackMeta callback) {
         executor.execute(() -> {
             Meta meta = dao.obtenerPorId(id, userId);
@@ -71,7 +70,6 @@ public class MetaControlador {
         });
     }
 
-    /** Obtener todas las metas del usuario */
     public void obtenerTodas(CallbackListaMeta callback) {
         executor.execute(() -> {
             List<Meta> lista = dao.obtenerTodas(userId);
@@ -79,15 +77,8 @@ public class MetaControlador {
         });
     }
 
-    /** Actualizar solo la cantidad actual */
-    public void actualizarCantidad(int id, double nuevaCantidad, CallbackInt callback) {
-        executor.execute(() -> {
-            int filas = dao.actualizarCantidad(nuevaCantidad, id, userId);
-            callback.onResult(filas);
-        });
-    }
 
-    /** Eliminar una meta */
+
     public void eliminar(Meta meta, CallbackInt callback) {
         executor.execute(() -> {
             int filas = dao.eliminar(meta);

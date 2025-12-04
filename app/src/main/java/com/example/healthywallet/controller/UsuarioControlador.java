@@ -12,13 +12,16 @@ import java.util.concurrent.ExecutorService;
 
 public class UsuarioControlador {
 
+    // === CAMPOS ===
     private final UsuarioDao usuarioDao;
     private final ExecutorService executor;
 
+    // === CALLBACKS ===
     public interface Callback<T> {
         void onComplete(T resultado);
     }
 
+    // === CONSTRUCTOR ===
     public UsuarioControlador(Context context) {
         GestorBaseDatos db = GestorBaseDatos.obtenerInstancia(context);
         usuarioDao = db.usuarioDao();

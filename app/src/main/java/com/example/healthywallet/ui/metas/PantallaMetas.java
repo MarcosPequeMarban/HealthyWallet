@@ -55,9 +55,7 @@ public class PantallaMetas extends Fragment {
         adaptador = new AdaptadorMetas(requireContext(), lista);
         recycler.setAdapter(adaptador);
 
-        // =======================================================
-        // AÑADIMOS LISTENER NORMAL → ABRIR DETALLE DE META
-        // =======================================================
+
         adaptador.setOnMetaClickListener(meta -> {
             Bundle bundle = new Bundle();
             bundle.putInt("metaId", meta.getId());

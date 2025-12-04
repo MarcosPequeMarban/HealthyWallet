@@ -13,10 +13,10 @@ public class Formacion {
     private String url;
     private String nivel; // PRINCIPIANTE / INTERMEDIO / EXPERTO
 
-    private boolean completado;     // ← IMPORTANTE
-    private long fechaCompletado;   // ← IMPORTANTE
+    private boolean completado;
+    private long fechaCompletado;
 
-    private int userId; // MULTICUENTA
+    private int userId;
 
     public Formacion(String titulo, String url, String nivel, int userId) {
         this.titulo = titulo;
@@ -27,7 +27,7 @@ public class Formacion {
         this.fechaCompletado = 0;
     }
 
-    // ==== GETTERS ====
+    // ==== GETTERS ==== ==== SETTERS ====
     public int getId() { return id; }
     public String getTitulo() { return titulo; }
     public String getUrl() { return url; }
@@ -36,7 +36,6 @@ public class Formacion {
     public long getFechaCompletado() { return fechaCompletado; }
     public int getUserId() { return userId; }
 
-    // ==== SETTERS ====
     public void setId(int id) { this.id = id; }
     public void setTitulo(String titulo) { this.titulo = titulo; }
     public void setUrl(String url) { this.url = url; }

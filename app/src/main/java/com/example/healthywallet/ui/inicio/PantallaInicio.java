@@ -176,9 +176,6 @@ public class PantallaInicio extends Fragment {
                     ));
         });
 
-        // =====================================================================================
-        //   🌟 EDUCACIÓN FINANCIERA — TEXTO CORREGIDO
-        // =====================================================================================
         formacionControlador.contarTodosGlobal(total ->
                 formacionControlador.contarCompletadosGlobal(completados ->
                         requireActivity().runOnUiThread(() ->

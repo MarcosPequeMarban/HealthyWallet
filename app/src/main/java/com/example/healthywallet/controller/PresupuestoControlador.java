@@ -12,6 +12,7 @@ import java.util.concurrent.ExecutorService;
 
 public class PresupuestoControlador {
 
+    // === CALLBACKS ===
     public interface CallbackListaPresupuesto {
         void onResult(List<Presupuesto> lista);
     }
@@ -28,10 +29,12 @@ public class PresupuestoControlador {
         void onResult(long valor);
     }
 
+    // === CAMPOS ===
     private final PresupuestoDao dao;
     private final ExecutorService executor;
-    private final int userId;   // ← userId del usuario actual
+    private final int userId;
 
+    // === CONSTRUCTOR ===
     public PresupuestoControlador(Context context) {
         GestorBaseDatos db = GestorBaseDatos.obtenerInstancia(context);
         dao = db.presupuestoDao();
@@ -40,7 +43,7 @@ public class PresupuestoControlador {
         SharedPreferences prefs = context.getSharedPreferences("session", Context.MODE_PRIVATE);
         userId = prefs.getInt("usuarioId", -1);
     }
-
+    // === CRUD ===
     public void insertar(Presupuesto p, CallbackLong callback) {
         p.setUserId(userId);
         executor.execute(() -> callback.onResult(dao.insertar(p)));
@@ -58,9 +61,6 @@ public class PresupuestoControlador {
         executor.execute(() -> callback.onResult(dao.obtenerTodos(userId)));
     }
 
-    public void actualizarGasto(int id, double gasto, CallbackInt callback) {
-        executor.execute(() -> callback.onResult(dao.actualizarGasto(id, userId, gasto)));
-    }
 
     public void eliminar(Presupuesto p, CallbackInt callback) {
         executor.execute(() -> callback.onResult(dao.eliminar(p)));

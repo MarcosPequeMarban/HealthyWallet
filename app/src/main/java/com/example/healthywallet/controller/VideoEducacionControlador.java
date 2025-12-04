@@ -12,13 +12,16 @@ import java.util.concurrent.ExecutorService;
 
 public class VideoEducacionControlador {
 
+    // === CAMPOS ===
     private final VideoEducacionDao dao;
     private final ExecutorService executor;
     private final int userId;
 
+    // === CALLBACKS ===
     public interface CallbackLista { void onResult(List<VideoEducacion> lista); }
     public interface CallbackSimple { void onResult(); }
 
+    // === CONSTRUCTOR ===
     public VideoEducacionControlador(Context context) {
         dao = GestorBaseDatos.obtenerInstancia(context).videoEducacionDao();
         executor = GestorBaseDatos.databaseExecutor;
@@ -35,14 +38,6 @@ public class VideoEducacionControlador {
         });
     }
 
-    public void insertarTodos(List<VideoEducacion> lista, CallbackSimple callback) {
-        for (VideoEducacion v : lista) v.userId = userId;
-
-        executor.execute(() -> {
-            dao.insertarTodos(lista);
-            callback.onResult();
-        });
-    }
 
     public void obtenerTodos(CallbackLista callback) {
         executor.execute(() -> {
@@ -50,21 +45,5 @@ public class VideoEducacionControlador {
             callback.onResult(lista);
         });
     }
-
-    public void obtenerPorNivel(String nivel, CallbackLista callback) {
-        executor.execute(() -> {
-            List<VideoEducacion> lista = dao.obtenerPorNivel(nivel, userId);
-            callback.onResult(lista);
-        });
-    }
-
-    public void marcarComoCompletado(VideoEducacion video, CallbackSimple callback) {
-        video.setCompletado(true);
-        video.setFechaCompletado(System.currentTimeMillis());
-
-        executor.execute(() -> {
-            dao.actualizar(video);
-            callback.onResult();
-        });
-    }
+    
 }

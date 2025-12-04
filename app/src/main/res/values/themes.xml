@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.HealthyWallet" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+    <style name="Theme.HealthyWallet" parent="Theme.MaterialComponents.Light.NoActionBar">
 
         <!-- PALETA PRINCIPAL -->
         <item name="colorPrimary">@color/colorVerde</item>

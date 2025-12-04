@@ -25,9 +25,6 @@ public class AdaptadorMetas extends RecyclerView.Adapter<AdaptadorMetas.ViewHold
     private OnMetaClickListener listenerNormal;
     private OnMetaCompletadaListener listenerCompletada;
 
-    // ---------------------------------------------------------
-    // LISTENER PARA ABRIR EL DETALLE
-    // ---------------------------------------------------------
     public interface OnMetaClickListener {
         void onMetaClick(Meta meta);
     }
@@ -36,9 +33,7 @@ public class AdaptadorMetas extends RecyclerView.Adapter<AdaptadorMetas.ViewHold
         this.listenerNormal = l;
     }
 
-    // ---------------------------------------------------------
-    // LISTENER PARA META COMPLETADA (100%)
-    // ---------------------------------------------------------
+
     public interface OnMetaCompletadaListener {
         void onMetaCompletada(Meta meta);
     }
@@ -47,9 +42,8 @@ public class AdaptadorMetas extends RecyclerView.Adapter<AdaptadorMetas.ViewHold
         this.listenerCompletada = l;
     }
 
-    // ---------------------------------------------------------
-    // CONSTRUCTOR
-    // ---------------------------------------------------------
+
+    //==== CONSTRUCTOR =====
     public AdaptadorMetas(Context context, List<Meta> lista) {
         this.context = context;
         this.lista = lista;
@@ -85,9 +79,8 @@ public class AdaptadorMetas extends RecyclerView.Adapter<AdaptadorMetas.ViewHold
         holder.txtPorcentaje.setText(String.format("%.0f%%", porcentaje));
         holder.barra.setProgress((int) porcentaje);
 
-        // ---------------------------------------------------------
+
         // COLORES SEGÚN PROGRESO
-        // ---------------------------------------------------------
         if (porcentaje >= 100) {
             holder.barra.setProgressTintList(context.getColorStateList(R.color.meta_verde));
             holder.card.setCardBackgroundColor(Color.parseColor("#D1FFD8")); // verde triunfo
@@ -105,9 +98,6 @@ public class AdaptadorMetas extends RecyclerView.Adapter<AdaptadorMetas.ViewHold
             holder.card.setCardBackgroundColor(Color.parseColor("#FFEBEE"));
         }
 
-        // ---------------------------------------------------------
-        // CLICK (NORMAL o META COMPLETADA)
-        // ---------------------------------------------------------
         final double porcentajeFinal = porcentaje;
         holder.itemView.setOnClickListener(v -> {
 
@@ -126,9 +116,7 @@ public class AdaptadorMetas extends RecyclerView.Adapter<AdaptadorMetas.ViewHold
         return lista.size();
     }
 
-    // ---------------------------------------------------------
-    // VIEW HOLDER
-    // ---------------------------------------------------------
+
     static class ViewHolderMeta extends RecyclerView.ViewHolder {
 
         CardView card;

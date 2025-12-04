@@ -188,7 +188,7 @@ public class PantallaAgregarMovimiento extends Fragment {
                     cantidad,
                     fecha,
                     descripcion,
-                    userId   // ← NUEVO
+                    userId
             );
 
             controlador.insertar(mov, id -> {

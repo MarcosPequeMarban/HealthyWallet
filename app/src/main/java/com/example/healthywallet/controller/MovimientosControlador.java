@@ -13,10 +13,7 @@ import java.util.concurrent.ExecutorService;
 
 public class MovimientosControlador {
 
-    // =============================
-    //      CALLBACKS
-    // =============================
-
+    // === CALLBACKS ===
     public interface CallbackMovimiento {
         void onResult(Movimiento mov);
     }
@@ -33,30 +30,16 @@ public class MovimientosControlador {
         void onResult(int valor);
     }
 
-    public interface CallbackCategoriaGasto {
-        void onResult(List<CategoriaGasto> lista);
-    }
-
-    public interface CallbackUnaCategoria {
-        void onResult(CategoriaGasto categoria);
-    }
-
     public interface CallbackListaCategoriaGasto {
         void onResult(List<CategoriaGasto> lista);
     }
 
-    // =============================
-    //  ATRIBUTOS
-    // =============================
-
+    // === CAMPOS ===
     private final MovimientoDao dao;
     private final ExecutorService executor;
     private final int userId;
 
-    // =============================
-    //  CONSTRUCTOR
-    // =============================
-
+    // === CONSTRUCTOR ===
     public MovimientosControlador(Context context) {
         GestorBaseDatos db = GestorBaseDatos.obtenerInstancia(context);
         dao = db.movimientoDao();
@@ -66,10 +49,7 @@ public class MovimientosControlador {
         userId = prefs.getInt("usuarioId", -1);
     }
 
-    // =============================
-    //      CRUD BÁSICO
-    // =============================
-
+    // === CRUD ===
     public void insertar(Movimiento mov, CallbackInt callback) {
         mov.setUserId(userId);
         executor.execute(() -> {
@@ -100,12 +80,7 @@ public class MovimientosControlador {
         });
     }
 
-    public void obtenerPorTipo(String tipo, CallbackListaMovimiento callback) {
-        executor.execute(() -> {
-            List<Movimiento> lista = dao.obtenerPorTipo(tipo, userId);
-            callback.onResult(lista);
-        });
-    }
+
 
     public void obtenerSumaPorTipo(String tipo, CallbackDouble callback) {
         executor.execute(() -> {
@@ -114,16 +89,6 @@ public class MovimientosControlador {
         });
     }
 
-    // =============================
-    //      ESTADÍSTICAS NUEVAS
-    // =============================
-
-    public void obtenerCategoriaMayorGasto(CallbackUnaCategoria callback) {
-        executor.execute(() -> {
-            CategoriaGasto cat = dao.obtenerCategoriaMayorGasto(userId);
-            callback.onResult(cat);
-        });
-    }
 
     public void obtenerGastosPorCategoria(CallbackListaCategoriaGasto callback) {
         executor.execute(() -> {
@@ -131,10 +96,6 @@ public class MovimientosControlador {
             callback.onResult(lista);
         });
     }
-
-    // =============================
-    //      ELIMINAR MOVIMIENTO
-    // =============================
 
     public void eliminar(Movimiento mov, CallbackInt callback) {
         executor.execute(() -> {

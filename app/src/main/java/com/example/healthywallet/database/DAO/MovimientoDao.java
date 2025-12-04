@@ -36,7 +36,6 @@ public interface MovimientoDao {
     @Query("SELECT SUM(cantidad) FROM movimientos WHERE tipo = :tipo AND userId = :userId")
     Double obtenerSumaPorTipo(String tipo, int userId);
 
-    // ============= NUEVOS MÉTODOS =============
 
     @Query("SELECT categoria AS categoria, SUM(cantidad) AS total " +
             "FROM movimientos WHERE userId = :userId AND tipo='Gasto' " +
