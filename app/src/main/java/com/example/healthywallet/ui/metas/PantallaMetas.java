@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -29,6 +30,7 @@ public class PantallaMetas extends Fragment {
     private RecyclerView recycler;
     private AdaptadorMetas adaptador;
     private FloatingActionButton fabAgregarMeta;
+    private TextView txtProgresoGeneral;
 
     private MetaControlador controlador;
     private int userId;
@@ -50,11 +52,11 @@ public class PantallaMetas extends Fragment {
 
         recycler = vista.findViewById(R.id.recyclerMetas);
         fabAgregarMeta = vista.findViewById(R.id.fabAgregarMeta);
+        txtProgresoGeneral = vista.findViewById(R.id.txtResumenCantidad);
 
         recycler.setLayoutManager(new LinearLayoutManager(getContext()));
         adaptador = new AdaptadorMetas(requireContext(), lista);
         recycler.setAdapter(adaptador);
-
 
         adaptador.setOnMetaClickListener(meta -> {
             Bundle bundle = new Bundle();
@@ -64,9 +66,6 @@ public class PantallaMetas extends Fragment {
                     .navigate(R.id.action_metas_to_detalleMeta, bundle);
         });
 
-        // =======================================================
-        // AÑADIMOS LISTENER META COMPLETADA → POPUP O DETALLE
-        // =======================================================
         adaptador.setOnMetaCompletadaListener(meta -> {
 
             new androidx.appcompat.app.AlertDialog.Builder(requireContext())
@@ -74,13 +73,12 @@ public class PantallaMetas extends Fragment {
                     .setMessage("Has alcanzado el 100% de esta meta.\n¿Deseas eliminarla?")
                     .setPositiveButton("Eliminar", (dialog, which) -> {
 
-                        // SOLO BORRA SI EL USUARIO LO CONFIRMA
                         controlador.eliminar(meta, filas -> requireActivity().runOnUiThread(() -> {
 
                             if (filas > 0) {
                                 Toast.makeText(requireContext(),
                                         "Meta eliminada", Toast.LENGTH_SHORT).show();
-                                cargarMetas(); // refrescar la lista
+                                cargarMetas();
                             } else {
                                 Toast.makeText(requireContext(),
                                         "Error al eliminar la meta", Toast.LENGTH_SHORT).show();
@@ -113,8 +111,29 @@ public class PantallaMetas extends Fragment {
                 lista.clear();
                 if (metas != null) lista.addAll(metas);
                 adaptador.notifyDataSetChanged();
+
+                calcularProgresoGeneral(metas);
             });
         });
     }
 
+    private void calcularProgresoGeneral(List<Meta> metas) {
+
+        double actual = 0;
+        double total = 0;
+
+        if (metas != null) {
+            for (Meta m : metas) {
+                actual += m.getCantidadActual();
+                total += m.getCantidadObjetivo();
+            }
+        }
+
+        final double finalActual = actual;
+        final double finalTotal = total;
+
+        requireActivity().runOnUiThread(() -> {
+            txtProgresoGeneral.setText(finalActual + " € / " + finalTotal + " €");
+        });
+    }
 }

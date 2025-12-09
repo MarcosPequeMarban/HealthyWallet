@@ -195,9 +195,6 @@ public class AdaptadorMetas extends RecyclerView.Adapter<AdaptadorMetas.ViewHold
     private OnMetaClickListener listenerNormal;
     private OnMetaCompletadaListener listenerCompletada;
 
-    // ---------------------------------------------------------
-    // LISTENER PARA ABRIR EL DETALLE
-    // ---------------------------------------------------------
     public interface OnMetaClickListener {
         void onMetaClick(Meta meta);
     }
@@ -206,9 +203,7 @@ public class AdaptadorMetas extends RecyclerView.Adapter<AdaptadorMetas.ViewHold
         this.listenerNormal = l;
     }
 
-    // ---------------------------------------------------------
-    // LISTENER PARA META COMPLETADA (100%)
-    // ---------------------------------------------------------
+
     public interface OnMetaCompletadaListener {
         void onMetaCompletada(Meta meta);
     }
@@ -217,9 +212,8 @@ public class AdaptadorMetas extends RecyclerView.Adapter<AdaptadorMetas.ViewHold
         this.listenerCompletada = l;
     }
 
-    // ---------------------------------------------------------
-    // CONSTRUCTOR
-    // ---------------------------------------------------------
+
+    //==== CONSTRUCTOR =====
     public AdaptadorMetas(Context context, List<Meta> lista) {
         this.context = context;
         this.lista = lista;
@@ -255,9 +249,8 @@ public class AdaptadorMetas extends RecyclerView.Adapter<AdaptadorMetas.ViewHold
         holder.txtPorcentaje.setText(String.format("%.0f%%", porcentaje));
         holder.barra.setProgress((int) porcentaje);
 
-        // ---------------------------------------------------------
+
         // COLORES SEGÃšN PROGRESO
-        // ---------------------------------------------------------
         if (porcentaje >= 100) {
             holder.barra.setProgressTintList(context.getColorStateList(R.color.meta_verde));
             holder.card.setCardBackgroundColor(Color.parseColor("#D1FFD8")); // verde triunfo
@@ -275,9 +268,6 @@ public class AdaptadorMetas extends RecyclerView.Adapter<AdaptadorMetas.ViewHold
             holder.card.setCardBackgroundColor(Color.parseColor("#FFEBEE"));
         }
 
-        // ---------------------------------------------------------
-        // CLICK (NORMAL o META COMPLETADA)
-        // ---------------------------------------------------------
         final double porcentajeFinal = porcentaje;
         holder.itemView.setOnClickListener(v -> {
 
@@ -296,9 +286,7 @@ public class AdaptadorMetas extends RecyclerView.Adapter<AdaptadorMetas.ViewHold
         return lista.size();
     }
 
-    // ---------------------------------------------------------
-    // VIEW HOLDER
-    // ---------------------------------------------------------
+
     static class ViewHolderMeta extends RecyclerView.ViewHolder {
 
         CardView card;
@@ -341,9 +329,7 @@ public class AdaptadorMovimientos extends RecyclerView.Adapter<AdaptadorMovimien
     private final Context context;
     private List<Movimiento> lista;
 
-    // =========================================================
-    //  LISTENER DE PULSACIÃ“N LARGA (NUEVO)
-    // =========================================================
+
     public interface OnMovimientoLongClickListener {
         void onLongClick(Movimiento mov);
     }
@@ -353,7 +339,6 @@ public class AdaptadorMovimientos extends RecyclerView.Adapter<AdaptadorMovimien
     public void setOnMovimientoLongClickListener(OnMovimientoLongClickListener l) {
         this.longClickListener = l;
     }
-    // =========================================================
 
 
     public AdaptadorMovimientos(Context context, List<Movimiento> lista) {
@@ -377,16 +362,14 @@ public class AdaptadorMovimientos extends RecyclerView.Adapter<AdaptadorMovimien
         holder.txtCantidad.setText(mov.getCantidad() + " â‚¬");
         holder.txtFecha.setText(mov.getFecha());
 
-        // =========================================================
-        //  AÃ‘ADIR PULSACIÃ“N LARGA EN EL ITEM (NUEVO)
-        // =========================================================
+
         holder.itemView.setOnLongClickListener(v -> {
             if (longClickListener != null) {
                 longClickListener.onLongClick(mov);
             }
-            return true; // importante â†’ indica que el evento se consume
+            return true;
         });
-        // =========================================================
+
     }
 
     @Override
@@ -394,7 +377,7 @@ public class AdaptadorMovimientos extends RecyclerView.Adapter<AdaptadorMovimien
         return lista.size();
     }
 
-    /** MÃ©todo para refrescar la lista */
+
     public void actualizarLista(List<Movimiento> nuevaLista) {
         lista.clear();
         lista.addAll(nuevaLista);
@@ -440,9 +423,6 @@ public class AdaptadorPresupuestos extends RecyclerView.Adapter<AdaptadorPresupu
     private final Context context;
     private final List<Presupuesto> lista;
 
-    // ==========================================================
-    //     LISTENER DE MANTENER PULSADO (NUEVO)
-    // ==========================================================
     public interface OnPresupuestoLongClickListener {
         void onLongClick(Presupuesto presupuesto);
     }
@@ -452,7 +432,7 @@ public class AdaptadorPresupuestos extends RecyclerView.Adapter<AdaptadorPresupu
     public void setOnPresupuestoLongClickListener(OnPresupuestoLongClickListener listener) {
         this.longClickListener = listener;
     }
-    // ==========================================================
+
 
     public AdaptadorPresupuestos(Context context, List<Presupuesto> lista) {
         this.context = context;
@@ -477,7 +457,7 @@ public class AdaptadorPresupuestos extends RecyclerView.Adapter<AdaptadorPresupu
         double limite = p.getLimite();
         double gasto = p.getGastoActual();
 
-        // ðŸ”¥ COLOR DINÃMICO SEGÃšN EL NIVEL DE GASTO
+        //COLOR DINÃMICO SEGÃšN EL NIVEL DE GASTO
         if (gasto > limite) {
             holder.itemView.setBackgroundColor(Color.parseColor("#FF8A80"));
         }
@@ -488,14 +468,12 @@ public class AdaptadorPresupuestos extends RecyclerView.Adapter<AdaptadorPresupu
             holder.itemView.setBackgroundColor(Color.parseColor("#FFFFFF"));
         }
 
-        // ==========================================================
-        //     AÃ‘ADIMOS LA PULSACIÃ“N LARGA (NUEVO)
-        // ==========================================================
+
         holder.itemView.setOnLongClickListener(v -> {
             if (longClickListener != null) {
                 longClickListener.onLongClick(p);
             }
-            return true; // consumimos el evento
+            return true;
         });
     }
 
@@ -629,16 +607,17 @@ import java.util.concurrent.ExecutorService;
 
 public class FormacionControlador {
 
-    // ==== Callbacks ====
+    // === CALLBACKS ===
     public interface CallbackListaFormacion { void onResult(List<Formacion> lista); }
     public interface CallbackInt { void onResult(int valor); }
-    public interface CallbackSimple { void onFinish(); }
-    public interface CallbackFormacion { void onResult(Formacion formacion); }
 
+
+    // === CAMPOS ===
     private final FormacionDao dao;
     private final ExecutorService executor;
     private final int userId;
 
+    // === CONSTRUCTOR ===
     public FormacionControlador(Context context) {
         GestorBaseDatos db = GestorBaseDatos.obtenerInstancia(context);
         dao = db.formacionDao();
@@ -648,93 +627,28 @@ public class FormacionControlador {
         userId = prefs.getInt("usuarioId", -1);
     }
 
-    // ===============================
-    // INSERTAR VIDEO
-    // ===============================
+
     public void insertar(Formacion formacion, CallbackInt callback) {
         formacion.setUserId(userId);
         executor.execute(() -> callback.onResult((int) dao.insertar(formacion)));
     }
 
-    // ===============================
-    // OBTENER TODOS LOS VIDEOS
-    // ===============================
     public void obtenerTodas(CallbackListaFormacion callback) {
         executor.execute(() -> callback.onResult(dao.obtenerTodas(userId)));
     }
 
-    // ===============================
-    // ELIMINAR VIDEO
-    // ===============================
-    public void eliminarPorId(int id, CallbackInt callback) {
-        executor.execute(() -> callback.onResult(dao.eliminarPorId(id, userId)));
-    }
-
-    // ===============================
-    // OBTENER VIDEOS POR NIVEL
-    // ===============================
-    public void obtenerPorNivel(String nivel, CallbackListaFormacion callback) {
-        executor.execute(() -> callback.onResult(
-                dao.obtenerPorNivel(nivel, userId)
-        ));
-    }
-
-    // ===============================
-    // MARCAR COMPLETADO / NO COMPLETADO
-    // ===============================
-    public void marcarCompletado(Formacion video, boolean nuevoEstado, CallbackSimple callback) {
-        executor.execute(() -> {
-            video.setCompletado(nuevoEstado);
-
-            if (nuevoEstado)
-                video.setFechaCompletado(System.currentTimeMillis());
-            else
-                video.setFechaCompletado(0);
-
-            dao.actualizar(video);
-            callback.onFinish();
-        });
-    }
-
-    // ===============================
-    // CONTAR TOTAL VIDEOS POR NIVEL
-    // ===============================
-    public void contarVideosNivel(String nivel, CallbackInt callback) {
-        executor.execute(() -> callback.onResult(
-                dao.contarPorNivel(nivel, userId)
-        ));
-    }
-
-    // ===============================
-    // CONTAR COMPLETADOS POR NIVEL
-    // ===============================
-    public void contarCompletadosNivel(String nivel, CallbackInt callback) {
-        executor.execute(() -> callback.onResult(
-                dao.contarCompletadosNivel(nivel, userId)
-        ));
-    }
-
-    // ===============================
-    // CONTAR TODOS GLOBAL
-    // ===============================
     public void contarTodosGlobal(CallbackInt callback) {
         executor.execute(() ->
                 callback.onResult(dao.contarTodos(userId))
         );
     }
 
-    // ===============================
-    // CONTAR COMPLETADOS GLOBAL
-    // ===============================
     public void contarCompletadosGlobal(CallbackInt callback) {
         executor.execute(() ->
                 callback.onResult(dao.contarTodosCompletados(userId))
         );
     }
 
-    // ===============================
-    // CALCULAR % PROGRESO GLOBAL
-    // ===============================
     public void calcularProgresoGlobal(CallbackInt callback) {
         executor.execute(() -> {
 
@@ -747,35 +661,11 @@ public class FormacionControlador {
         });
     }
 
-    // ===============================
-    // LIBRO DE LA SEMANA
-    // ===============================
-    public void obtenerLibroSemana(CallbackFormacion callback) {
-        executor.execute(() -> {
-            List<Formacion> libros = dao.obtenerPorNivel("LIBRO", userId);
-
-            if (libros.isEmpty()) {
-                callback.onResult(null);
-                return;
-            }
-
-            int week = (int) (System.currentTimeMillis() / (7L * 24 * 60 * 60 * 1000));
-            int index = week % libros.size();
-
-            callback.onResult(libros.get(index));
-        });
-    }
-
-    // ===============================
-    // ACTUALIZAR VIDEO
-    // ===============================
     public void actualizar(Formacion f, CallbackInt callback) {
         executor.execute(() -> callback.onResult(dao.actualizar(f)));
     }
 
-    // ===============================
-    // INSERTAR VIDEOS SI NO EXISTEN
-    // ===============================
+
     public void inicializarDatosSiNecesario() {
         executor.execute(() -> {
 
@@ -881,7 +771,6 @@ public class MetaControlador {
 
     // === CRUD ===
 
-    /** Insertar una meta y devolver el ID generado */
     public void insertar(Meta meta, CallbackLong callback) {
         meta.setUserId(userId);
         executor.execute(() -> {
@@ -890,7 +779,7 @@ public class MetaControlador {
         });
     }
 
-    /** Actualizar una meta */
+
     public void actualizar(Meta meta, CallbackInt callback) {
         executor.execute(() -> {
             int filas = dao.actualizar(meta);
@@ -898,7 +787,7 @@ public class MetaControlador {
         });
     }
 
-    /** Obtener meta por ID */
+
     public void obtenerPorId(int id, CallbackMeta callback) {
         executor.execute(() -> {
             Meta meta = dao.obtenerPorId(id, userId);
@@ -906,7 +795,6 @@ public class MetaControlador {
         });
     }
 
-    /** Obtener todas las metas del usuario */
     public void obtenerTodas(CallbackListaMeta callback) {
         executor.execute(() -> {
             List<Meta> lista = dao.obtenerTodas(userId);
@@ -914,15 +802,8 @@ public class MetaControlador {
         });
     }
 
-    /** Actualizar solo la cantidad actual */
-    public void actualizarCantidad(int id, double nuevaCantidad, CallbackInt callback) {
-        executor.execute(() -> {
-            int filas = dao.actualizarCantidad(nuevaCantidad, id, userId);
-            callback.onResult(filas);
-        });
-    }
 
-    /** Eliminar una meta */
+
     public void eliminar(Meta meta, CallbackInt callback) {
         executor.execute(() -> {
             int filas = dao.eliminar(meta);
@@ -948,10 +829,7 @@ import java.util.concurrent.ExecutorService;
 
 public class MovimientosControlador {
 
-    // =============================
-    //      CALLBACKS
-    // =============================
-
+    // === CALLBACKS ===
     public interface CallbackMovimiento {
         void onResult(Movimiento mov);
     }
@@ -968,30 +846,16 @@ public class MovimientosControlador {
         void onResult(int valor);
     }
 
-    public interface CallbackCategoriaGasto {
-        void onResult(List<CategoriaGasto> lista);
-    }
-
-    public interface CallbackUnaCategoria {
-        void onResult(CategoriaGasto categoria);
-    }
-
     public interface CallbackListaCategoriaGasto {
         void onResult(List<CategoriaGasto> lista);
     }
 
-    // =============================
-    //  ATRIBUTOS
-    // =============================
-
+    // === CAMPOS ===
     private final MovimientoDao dao;
     private final ExecutorService executor;
     private final int userId;
 
-    // =============================
-    //  CONSTRUCTOR
-    // =============================
-
+    // === CONSTRUCTOR ===
     public MovimientosControlador(Context context) {
         GestorBaseDatos db = GestorBaseDatos.obtenerInstancia(context);
         dao = db.movimientoDao();
@@ -1001,10 +865,7 @@ public class MovimientosControlador {
         userId = prefs.getInt("usuarioId", -1);
     }
 
-    // =============================
-    //      CRUD BÃSICO
-    // =============================
-
+    // === CRUD ===
     public void insertar(Movimiento mov, CallbackInt callback) {
         mov.setUserId(userId);
         executor.execute(() -> {
@@ -1035,12 +896,7 @@ public class MovimientosControlador {
         });
     }
 
-    public void obtenerPorTipo(String tipo, CallbackListaMovimiento callback) {
-        executor.execute(() -> {
-            List<Movimiento> lista = dao.obtenerPorTipo(tipo, userId);
-            callback.onResult(lista);
-        });
-    }
+
 
     public void obtenerSumaPorTipo(String tipo, CallbackDouble callback) {
         executor.execute(() -> {
@@ -1049,16 +905,6 @@ public class MovimientosControlador {
         });
     }
 
-    // =============================
-    //      ESTADÃSTICAS NUEVAS
-    // =============================
-
-    public void obtenerCategoriaMayorGasto(CallbackUnaCategoria callback) {
-        executor.execute(() -> {
-            CategoriaGasto cat = dao.obtenerCategoriaMayorGasto(userId);
-            callback.onResult(cat);
-        });
-    }
 
     public void obtenerGastosPorCategoria(CallbackListaCategoriaGasto callback) {
         executor.execute(() -> {
@@ -1066,10 +912,6 @@ public class MovimientosControlador {
             callback.onResult(lista);
         });
     }
-
-    // =============================
-    //      ELIMINAR MOVIMIENTO
-    // =============================
 
     public void eliminar(Movimiento mov, CallbackInt callback) {
         executor.execute(() -> {
@@ -1095,6 +937,7 @@ import java.util.concurrent.ExecutorService;
 
 public class PresupuestoControlador {
 
+    // === CALLBACKS ===
     public interface CallbackListaPresupuesto {
         void onResult(List<Presupuesto> lista);
     }
@@ -1111,10 +954,12 @@ public class PresupuestoControlador {
         void onResult(long valor);
     }
 
+    // === CAMPOS ===
     private final PresupuestoDao dao;
     private final ExecutorService executor;
-    private final int userId;   // â† userId del usuario actual
+    private final int userId;
 
+    // === CONSTRUCTOR ===
     public PresupuestoControlador(Context context) {
         GestorBaseDatos db = GestorBaseDatos.obtenerInstancia(context);
         dao = db.presupuestoDao();
@@ -1123,7 +968,7 @@ public class PresupuestoControlador {
         SharedPreferences prefs = context.getSharedPreferences("session", Context.MODE_PRIVATE);
         userId = prefs.getInt("usuarioId", -1);
     }
-
+    // === CRUD ===
     public void insertar(Presupuesto p, CallbackLong callback) {
         p.setUserId(userId);
         executor.execute(() -> callback.onResult(dao.insertar(p)));
@@ -1141,9 +986,6 @@ public class PresupuestoControlador {
         executor.execute(() -> callback.onResult(dao.obtenerTodos(userId)));
     }
 
-    public void actualizarGasto(int id, double gasto, CallbackInt callback) {
-        executor.execute(() -> callback.onResult(dao.actualizarGasto(id, userId, gasto)));
-    }
 
     public void eliminar(Presupuesto p, CallbackInt callback) {
         executor.execute(() -> callback.onResult(dao.eliminar(p)));
@@ -1166,13 +1008,16 @@ import java.util.concurrent.ExecutorService;
 
 public class UsuarioControlador {
 
+    // === CAMPOS ===
     private final UsuarioDao usuarioDao;
     private final ExecutorService executor;
 
+    // === CALLBACKS ===
     public interface Callback<T> {
         void onComplete(T resultado);
     }
 
+    // === CONSTRUCTOR ===
     public UsuarioControlador(Context context) {
         GestorBaseDatos db = GestorBaseDatos.obtenerInstancia(context);
         usuarioDao = db.usuarioDao();
@@ -1272,13 +1117,16 @@ import java.util.concurrent.ExecutorService;
 
 public class VideoEducacionControlador {
 
+    // === CAMPOS ===
     private final VideoEducacionDao dao;
     private final ExecutorService executor;
     private final int userId;
 
+    // === CALLBACKS ===
     public interface CallbackLista { void onResult(List<VideoEducacion> lista); }
     public interface CallbackSimple { void onResult(); }
 
+    // === CONSTRUCTOR ===
     public VideoEducacionControlador(Context context) {
         dao = GestorBaseDatos.obtenerInstancia(context).videoEducacionDao();
         executor = GestorBaseDatos.databaseExecutor;
@@ -1295,14 +1143,6 @@ public class VideoEducacionControlador {
         });
     }
 
-    public void insertarTodos(List<VideoEducacion> lista, CallbackSimple callback) {
-        for (VideoEducacion v : lista) v.userId = userId;
-
-        executor.execute(() -> {
-            dao.insertarTodos(lista);
-            callback.onResult();
-        });
-    }
 
     public void obtenerTodos(CallbackLista callback) {
         executor.execute(() -> {
@@ -1310,23 +1150,7 @@ public class VideoEducacionControlador {
             callback.onResult(lista);
         });
     }
-
-    public void obtenerPorNivel(String nivel, CallbackLista callback) {
-        executor.execute(() -> {
-            List<VideoEducacion> lista = dao.obtenerPorNivel(nivel, userId);
-            callback.onResult(lista);
-        });
-    }
-
-    public void marcarComoCompletado(VideoEducacion video, CallbackSimple callback) {
-        video.setCompletado(true);
-        video.setFechaCompletado(System.currentTimeMillis());
-
-        executor.execute(() -> {
-            dao.actualizar(video);
-            callback.onResult();
-        });
-    }
+    
 }
 
 --- FILE: C:\AndroidProjects\HealthyWallet\app\src\main\java\com\example\healthywallet\database\DAO\CategoriaDao.java ---
@@ -1372,57 +1196,31 @@ import java.util.List;
 @Dao
 public interface FormacionDao {
 
-    // =========================
-    // INSERTAR
-    // =========================
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     long insertar(Formacion formacion);
 
-    // =========================
-    // ACTUALIZAR
-    // =========================
     @Update
     int actualizar(Formacion formacion);
 
-    // =========================
-    // OBTENER TODOS
-    // =========================
     @Query("SELECT * FROM formacion WHERE userId = :userId ORDER BY nivel ASC")
     List<Formacion> obtenerTodas(int userId);
 
-    // =========================
-    // OBTENER POR NIVEL
-    // =========================
     @Query("SELECT * FROM formacion WHERE nivel = :nivel AND userId = :userId ORDER BY id ASC")
     List<Formacion> obtenerPorNivel(String nivel, int userId);
 
-    // =========================
-    // CONTAR TOTAL POR NIVEL
-    // =========================
     @Query("SELECT COUNT(*) FROM formacion WHERE nivel = :nivel AND userId = :userId")
     int contarPorNivel(String nivel, int userId);
 
-    // =========================
-    // CONTAR COMPLETADOS POR NIVEL
-    // =========================
     @Query("SELECT COUNT(*) FROM formacion WHERE nivel = :nivel AND completado = 1 AND userId = :userId")
     int contarCompletadosNivel(String nivel, int userId);
 
-    // =========================
-    // CONTAR TODOS LOS VIDEOS
-    // =========================
     @Query("SELECT COUNT(*) FROM formacion WHERE userId = :userId")
     int contarTodos(int userId);
 
-    // =========================
-    // CONTAR TODOS COMPLETADOS
-    // =========================
     @Query("SELECT COUNT(*) FROM formacion WHERE completado = 1 AND userId = :userId")
     int contarTodosCompletados(int userId);
 
-    // =========================
-    // ELIMINAR POR ID
-    // =========================
     @Query("DELETE FROM formacion WHERE id = :id AND userId = :userId")
     int eliminarPorId(int id, int userId);
 }
@@ -1504,7 +1302,6 @@ public interface MovimientoDao {
     @Query("SELECT SUM(cantidad) FROM movimientos WHERE tipo = :tipo AND userId = :userId")
     Double obtenerSumaPorTipo(String tipo, int userId);
 
-    // ============= NUEVOS MÃ‰TODOS =============
 
     @Query("SELECT categoria AS categoria, SUM(cantidad) AS total " +
             "FROM movimientos WHERE userId = :userId AND tipo='Gasto' " +
@@ -1652,7 +1449,7 @@ public class Categoria {
         this.descripcion = descripcion;
     }
 
-    // Getters y setters
+    // ==== GETTERS ==== ==== SETTERS ====
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
 
@@ -1676,7 +1473,7 @@ public class CategoriaGasto {
         this.categoria = categoria;
         this.total = total;
     }
-
+    // ==== GETTERS ==== ==== SETTERS ====
     public String getCategoria() {
         return categoria;
     }
@@ -1703,10 +1500,10 @@ public class Formacion {
     private String url;
     private String nivel; // PRINCIPIANTE / INTERMEDIO / EXPERTO
 
-    private boolean completado;     // â† IMPORTANTE
-    private long fechaCompletado;   // â† IMPORTANTE
+    private boolean completado;
+    private long fechaCompletado;
 
-    private int userId; // MULTICUENTA
+    private int userId;
 
     public Formacion(String titulo, String url, String nivel, int userId) {
         this.titulo = titulo;
@@ -1717,7 +1514,7 @@ public class Formacion {
         this.fechaCompletado = 0;
     }
 
-    // ==== GETTERS ====
+    // ==== GETTERS ==== ==== SETTERS ====
     public int getId() { return id; }
     public String getTitulo() { return titulo; }
     public String getUrl() { return url; }
@@ -1726,7 +1523,6 @@ public class Formacion {
     public long getFechaCompletado() { return fechaCompletado; }
     public int getUserId() { return userId; }
 
-    // ==== SETTERS ====
     public void setId(int id) { this.id = id; }
     public void setTitulo(String titulo) { this.titulo = titulo; }
     public void setUrl(String url) { this.url = url; }
@@ -1772,7 +1568,7 @@ public class Meta {
     private String fechaObjetivo;
 
     @ColumnInfo(name = "userId", index = true)
-    private int userId;  // â† NUEVO: dueÃ±o de la meta
+    private int userId;
 
     public Meta(String nombre, double cantidadObjetivo, double cantidadActual, String fechaObjetivo, int userId) {
         this.nombre = nombre;
@@ -1782,7 +1578,7 @@ public class Meta {
         this.userId = userId;
     }
 
-    // Getters y setters
+    // ==== GETTERS ==== ==== SETTERS ====
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
 
@@ -1841,7 +1637,7 @@ public class Movimiento {
     private String descripcion;
 
     @ColumnInfo(name = "userId", index = true)
-    private int userId;  // â† NUEVO: para asociar este movimiento al usuario
+    private int userId;
 
     public Movimiento(String tipo, String categoria, double cantidad, String fecha, String descripcion, int userId) {
         this.tipo = tipo;
@@ -1852,7 +1648,7 @@ public class Movimiento {
         this.userId = userId;
     }
 
-    // Getters y setters
+    // ==== GETTERS ==== ==== SETTERS ====
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
 
@@ -1908,7 +1704,7 @@ public class Presupuesto {
     private double gastoActual;
 
     @ColumnInfo(name = "userId", index = true)
-    private int userId; // â† NUEVO: identifica al dueÃ±o del presupuesto
+    private int userId;
 
     // Constructor principal
     public Presupuesto(String categoria, double limite, double gastoActual, int userId) {
@@ -1918,7 +1714,7 @@ public class Presupuesto {
         this.userId = userId;
     }
 
-    // Getters y setters
+    // ==== GETTERS ==== ==== SETTERS ====
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
 
@@ -1948,7 +1744,7 @@ import androidx.room.PrimaryKey;
 
 @Entity(
         tableName = "usuarios",
-        indices = { @Index(value = "email", unique = true) } // Opcional pero recomendado
+        indices = { @Index(value = "email", unique = true) }
 )
 public class Usuario {
 
@@ -1981,7 +1777,7 @@ public class Usuario {
         this.password = password;
     }
 
-    // Getters y Setters
+    // ==== GETTERS ==== ==== SETTERS ====
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
 
@@ -2018,9 +1814,9 @@ public class VideoEducacion {
     public int completado = 0;    // 0 = no, 1 = sÃ­
     public long fechaCompletado = 0;
 
-    public int userId;            // necesario para multicuenta
+    public int userId;
 
-    // --- SETTERS NECESARIOS ---
+    // ==== GETTERS ==== ==== SETTERS ====
     public void setCompletado(boolean valor) {
         this.completado = valor ? 1 : 0;
     }
@@ -2070,9 +1866,9 @@ import java.util.concurrent.Executors;
                 Meta.class,
                 Formacion.class,
                 Usuario.class,
-                VideoEducacion.class  // â† NUEVA ENTIDAD
+                VideoEducacion.class
         },
-        version = 6  // â† SUBIDA A VERSIÃ“N 6
+        version = 6
 )
 public abstract class GestorBaseDatos extends RoomDatabase {
 
@@ -2083,7 +1879,7 @@ public abstract class GestorBaseDatos extends RoomDatabase {
     public abstract FormacionDao formacionDao();
     public abstract CategoriaDao categoriaDao();
     public abstract UsuarioDao usuarioDao();
-    public abstract VideoEducacionDao videoEducacionDao();   // â† NUEVO DAO
+    public abstract VideoEducacionDao videoEducacionDao();
 
     // ==== SINGLETON ====
     private static volatile GestorBaseDatos INSTANCIA;
@@ -2134,7 +1930,7 @@ public abstract class GestorBaseDatos extends RoomDatabase {
         }
     };
 
-    // ==== NUEVA MIGRACIÃ“N 5â†’6 ====
+    // ==== Migracion 5â†’6 ====
     static final Migration MIGRACION_5_6 = new Migration(5, 6) {
         @Override public void migrate(@NonNull SupportSQLiteDatabase db) {
 
@@ -2164,7 +1960,7 @@ public abstract class GestorBaseDatos extends RoomDatabase {
                                     MIGRACION_2_3,
                                     MIGRACION_3_4,
                                     MIGRACION_4_5,
-                                    MIGRACION_5_6   // â† REGISTRADA
+                                    MIGRACION_5_6
                             )
                             .build();
                 }
@@ -2663,9 +2459,6 @@ public class PantallaBalanceGeneral extends Fragment {
 
 
 
-    // ---------------------------------------------------------
-    // Mensajes motivadores
-    // ---------------------------------------------------------
     private String generarMensaje(int pct) {
         if (pct >= 80) return "Â¡Excelente progreso! ðŸŽ‰";
         if (pct >= 50) return "Vas por buen camino ðŸ‘";
@@ -2854,9 +2647,6 @@ public class PantallaInicio extends Fragment {
                     ));
         });
 
-        // =====================================================================================
-        //   ðŸŒŸ EDUCACIÃ“N FINANCIERA â€” TEXTO CORREGIDO
-        // =====================================================================================
         formacionControlador.contarTodosGlobal(total ->
                 formacionControlador.contarCompletadosGlobal(completados ->
                         requireActivity().runOnUiThread(() ->
@@ -3355,9 +3145,7 @@ public class PantallaMetas extends Fragment {
         adaptador = new AdaptadorMetas(requireContext(), lista);
         recycler.setAdapter(adaptador);
 
-        // =======================================================
-        // AÃ‘ADIMOS LISTENER NORMAL â†’ ABRIR DETALLE DE META
-        // =======================================================
+
         adaptador.setOnMetaClickListener(meta -> {
             Bundle bundle = new Bundle();
             bundle.putInt("metaId", meta.getId());
@@ -3613,7 +3401,7 @@ public class PantallaAgregarMovimiento extends Fragment {
                     cantidad,
                     fecha,
                     descripcion,
-                    userId   // â† NUEVO
+                    userId
             );
 
             controlador.insertar(mov, id -> {
@@ -3720,9 +3508,6 @@ public class PantallaMovimientos extends Fragment {
                     adaptador = new AdaptadorMovimientos(requireContext(), movimientos);
                     recyclerView.setAdapter(adaptador);
 
-                    // ==========================================================
-                    //      AÃ‘ADIR LISTENER DE PULSACIÃ“N LARGA  (NUEVO)
-                    // ==========================================================
                     adaptador.setOnMovimientoLongClickListener(mov -> {
 
                         new AlertDialog.Builder(requireContext())
@@ -3748,7 +3533,7 @@ public class PantallaMovimientos extends Fragment {
                                 .setNegativeButton("Cancelar", null)
                                 .show();
                     });
-                    // ==========================================================
+
 
                 } else {
                     adaptador.actualizarLista(movimientos);
@@ -4247,7 +4032,6 @@ public class PantallaLogin extends Fragment {
 
         controlador = new UsuarioControlador(requireContext());
 
-        // âŒ YA NO AUTO-INICIA SESIÃ“N
         // SIEMPRE MOSTRAR LOGIN
 
         btnLogin.setOnClickListener(view -> login());
@@ -4446,7 +4230,6 @@ public class PantallaRegistroUsuario extends Fragment {
 package com.example.healthywallet.ui;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.app.AppCompatDelegate;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.NavigationUI;
@@ -4465,7 +4248,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
 
         // Obtiene el NavHostFragment
         NavHostFragment navHostFragment =
@@ -4503,70 +4285,52 @@ public class MainActivity extends AppCompatActivity {
     }
 }
 
---- FILE: C:\AndroidProjects\HealthyWallet\app\src\main\java\com\example\healthywallet\utils\UtilidadesFecha.java ---
-
-package com.example.healthywallet.utils;
-
-public class UtilidadesFecha {
-}
-
---- FILE: C:\AndroidProjects\HealthyWallet\app\src\main\java\com\example\healthywallet\utils\UtilidadesMoneda.java ---
-
-package com.example.healthywallet.utils;
-
-public class UtilidadesMoneda {
-}
-
---- FILE: C:\AndroidProjects\HealthyWallet\app\src\main\java\com\example\healthywallet\utils\Validaciones.java ---
-
-package com.example.healthywallet.utils;
-
-public class Validaciones {
-}
-
 ===== LAYOUTS =====
 
 
 --- LAYOUT: C:\AndroidProjects\HealthyWallet\app\src\main\res\layout\activity_main.xml ---
 
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
+    android:fitsSystemWindows="true"
     android:background="@color/fondo_app"
-    android:padding="0dp"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- CONTENEDOR DE FRAGMENTS -->
+    <!-- CONTENEDOR DE FRAGMENTS  -->
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/contenedorFragments"
         android:name="androidx.navigation.fragment.NavHostFragment"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="70dp"
         app:defaultNavHost="true"
-        app:navGraph="@navigation/nav_graph" />
+        app:navGraph="@navigation/nav_graph"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
 
-    <!-- SEPARADOR ELEGANTE -->
+    <!-- SEPARADOR SUPERIOR DEL NAV -->
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
+        android:layout_gravity="bottom"
         android:background="@color/separador_suave" />
 
-    <!-- BOTTOM NAVIGATION MEJORADO -->
+    <!-- BOTTOM NAVIGATION VIEW -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigation"
         android:layout_width="match_parent"
-        android:layout_height="70dp"
+        android:layout_height="80dp"
+        android:layout_gravity="bottom"
         android:background="@color/nav_fondo"
         android:elevation="10dp"
         app:itemIconTint="@color/nav_selector"
         app:itemTextColor="@color/nav_selector"
         app:labelVisibilityMode="labeled"
-        app:menu="@menu/bottom_nav_menu" />
+        app:menu="@menu/bottom_nav_menu"/>
 
-</LinearLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
 
 --- LAYOUT: C:\AndroidProjects\HealthyWallet\app\src\main\res\layout\item_categoria.xml ---
 
@@ -7230,7 +6994,7 @@ public class Validaciones {
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item>
         <bitmap
-            android:src="@drawable/logo_texto"
+            android:src="@drawable/logo_wallet"
             android:gravity="center"
             android:antialias="true" />
     </item>
