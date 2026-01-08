@@ -68,16 +68,6 @@ La aplicación sigue el patrón de arquitectura **MVVM (Model–View–ViewModel
 
 ---
 
-## 📸 Capturas y presentación
-
-📊 Presentación del proyecto:  
-👉 *(añadir enlace al PowerPoint si es público)*
-
-📄 Documentación completa del TFG:  
-👉 *(añadir enlace al PDF del TFG)*
-
----
-
 ## 🚀 Estado del proyecto
 
 🟢 **Finalizado (TFG)**  
